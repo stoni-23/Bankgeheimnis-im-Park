@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+    color: #ffffff;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    font-family: Arial, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* ============================================================ */
+/* BANNER ANIMATIONEN: SCHILD SCHIESST HOCH & WACKELT SCHNELL   */
+/* KÖPFE KOMMEN REIN OHNE ABGESCHNITTENE RÄNDER                */
+/* BLÄTTER FLIEGEN ALS EFFEKT WEG                               */
+/* ============================================================ */
+
+/* 1. Schild schießt von unten hoch und wackelt kurz schnell */
+@keyframes schildShootUp {
+  0% {
+    transform: translate3d(-50%, 140%, 0) scale(0.65);
+    opacity: 0;
+  }
+  36% {
+    transform: translate3d(-50%, -22px, 0) scale(1.04);
+    opacity: 1;
+  }
+  46% {
+    transform: translate3d(-50%, 8px, 0) scale(0.99) rotate(-8deg);
+  }
+  58% {
+    transform: translate3d(-50%, -4px, 0) scale(1.02) rotate(6.5deg);
+  }
+  70% {
+    transform: translate3d(-50%, 2px, 0) scale(0.995) rotate(-3.5deg);
+  }
+  82% {
+    transform: translate3d(-50%, -1px, 0) scale(1.01) rotate(1.8deg);
+  }
+  92% {
+    transform: translate3d(-50%, 0, 0) scale(1) rotate(-0.5deg);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* 2. Köpfe schlüpfen von außen herein */
+/* WICHTIG: Kein Skalieren von der Bildmitte, damit kein Rand sichtbar ist! */
+@keyframes headFromLeft {
+  0% {
+    transform: translate3d(-105%, 0, 0);
+    opacity: 0;
+  }
+  70% {
+    transform: translate3d(6px, 0, 0);
+    opacity: 1;
+  }
+  85% {
+    transform: translate3d(-2px, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes headFromRight {
+  0% {
+    transform: translate3d(105%, 0, 0);
+    opacity: 0;
+  }
+  70% {
+    transform: translate3d(-6px, 0, 0);
+    opacity: 1;
+  }
+  85% {
+    transform: translate3d(2px, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes headFromTop {
+  0% {
+    transform: translate3d(0, -105%, 0);
+    opacity: 0;
+  }
+  70% {
+    transform: translate3d(0, 6px, 0);
+    opacity: 1;
+  }
+  85% {
+    transform: translate3d(0, -2px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes headFromBottom {
+  0% {
+    transform: translate3d(0, 105%, 0);
+    opacity: 0;
+  }
+  70% {
+    transform: translate3d(0, -6px, 0);
+    opacity: 1;
+  }
+  85% {
+    transform: translate3d(0, 2px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+/* Stufe 4: Titel & CTA Button Punch */
+@keyframes punchIn {
+  0% {
+    transform: translate3d(0, 25px, 0) scale(0.85);
+    opacity: 0;
+  }
+  75% {
+    transform: translate3d(0, -5px, 0) scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Sprechblasen Pop */
+@keyframes bubblePop {
+  0% {
+    transform: scale(0.4) translateY(20px);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.06) translateY(-3px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animationsklassen für das Banner */
+.anim-banner-schild {
+  animation: schildShootUp 0.85s cubic-bezier(0.15, 0.85, 0.35, 1.2) 0.05s both;
+}
+
+/* Köpfe kommen nach dem Schild-Wackeln zügig rein */
+.anim-banner-punk {
+  animation: headFromLeft 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.42s both;
+  transform-origin: left center;
+}
+.anim-banner-genz {
+  animation: headFromLeft 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.54s both;
+  transform-origin: left center;
+}
+.anim-banner-kevin {
+  animation: headFromRight 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.46s both;
+  transform-origin: right center;
+}
+.anim-banner-hippi {
+  animation: headFromRight 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.58s both;
+  transform-origin: right center;
+}
+.anim-banner-rocker {
+  animation: headFromTop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.68s both;
+  transform-origin: center top;
+}
+.anim-banner-talahon {
+  animation: headFromTop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.78s both;
+  transform-origin: center top;
+}
+.anim-banner-omma {
+  animation: headFromBottom 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.88s both;
+  transform-origin: center bottom;
+}
+.anim-banner-opa {
+  animation: headFromBottom 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.98s both;
+  transform-origin: center bottom;
+}
+
+.anim-cta-banner {
+  animation: punchIn 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.15s both;
+}
+
+.anim-bubble {
+  animation: bubblePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}

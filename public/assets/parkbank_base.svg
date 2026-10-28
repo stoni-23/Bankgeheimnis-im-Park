@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Shadow gradient for under the bench -->
+    <radialGradient id="groundShadow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.95)"/>
+      <stop offset="70%" stop-color="rgba(0,0,0,0.5)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+
+    <!-- Wood slat gradient for realistic park bench wood -->
+    <linearGradient id="woodSlat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b4513"/>
+      <stop offset="25%" stop-color="#a0522d"/>
+      <stop offset="60%" stop-color="#6b3310"/>
+      <stop offset="100%" stop-color="#4a2208"/>
+    </linearGradient>
+
+    <!-- Wood slat highlight -->
+    <linearGradient id="woodSlatTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b86b35"/>
+      <stop offset="30%" stop-color="#8f4a1c"/>
+      <stop offset="100%" stop-color="#5c2807"/>
+    </linearGradient>
+
+    <!-- Cast iron metallic gradient -->
+    <linearGradient id="castIron" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2e2e2e"/>
+      <stop offset="40%" stop-color="#181818"/>
+      <stop offset="70%" stop-color="#333333"/>
+      <stop offset="100%" stop-color="#111111"/>
+    </linearGradient>
+    <linearGradient id="castIronHighlight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#555555"/>
+      <stop offset="50%" stop-color="#222222"/>
+      <stop offset="100%" stop-color="#111111"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient background glow / park atmosphere -->
+  <circle cx="800" cy="420" r="550" fill="radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0) 70%)" />
+
+  <!-- Ground contact shadow -->
+  <ellipse cx="800" cy="780" rx="650" ry="70" fill="url(#groundShadow)" />
+  <ellipse cx="800" cy="770" rx="540" ry="35" fill="rgba(0,0,0,0.85)" />
+
+  <!-- Sign stand shadow -->
+  <ellipse cx="1240" cy="760" rx="90" ry="22" fill="rgba(0,0,0,0.7)" />
+
+  <!-- Left Cast Iron Leg & Armrest Back -->
+  <g id="benchStructure">
+    <!-- Bench back cast-iron frame struts -->
+    <path d="M 360 420 Q 350 560 370 640 L 410 640 Q 395 560 400 420 Z" fill="url(#castIron)" stroke="#111" stroke-width="2"/>
+    <path d="M 780 420 Q 775 560 785 640 L 815 640 Q 810 560 815 420 Z" fill="url(#castIron)" stroke="#111" stroke-width="2"/>
+    <path d="M 1200 420 Q 1190 560 1200 640 L 1230 640 Q 1225 560 1230 420 Z" fill="url(#castIron)" stroke="#111" stroke-width="2"/>
+
+    <!-- Bench Back Slats (horizontal wooden planks) -->
+    <!-- Slat 1 (Top) -->
+    <g filter="drop-shadow(0 4px 6px rgba(0,0,0,0.6))">
+      <rect x="300" y="410" width="960" height="36" rx="6" fill="url(#woodSlatTop)" stroke="#3b1a05" stroke-width="2"/>
+      <!-- Wood screws -->
+      <circle cx="380" cy="428" r="4" fill="#1a1a1a"/><circle cx="800" cy="428" r="4" fill="#1a1a1a"/><circle cx="1215" cy="428" r="4" fill="#1a1a1a"/>
+    </g>
+    <!-- Slat 2 -->
+    <g filter="drop-shadow(0 4px 6px rgba(0,0,0,0.6))">
+      <rect x="300" y="460" width="960" height="36" rx="6" fill="url(#woodSlat)" stroke="#3b1a05" stroke-width="2"/>
+      <circle cx="380" cy="478" r="4" fill="#1a1a1a"/><circle cx="800" cy="478" r="4" fill="#1a1a1a"/><circle cx="1215" cy="478" r="4" fill="#1a1a1a"/>
+    </g>
+    <!-- Slat 3 -->
+    <g filter="drop-shadow(0 4px 6px rgba(0,0,0,0.6))">
+      <rect x="300" y="510" width="960" height="36" rx="6" fill="url(#woodSlat)" stroke="#3b1a05" stroke-width="2"/>
+      <circle cx="380" cy="528" r="4" fill="#1a1a1a"/><circle cx="800" cy="528" r="4" fill="#1a1a1a"/><circle cx="1215" cy="528" r="4" fill="#1a1a1a"/>
+    </g>
+    <!-- Slat 4 -->
+    <g filter="drop-shadow(0 4px 6px rgba(0,0,0,0.6))">
+      <rect x="300" y="560" width="960" height="36" rx="6" fill="url(#woodSlat)" stroke="#3b1a05" stroke-width="2"/>
+      <circle cx="380" cy="578" r="4" fill="#1a1a1a"/><circle cx="800" cy="578" r="4" fill="#1a1a1a"/><circle cx="1215" cy="578" r="4" fill="#1a1a1a"/>
+    </g>
+
+    <!-- Bench Seat Slats (perspective view) -->
+    <!-- Seat Slat 1 (Back) -->
+    <rect x="290" y="620" width="980" height="30" rx="5" fill="url(#woodSlat)" stroke="#3b1a05" stroke-width="2"/>
+    <!-- Seat Slat 2 -->
+    <rect x="285" y="646" width="990" height="32" rx="5" fill="url(#woodSlatTop)" stroke="#3b1a05" stroke-width="2"/>
+    <!-- Seat Slat 3 (Front) -->
+    <rect x="280" y="674" width="1000" height="34" rx="6" fill="url(#woodSlatTop)" stroke="#3b1a05" stroke-width="2"/>
+
+    <!-- Front bench legs and vintage armrests -->
+    <!-- Left Leg and Armrest -->
+    <g filter="drop-shadow(0 8px 12px rgba(0,0,0,0.8))">
+      <!-- Armrest scroll -->
+      <path d="M 360 520 C 320 520, 310 590, 340 640 C 350 655, 370 660, 380 640 C 390 620, 370 600, 355 600 C 340 600, 345 545, 370 540 Z" fill="url(#castIronHighlight)" stroke="#111" stroke-width="3"/>
+      <!-- Front leg -->
+      <path d="M 340 640 Q 320 710 330 760 L 360 760 Q 365 710 375 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="3"/>
+      <!-- Foot pad -->
+      <ellipse cx="345" cy="760" rx="22" ry="7" fill="#111"/>
+      <!-- Back leg -->
+      <path d="M 370 640 Q 395 715 410 755 L 435 752 Q 410 705 390 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="2"/>
+      <ellipse cx="422" cy="754" rx="18" ry="6" fill="#111"/>
+    </g>
+
+    <!-- Middle Support Leg -->
+    <g filter="drop-shadow(0 8px 12px rgba(0,0,0,0.8))">
+      <path d="M 790 640 Q 780 710 785 760 L 815 760 Q 820 710 825 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="3"/>
+      <ellipse cx="800" cy="760" rx="22" ry="7" fill="#111"/>
+    </g>
+
+    <!-- Right Leg and Armrest -->
+    <g filter="drop-shadow(0 8px 12px rgba(0,0,0,0.8))">
+      <path d="M 1200 520 C 1160 520, 1150 590, 1180 640 C 1190 655, 1210 660, 1220 640 C 1230 620, 1210 600, 1195 600 C 1180 600, 1185 545, 1210 540 Z" fill="url(#castIronHighlight)" stroke="#111" stroke-width="3"/>
+      <path d="M 1180 640 Q 1160 710 1170 760 L 1200 760 Q 1205 710 1215 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="3"/>
+      <ellipse cx="1185" cy="760" rx="22" ry="7" fill="#111"/>
+      <path d="M 1210 640 Q 1235 715 1250 755 L 1275 752 Q 1250 705 1230 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="2"/>
+      <ellipse cx="1262" cy="754" rx="18" ry="6" fill="#111"/>
+    </g>
+  </g>
+</svg>
