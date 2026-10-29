@@ -20,6 +20,7 @@ export type CastId =
   | 'kevin'
   | 'hippie'
   | 'pimpelhuber'
+  | 'blocksberg'
   | 'omaschelle'
   | 'parkbank';
 
@@ -73,7 +74,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Gemüse im Obstladen',
     duration: '01:02 min',
     episodeNumber: 'Neu',
-    cast: ['omma'],
+    cast: ['omma', 'chantal'],
     isVip: false
   },
   {
@@ -100,10 +101,10 @@ const REAL_VIDEOS: RealVideo[] = [
     id: 'r2-genz',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_genZ_leer.mp4',
     poster: '/assets/posters/opa-genz-leer.jpg?v=frame',
-    title: 'Alman Opa: Kevin leer',
+    title: 'Alman Opa: Chantal, leer',
     duration: '00:15 min',
     episodeNumber: 'Neu',
-    cast: ['opa', 'kevin'],
+    cast: ['opa', 'chantal'],
     isVip: false
   },
   {
@@ -183,7 +184,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Oma ist weg',
     duration: '02:40 min',
     episodeNumber: 'Neu',
-    cast: ['parkbank'],
+    cast: ['chantal', 'bahndidos', 'hippie'],
     isVip: false
   },
   {
@@ -313,7 +314,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Blocksberg Brigade: Strohbesen-Bataillon',
     duration: '01:03 min',
     episodeNumber: 'Neu',
-    cast: ['pimpelhuber'],
+    cast: ['blocksberg', 'pimpelhuber'],
     isVip: false
   },
   {
@@ -401,20 +402,20 @@ const REAL_VIDEOS: RealVideo[] = [
     id: 'r2-groenland',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Blocksberg-Brigade-Gr%C3%B6nland-bleibt-besenrein.mp4',
     poster: '/assets/posters/groenland.jpg?v=frame',
-    title: 'Pimpelhuber: Grönland bleibt besenrein',
+    title: 'Blocksberg Brigade: Grönland bleibt besenrein',
     duration: '00:29 min',
     episodeNumber: 'Neu',
-    cast: ['pimpelhuber'],
+    cast: ['blocksberg'],
     isVip: false
   },
   {
     id: 'r2-stroh2000',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Blocksberg-Brigade-strohbesen2000.mp4',
     poster: '/assets/posters/strohbesen2000.jpg?v=frame',
-    title: 'Pimpelhuber: Strohbesen 2000',
+    title: 'Blocksberg Brigade: Strohbesen 2000',
     duration: '00:38 min',
     episodeNumber: 'Neu',
-    cast: ['pimpelhuber'],
+    cast: ['blocksberg'],
     isVip: false
   },
   {
@@ -512,6 +513,7 @@ const CAST_LABEL: Record<CastId, string> = {
   kevin: 'Kevin',
   hippie: 'Hippie',
   pimpelhuber: 'Pimpelhuber',
+  blocksberg: 'Blocksberg Brigade',
   omaschelle: 'Oma Schelle',
   parkbank: 'Parkbank'
 };
@@ -526,6 +528,7 @@ const CAST_FILTERS: CastId[] = [
   'kevin',
   'hippie',
   'pimpelhuber',
+  'blocksberg',
   'omaschelle',
   'parkbank'
 ];
