@@ -10,15 +10,17 @@ import {
   Film, Users, Gamepad2, Trophy, RotateCcw, ExternalLink
 } from 'lucide-react';
 
-export type VideoCategory = 'all' | 'omma_opa' | 'bahndidos' | 'kevin' | 'vip';
+export type VideoCategory = 'all' | 'oma' | 'opa' | 'bahndidos' | 'blocksberg' | 'kevin' | 'sonst' | 'vip';
 
 interface RealVideo {
   id: string;
-  youtubeId: string;
+  youtubeId?: string;
+  src?: string;
+  poster?: string;
   title: string;
   duration: string;
   episodeNumber: string;
-  category: 'omma_opa' | 'bahndidos' | 'vip';
+  category: 'oma' | 'opa' | 'bahndidos' | 'blocksberg' | 'kevin' | 'sonst' | 'vip';
   categoryLabel: string;
   characters: string;
   isVip: boolean;
@@ -26,60 +28,401 @@ interface RealVideo {
 
 const REAL_VIDEOS: RealVideo[] = [
   {
-    id: 'vid-1',
-    youtubeId: 'dEsfLx0d5N0',
-    title: 'Auf unsere Kosten chillen und dicke Hose machen? Nicht mit Alman Opa!',
-    duration: '04:12 min',
-    episodeNumber: 'Folge 1',
-    category: 'omma_opa',
-    categoryLabel: 'Omma & Opa Sketche',
-    characters: 'Alman Opa & Omma',
+    id: 'r2-nogo',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bankgeheimnis_no_go_area_fuer_alman_opa.mp4',
+    poster: '/assets/posters/no-go-area.jpg?v=frame',
+    title: 'Alman Opa: No-Go-Area',
+    duration: '01:01 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa',
     isVip: false
   },
   {
-    id: 'vid-2',
-    youtubeId: 'dmfUYkjs_z8',
-    title: 'Zu zweit gegen eine Rentnerin! Doch als Oma auspackt, vergeht ihnen das Lachen...',
-    duration: '03:45 min',
-    episodeNumber: 'Folge 2',
-    category: 'omma_opa',
-    categoryLabel: 'Omma & Opa Sketche',
+    id: 'r2-waschen',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/bankgeheimnis_waschenverbotszone.mp4',
+    poster: '/assets/posters/waschenverbotszone.jpg?v=frame',
+    title: 'Omma: Punk bei Waschverbotszone',
+    duration: '01:01 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
     characters: 'Omma',
     isVip: false
   },
   {
-    id: 'vid-3',
-    youtubeId: '2Tsv9Ito1Yo',
-    title: 'Highway to Hell? Nein, S6 nach Wixhausen! Bahndidos auf der Parkbank',
-    duration: '05:08 min',
-    episodeNumber: 'Folge 3',
+    id: 'r2-blitzbirne',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/komissar_blitzbirne.mp4',
+    poster: '/assets/posters/komissar-blitzbirne.jpg?v=frame',
+    title: 'Omma: Komissar Blitzbirne',
+    duration: '00:45 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Komissar Blitzbirne',
+    isVip: false
+  },
+  {
+    id: 'r2-gemuese',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/oma_gem%C3%BCse_im_obstladen.mp4',
+    poster: '/assets/posters/oma-gemuese.jpg?v=frame',
+    title: 'Omma: Gemüse im Obstladen',
+    duration: '01:02 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-nullpunkt',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/oma_punk_nullpunkt.mp4',
+    poster: '/assets/posters/oma-punk-nullpunkt.jpg?v=frame',
+    title: 'Omma: Punk bei Nullpunkt',
+    duration: '00:27 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma & Punk',
+    isVip: false
+  },
+  {
+    id: 'r2-eco',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/oma_rocker_im_eco_modus.mp4',
+    poster: '/assets/posters/oma-rocker-eco.jpg?v=frame',
+    title: 'Oma und Rocker im Eco-Modus',
+    duration: '01:01 min',
+    episodeNumber: 'Neu',
+    category: 'bahndidos',
+    categoryLabel: 'Bahndidos',
+    characters: 'Omma & Bahndidos',
+    isVip: false
+  },
+  {
+    id: 'r2-genz',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_genZ_leer.mp4',
+    poster: '/assets/posters/opa-genz-leer.jpg?v=frame',
+    title: 'Alman Opa: Kevin leer',
+    duration: '00:15 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa & Kevin',
+    isVip: false
+  },
+  {
+    id: 'r2-shaschlik',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_punk_shaschlik.mp4',
+    poster: '/assets/posters/opa-punk-shaschlik.jpg?v=frame',
+    title: 'Alman Opa: Punk bei Schaschlik',
+    duration: '00:30 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa & Punk',
+    isVip: false
+  },
+  {
+    id: 'r2-naegel',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_talahinnen_Plastikn%C3%A4gel_kartell_Full%20HD%201080p_HIGH_FR24.mp4',
+    poster: '/assets/posters/opa-talahinnen-naegel.jpg?v=frame',
+    title: 'Alman Opa: Chantal bei Plastiknägeln',
+    duration: '00:23 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa & Chantal',
+    isVip: false
+  },
+  {
+    id: 'r2-ramadan',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_talahons_ramadan_f%C3%BCrs_gehirn.mp4',
+    poster: '/assets/posters/opa-talahons-ramadan.jpg?v=frame',
+    title: 'Alman Opa: Talahons, Ramadan fürs Gehirn',
+    duration: '00:39 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa & Talahons',
+    isVip: false
+  },
+  {
+    id: 'r2-bahnhofsklo',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bahnhofsklo_als_meldeadresse_4K_HIGH_FR24.mp4',
+    poster: '/assets/posters/bahnhofsklo.jpg?v=frame',
+    title: 'Alman Opa: Bahnhofsklo als Meldeadresse',
+    duration: '00:24 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa',
+    isVip: false
+  },
+  {
+    id: 'r2-hippie',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bankgeheimnis_hippie_hohlkopf.mp4',
+    poster: '/assets/posters/hippie-hohlkopf.jpg?v=frame',
+    title: 'Alman Opa: Hippie Hohlkopf',
+    duration: '00:17 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa & Hippie',
+    isVip: false
+  },
+  {
+    id: 'r2-barfuss',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bankgeheimnis_omma_barfu%C3%9F_durchs_waschbecken.mp4',
+    poster: '/assets/posters/barfuss-waschbecken.jpg?v=frame',
+    title: 'Omma: Barfuß durchs Waschbecken',
+    duration: '00:31 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-fremdsprachen',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Fremdsprachen_akrobatinnen.mp4',
+    poster: '/assets/posters/fremdsprachen.jpg?v=frame',
+    title: 'Alman Opa: Fremdsprachen-Akrobatinnen',
+    duration: '00:21 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa',
+    isVip: false
+  },
+  {
+    id: 'r2-oma-weg',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Hilfe%2C%20Oma%20ist%20weg%21%20Rollstuhl-Wahnsinn%20mit%20Lachflash%20Garantie..mp4',
+    poster: '/assets/posters/oma-ist-weg.jpg?v=frame',
+    title: 'Oma ist weg',
+    duration: '02:40 min',
+    episodeNumber: 'Neu',
+    category: 'sonst',
+    categoryLabel: 'Sonstiges',
+    characters: 'Rollstuhl',
+    isVip: false
+  },
+  {
+    id: 'r2-kappen',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Kappenfraktion_oder_hutb%C3%BCrger.mp4',
+    poster: '/assets/posters/kappenfraktion.jpg?v=frame',
+    title: 'Alman Opa: Kappenfraktion oder Hutbürger',
+    duration: '01:02 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa & Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-handtasche',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/No%20Go%20Area%20f%C3%BCr%20wen_%20-%20Oma%20hat%20ne%20andere%20Idee%20in%20der%20Handtasche%20_%20Comedy%20Sketch.mp4',
+    poster: '/assets/posters/nogo-handtasche.jpg?v=frame',
+    title: 'Omma: No-Go-Area, andere Idee',
+    duration: '01:03 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-parkverbot',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/PARK%20VERBOT%20F%C3%9CR%20ALMANS_%20%F0%9F%9A%AB%20Walla%20Omma%20Teil%203.mp4',
+    poster: '/assets/posters/parkverbot-almans.jpg?v=frame',
+    title: 'Omma: Parkverbot für Almans',
+    duration: '01:15 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-tram',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Tramdidos.mp4',
+    poster: '/assets/posters/tramdidos.jpg?v=frame',
+    title: 'Bahndidos: Tramdidos',
+    duration: '00:28 min',
+    episodeNumber: 'Neu',
     category: 'bahndidos',
     categoryLabel: 'Bahndidos',
     characters: 'Bahndidos',
     isVip: false
   },
   {
-    id: 'vid-4',
-    youtubeId: 'aptWdtkNkxQ',
-    title: 'Unterwegs mit Oma Schelle: Eskalation im Café Rote Bohne!',
-    duration: '04:30 min',
-    episodeNumber: 'Folge 4',
-    category: 'omma_opa',
-    categoryLabel: 'Omma & Opa Sketche',
+    id: 'r2-ubahn',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Ubahndidos.mp4',
+    poster: '/assets/posters/ubahndidos.jpg?v=frame',
+    title: 'Bahndidos: Ubahndidos',
+    duration: '00:29 min',
+    episodeNumber: 'Neu',
+    category: 'bahndidos',
+    categoryLabel: 'Bahndidos',
+    characters: 'Bahndidos',
+    isVip: false
+  },
+  {
+    id: 'r2-gesagt',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/WAS%20HABEN%20SIE%20GESAGT_%20%F0%9F%98%82%20Die%20frechste%20Oma%20Deutschlands.mp4',
+    poster: '/assets/posters/was-haben-sie-gesagt.jpg?v=frame',
+    title: 'Omma: Was haben Sie gesagt',
+    duration: '02:47 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
     characters: 'Omma',
     isVip: false
   },
   {
-    id: 'vid-5',
-    youtubeId: '1RltZcWhKS0',
-    title: '👑 VIP Exklusiv: Vorab-Folge & Unzensierte Parkbank-Outtakes',
-    duration: '07:22 min',
-    episodeNumber: 'VIP Special',
-    category: 'vip',
-    categoryLabel: 'VIP Special',
-    characters: 'Parkbank Cast',
+    id: 'r2-weich',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Weichsp%C3%BCler_auf_lunge.mp4',
+    poster: '/assets/posters/weichspueler.jpg?v=frame',
+    title: 'Alman Opa: Weichspüler auf Lunge',
+    duration: '01:01 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa',
+    isVip: false
+  },
+  {
+    id: 'r2-kassa',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman-opa-kassa-blanko.mp4',
+    poster: '/assets/posters/kassa-blanko.jpg?v=frame',
+    title: 'Alman Opa: Kassa blanko',
+    duration: '01:02 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa',
+    isVip: false
+  },
+  {
+    id: 'r2-kevin-zeugnis',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/bankgeheimnis_kevin_zeugnis.mp4',
+    poster: '/assets/posters/kevin-zeugnis.jpg?v=frame',
+    title: 'Kevin: Zeugnis',
+    duration: '01:03 min',
+    episodeNumber: 'Abo',
+    category: 'kevin',
+    categoryLabel: 'Kevin',
+    characters: 'Kevin',
     isVip: true
-  }
+  },
+  {
+    id: 'r2-strick-1',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/bankgeheimnis_oma_stricknadel_modifiziert_Full%20HD%201080p_HIGH_FR24.mp4',
+    poster: '/assets/posters/stricknadel-1.jpg?v=frame',
+    title: 'Omma: Stricknadelkommando Teil 1',
+    duration: '00:35 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-strick-2',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bankgeheimnis_stricknadel_mod_2.mp4',
+    poster: '/assets/posters/stricknadel-2.jpg?v=frame2',
+    title: 'Omma: Stricknadelkommando Teil 2',
+    duration: '00:37 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-bimmel',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/bimmelbahndidos.mp4',
+    poster: '/assets/posters/bimmelbahndidos.jpg?v=frame',
+    title: 'Bahndidos: Bimmelbahndidos',
+    duration: '00:29 min',
+    episodeNumber: 'Neu',
+    category: 'bahndidos',
+    categoryLabel: 'Bahndidos',
+    characters: 'Bahndidos',
+    isVip: false
+  },
+  {
+    id: 'r2-blocksberg',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/blocksberg_brigade_strohbesen_battalion.mp4',
+    poster: '/assets/posters/blocksberg.jpg?v=frame',
+    title: 'Blocksberg Brigade: Strohbesen-Bataillon',
+    duration: '01:03 min',
+    episodeNumber: 'Neu',
+    category: 'blocksberg',
+    categoryLabel: 'Blocksberg Brigade',
+    characters: 'Blocksberg Brigade',
+    isVip: false
+  },
+  {
+    id: 'r2-glocke',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/die-reichszeitglocke.mp4',
+    poster: '/assets/posters/reichszeitglocke.jpg?v=frame',
+    title: 'Reichszeitglocke',
+    duration: '01:33 min',
+    episodeNumber: 'Neu',
+    category: 'sonst',
+    categoryLabel: 'Sonstiges',
+    characters: 'Reichszeitglocke',
+    isVip: false
+  },
+  {
+    id: 'r2-hauptschule',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/hauptschulabschluss_aus_der_wunderlampe.mp4',
+    poster: '/assets/posters/hauptschule.jpg?v=frame',
+    title: 'Alman Opa: Hauptschulabschluss aus der Wunderlampe',
+    duration: '01:01 min',
+    episodeNumber: 'Neu',
+    category: 'opa',
+    categoryLabel: 'Opa Sketche',
+    characters: 'Alman Opa',
+    isVip: false
+  },
+  {
+    id: 'r2-kevin-ki',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/kevin_ist_ki_generiert_4K_HIGH_FR24_%281%29.mp4',
+    poster: '/assets/posters/kevin-ki.jpg?v=frame',
+    title: 'Kevin: ist KI-generiert',
+    duration: '01:01 min',
+    episodeNumber: 'Neu',
+    category: 'kevin',
+    categoryLabel: 'Kevin',
+    characters: 'Kevin',
+    isVip: false
+  },
+  {
+    id: 'r2-bus',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/omma-no-go-area-an-bushaltestelle.mp4',
+    poster: '/assets/posters/bushaltestelle.jpg?v=frame',
+    title: 'Omma: No-Go-Area an der Bushaltestelle',
+    duration: '01:07 min',
+    episodeNumber: 'Neu',
+    category: 'oma',
+    categoryLabel: 'Omma Sketche',
+    characters: 'Omma',
+    isVip: false
+  },
+  {
+    id: 'r2-flixtrain',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/flixtrain_Angels__4K_HIGH_FR24_%281%29.mp4',
+    poster: '/assets/posters/flixtrain-angels.jpg?v=frame',
+    title: 'Bahndidos: Flixtrain Angels',
+    duration: '00:42 min',
+    episodeNumber: 'Neu',
+    category: 'bahndidos',
+    categoryLabel: 'Bahndidos',
+    characters: 'Bahndidos',
+    isVip: false
+  },
 ];
 
 // Exakt die Bezeichnungen, die vom Nutzer vorgegeben wurden (keine ausgedachten Namen)
@@ -87,8 +430,8 @@ const CHARACTER_NAMES: Record<string, string> = {
   rocker: 'Bahndidos',
   talahon: 'Talahons',
   punk: 'Punks',
-  genz: 'Talahinnen',
-  kevin: 'Gen Z',
+  genz: 'Chantal',
+  kevin: 'Kevin',
   hippi: 'Hippie',
   omma: 'Omma',
   opa: 'Alman Opa',
@@ -108,6 +451,8 @@ interface LeafParticle {
   color: string;
   opacity: number;
 }
+
+const INTRO_SRC = 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Intro-player.mp4';
 
 const LEAF_COLORS = [
   '#2a612b',
@@ -154,14 +499,33 @@ export default function App() {
 
   // Video Player State
   const [playingVideo, setPlayingVideo] = useState<RealVideo | null>(null);
+  const [filmPhase, setFilmPhase] = useState<'intro' | 'film' | 'ende'>('intro');
+  const [introReady, setIntroReady] = useState(false);
+  const [tvLogo, setTvLogo] = useState(() =>
+    typeof window !== 'undefined' &&
+    window.innerWidth >= 1100 &&
+    window.innerWidth > window.innerHeight
+  );
+  const bannerCanvasRef = useRef<HTMLCanvasElement>(null);
   const [activeCategory, setActiveCategory] = useState<VideoCategory>('all');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [likedVideos, setLikedVideos] = useState<Record<string, boolean>>({});
 
   const videoSectionRef = useRef<HTMLElement>(null);
-  const bannerCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const isVipUnlocked = Boolean(currentUser?.isVip);
+
+  useEffect(() => {
+    if (!tvLogo) return;
+    const timer = window.setTimeout(() => setTvLogo(false), 2400);
+    return () => window.clearTimeout(timer);
+  }, [tvLogo]);
+
+  useEffect(() => {
+    if (!playingVideo?.src) return;
+    setFilmPhase('intro');
+    setIntroReady(false);
+  }, [playingVideo]);
 
   // Offizielles Parkbank-Duell Browsergame Modal State
   const [isGameOpen, setIsGameOpen] = useState(false);
@@ -420,10 +784,50 @@ export default function App() {
     showToast('Erfolgreich abgemeldet.');
   };
 
-  const filteredVideos = REAL_VIDEOS.filter(v => {
-    if (activeCategory === 'all') return true;
-    return v.category === activeCategory;
-  });
+  const clipSeconds = (duration: string) => {
+    const [minutes, seconds] = duration.split(' ')[0].split(':').map(Number);
+    return minutes * 60 + seconds;
+  };
+
+  const byLength = (list: RealVideo[]) =>
+    [...list].sort((a, b) => clipSeconds(a.duration) - clipSeconds(b.duration));
+
+  const of = (who: RealVideo['category']) => REAL_VIDEOS.filter((video) => video.category === who);
+
+  const lengthSections = (who: 'oma' | 'opa', label: string) => {
+    const list = of(who);
+    const kurz = byLength(list.filter((video) => clipSeconds(video.duration) < 60));
+    const lang = byLength(list.filter((video) => clipSeconds(video.duration) >= 60));
+    const prefix = activeCategory === 'all' ? `${label} · ` : '';
+    return [
+      kurz.length ? { title: `${prefix}Unter einer Minute`, videos: kurz } : null,
+      lang.length ? { title: `${prefix}Über einer Minute`, videos: lang } : null,
+    ].filter((section): section is { title: string; videos: RealVideo[] } => section !== null);
+  };
+
+  const videoSections =
+    activeCategory === 'oma'
+      ? lengthSections('oma', 'Omma')
+      : activeCategory === 'opa'
+        ? lengthSections('opa', 'Opa')
+        : activeCategory === 'bahndidos'
+          ? [{ title: 'Bahndidos', videos: byLength(of('bahndidos')) }]
+          : activeCategory === 'blocksberg'
+            ? [{ title: 'Blocksberg Brigade', videos: byLength(of('blocksberg')) }]
+            : activeCategory === 'kevin'
+              ? [{ title: 'Kevin', videos: byLength(of('kevin')) }]
+              : activeCategory === 'sonst'
+                ? [{ title: 'Sonstiges', videos: of('sonst') }]
+                : activeCategory === 'vip'
+                  ? []
+                  : [
+                      ...lengthSections('oma', 'Omma'),
+                      ...lengthSections('opa', 'Opa'),
+                      { title: 'Bahndidos', videos: byLength(of('bahndidos')) },
+                      { title: 'Blocksberg Brigade', videos: byLength(of('blocksberg')) },
+                      { title: 'Kevin', videos: byLength(of('kevin')) },
+                      { title: 'Sonstiges', videos: of('sonst') },
+                    ].filter((section) => section.videos.length);
 
   // Render-Funktion für das Namensschild direkt AUF der jeweils angeklickten Figur
   const renderCharBadge = (charKey: string, posClasses: string = "bottom-1 left-1/2 -translate-x-1/2") => {
@@ -441,6 +845,15 @@ export default function App() {
 
   return (
     <div className="bg-[#000000] text-white min-h-screen selection:bg-[#743f19] selection:text-white font-sans flex flex-col items-center">
+      {tvLogo && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black">
+          <img
+            src="/assets/logo_gross.webp"
+            alt="Bankgeheimnis im Park"
+            className="w-[min(42vw,28rem)] h-auto"
+          />
+        </div>
+      )}
       
       {/* Toast Notification */}
       {toastMsg && (
@@ -577,11 +990,11 @@ export default function App() {
                 className={`absolute left-[2%] top-[38%] w-[14.5%] max-w-[155px] z-10 anim-banner-genz cursor-pointer pointer-events-auto transition-transform duration-300 origin-left ${
                   activeChar === 'genz' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
                 }`}
-                title="Talahinnen"
+                title="Chantal"
               >
                 <img 
                   src="/assets/characters/genz_crop.webp" 
-                  alt="Talahinnen" 
+                  alt="Chantal" 
                   className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
                 />
                 {renderCharBadge('genz', 'bottom-0 left-1/2 -translate-x-1/2')}
@@ -593,11 +1006,11 @@ export default function App() {
                 className={`absolute right-[-2%] top-[11%] w-[12.5%] max-w-[135px] z-10 anim-banner-kevin cursor-pointer pointer-events-auto transition-transform duration-300 origin-right ${
                   activeChar === 'kevin' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
                 }`}
-                title="Gen Z"
+                title="Kevin"
               >
                 <img 
                   src="/assets/characters/kevin_crop.webp" 
-                  alt="Gen Z" 
+                  alt="Kevin" 
                   className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
                 />
                 {renderCharBadge('kevin', 'bottom-0 left-1/2 -translate-x-1/2')}
@@ -770,11 +1183,11 @@ export default function App() {
                 className={`absolute left-[-2%] top-[34%] w-[26%] z-10 anim-banner-genz cursor-pointer pointer-events-auto transition-transform duration-300 origin-left ${
                   activeChar === 'genz' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
                 }`}
-                title="Talahinnen"
+                title="Chantal"
               >
                 <img 
                   src="/assets/characters/genz_crop.webp" 
-                  alt="Talahinnen" 
+                  alt="Chantal" 
                   className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
                 />
                 {renderCharBadge('genz', 'bottom-0 left-1/2 -translate-x-1/2')}
@@ -786,11 +1199,11 @@ export default function App() {
                 className={`absolute right-[-2%] top-[16%] w-[23%] z-10 anim-banner-kevin cursor-pointer pointer-events-auto transition-transform duration-300 origin-right ${
                   activeChar === 'kevin' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
                 }`}
-                title="Gen Z"
+                title="Kevin"
               >
                 <img 
                   src="/assets/characters/kevin_crop.webp" 
-                  alt="Gen Z" 
+                  alt="Kevin" 
                   className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
                 />
                 {renderCharBadge('kevin', 'bottom-0 left-1/2 -translate-x-1/2')}
@@ -934,14 +1347,25 @@ export default function App() {
           </button>
 
           <button 
-            onClick={() => setActiveCategory('omma_opa')}
+            onClick={() => setActiveCategory('oma')}
             className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
-              activeCategory === 'omma_opa' 
+              activeCategory === 'oma' 
                 ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
                 : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
             }`}
           >
-            Omma & Opa Sketche
+            Oma ({REAL_VIDEOS.filter((video) => video.category === 'oma').length})
+          </button>
+
+          <button 
+            onClick={() => setActiveCategory('opa')}
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
+              activeCategory === 'opa' 
+                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
+                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
+            }`}
+          >
+            Opa ({REAL_VIDEOS.filter((video) => video.category === 'opa').length})
           </button>
 
           <button 
@@ -953,23 +1377,39 @@ export default function App() {
             }`}
           >
             <span>Bahndidos</span>
-            <span className="px-1.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-600/40 text-[10px] font-black uppercase">
-              Online
-            </span>
+          </button>
+
+          <button 
+            onClick={() => setActiveCategory('blocksberg')}
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
+              activeCategory === 'blocksberg' 
+                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
+                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
+            }`}
+          >
+            Blocksberg ({REAL_VIDEOS.filter((video) => video.category === 'blocksberg').length})
           </button>
 
           <button 
             onClick={() => setActiveCategory('kevin')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
               activeCategory === 'kevin' 
                 ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
                 : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
             }`}
           >
-            <span>Kevin</span>
-            <span className="px-1.5 py-0.5 rounded-full bg-amber-950 text-[#e8b568] border border-amber-600/40 text-[10px] font-black uppercase">
-              Bald
-            </span>
+            Kevin ({REAL_VIDEOS.filter((video) => video.category === 'kevin').length})
+          </button>
+
+          <button 
+            onClick={() => setActiveCategory('sonst')}
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
+              activeCategory === 'sonst' 
+                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
+                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
+            }`}
+          >
+            Sonstiges ({REAL_VIDEOS.filter((video) => video.category === 'sonst').length})
           </button>
 
           <button 
@@ -986,7 +1426,7 @@ export default function App() {
         </div>
 
         {/* VIDEOLISTE IM RASTER */}
-        {activeCategory === 'kevin' ? (
+        {activeCategory === 'kevin' && !REAL_VIDEOS.some((video) => video.category === 'kevin') ? (
           /* ============================================================ */
           /* KEVIN STATUS-KARTE: NOCH KEIN VIDEO ONLINE                    */
           /* ============================================================ */
@@ -994,7 +1434,7 @@ export default function App() {
             <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-black/80 border-2 border-[#c89346] flex items-center justify-center overflow-hidden mb-5 shadow-inner">
               <img 
                 src="/assets/characters/kevin_crop.webp" 
-                alt="Kevin (Gen Z)" 
+                alt="Kevin" 
                 className="w-full h-auto object-contain translate-y-3 scale-125" 
               />
             </div>
@@ -1005,7 +1445,7 @@ export default function App() {
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
-              Kevin (Gen Z)
+              Kevin
             </h3>
             
             <p className="mt-3 text-neutral-300 text-base sm:text-lg max-w-lg leading-relaxed">
@@ -1023,16 +1463,25 @@ export default function App() {
                 Bahndidos Sketche ansehen (Bereits online)
               </button>
               <button 
-                onClick={() => setActiveCategory('omma_opa')}
+                onClick={() => setActiveCategory('oma')}
                 className="px-5 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white font-bold text-sm sm:text-base border border-neutral-700 cursor-pointer transition-all"
               >
-                Omma & Opa Sketche ansehen
+                Oma und Opa Sketche ansehen
               </button>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {filteredVideos.map((vid) => {
+          <div className="space-y-10">
+            {activeCategory === 'vip' && (
+              <p className="text-center text-neutral-300 text-lg">Noch keine VIP-Folge.</p>
+            )}
+            {videoSections.map((section) => (
+              <div key={section.title}>
+                <h3 className="mb-4 text-xl sm:text-2xl font-black uppercase tracking-wide text-[#e8b568]">
+                  {section.title}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {section.videos.map((vid) => {
               const isLiked = likedVideos[vid.id];
 
               return (
@@ -1044,7 +1493,7 @@ export default function App() {
                   {/* Vorschaubild */}
                   <div className="relative aspect-video w-full bg-neutral-950 overflow-hidden">
                     <img 
-                      src={`https://img.youtube.com/vi/${vid.youtubeId}/hqdefault.jpg`} 
+                      src={vid.poster ?? `https://img.youtube.com/vi/${vid.youtubeId}/hqdefault.jpg`} 
                       alt={vid.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none"
                       loading="lazy"
@@ -1120,8 +1569,10 @@ export default function App() {
                 </div>
               );
             })}
+                </div>
+              </div>
+            ))}
 
-            {/* In der Gesamtübersicht: Teaser-Karte für Kevin */}
             {activeCategory === 'all' && (
               <div 
                 onClick={() => setActiveCategory('kevin')}
@@ -1131,7 +1582,7 @@ export default function App() {
                   <div className="relative w-24 h-24 rounded-full bg-neutral-950 border border-neutral-700 group-hover:border-[#c89346] transition-colors overflow-hidden mb-3 flex items-center justify-center">
                     <img 
                       src="/assets/characters/kevin_crop.webp" 
-                      alt="Kevin (Gen Z)" 
+                      alt="Kevin" 
                       className="w-full h-auto object-contain translate-y-1.5 scale-125" 
                     />
                   </div>
@@ -1140,7 +1591,7 @@ export default function App() {
                     <span>In Produktion</span>
                   </div>
                   <h3 className="font-extrabold text-lg text-white group-hover:text-[#c89346] transition-colors">
-                    Kevin (Gen Z)
+                    Kevin
                   </h3>
                   <p className="text-xs sm:text-sm text-neutral-400 mt-1.5 leading-relaxed">
                     Für Kevin gibt es noch kein Video online. Die erste Folge ist im Dreh.
@@ -1226,7 +1677,7 @@ export default function App() {
 
             {/* Schnelle Charakter-Tags */}
             <div className="mt-6 flex flex-wrap gap-2">
-              {['Bahndidos', 'Alman Opa', 'Omma', 'Punks', 'Talahons', 'Gen Z', 'Hippie'].map((charName) => (
+              {['Bahndidos', 'Alman Opa', 'Omma', 'Punks', 'Talahons', 'Kevin', 'Hippie'].map((charName) => (
                 <span 
                   key={charName}
                   className="px-3 py-1 rounded-lg bg-black/60 text-neutral-300 border border-neutral-800 text-xs font-bold"
@@ -1834,13 +2285,53 @@ export default function App() {
 
             {/* Echtes iFrame Video Player */}
             <div className="relative aspect-video w-full bg-black">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${playingVideo.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-                title={playingVideo.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="w-full h-full border-0"
-              ></iframe>
+              {playingVideo.src ? (
+                filmPhase === 'ende' ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black">
+                    <img
+                      src="/assets/logo_gross.webp"
+                      alt="Bankgeheimnis im Park"
+                      className="w-[38%] max-w-[18rem] h-auto"
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <video
+                      key={filmPhase === 'intro' ? 'intro' : playingVideo.src}
+                      src={filmPhase === 'intro' ? INTRO_SRC : playingVideo.src}
+                      poster={filmPhase === 'film' ? playingVideo.poster : undefined}
+                      controls={filmPhase === 'film'}
+                      controlsList="nodownload noplaybackrate"
+                      disablePictureInPicture
+                      autoPlay
+                      playsInline
+                      onPlaying={() => {
+                        if (filmPhase === 'intro') setIntroReady(true);
+                      }}
+                      onEnded={() => setFilmPhase(filmPhase === 'intro' ? 'film' : 'ende')}
+                      onContextMenu={(event) => event.preventDefault()}
+                      className="w-full h-full bg-black"
+                    />
+                    {filmPhase === 'intro' && !introReady && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
+                        <img
+                          src="/assets/logo_gross.webp"
+                          alt=""
+                          className="w-[38%] max-w-[18rem] h-auto"
+                        />
+                      </div>
+                    )}
+                  </>
+                )
+              ) : (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${playingVideo.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                  title={playingVideo.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full border-0"
+                ></iframe>
+              )}
             </div>
 
             {/* Modal Fußzeile & Interaktion (Keine externen YouTube-Links) */}
