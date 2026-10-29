@@ -6,11 +6,22 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Play, Lock, User, X, ChevronRight, ThumbsUp,
-  Check, LogOut, ShieldCheck, Sparkles, Clock,
+  Check, LogOut, ShieldCheck, Sparkles,
   Film, Users, Gamepad2, Trophy, RotateCcw, ExternalLink
 } from 'lucide-react';
 
-export type VideoCategory = 'all' | 'oma' | 'opa' | 'bahndidos' | 'blocksberg' | 'kevin' | 'sonst' | 'vip';
+export type CastId =
+  | 'omma'
+  | 'opa'
+  | 'bahndidos'
+  | 'punk'
+  | 'talahons'
+  | 'chantal'
+  | 'kevin'
+  | 'hippie'
+  | 'pimpelhuber'
+  | 'omaschelle'
+  | 'parkbank';
 
 interface RealVideo {
   id: string;
@@ -20,9 +31,7 @@ interface RealVideo {
   title: string;
   duration: string;
   episodeNumber: string;
-  category: 'oma' | 'opa' | 'bahndidos' | 'blocksberg' | 'kevin' | 'sonst' | 'vip';
-  categoryLabel: string;
-  characters: string;
+  cast: CastId[];
   isVip: boolean;
 }
 
@@ -34,9 +43,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: No-Go-Area',
     duration: '01:01 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa',
+    cast: ['opa'],
     isVip: false
   },
   {
@@ -46,9 +53,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Punk bei Waschverbotszone',
     duration: '01:01 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma', 'punk'],
     isVip: false
   },
   {
@@ -58,9 +63,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Komissar Blitzbirne',
     duration: '00:45 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Komissar Blitzbirne',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -70,9 +73,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Gemüse im Obstladen',
     duration: '01:02 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -82,9 +83,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Punk bei Nullpunkt',
     duration: '00:27 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma & Punk',
+    cast: ['omma', 'punk'],
     isVip: false
   },
   {
@@ -94,9 +93,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Oma und Rocker im Eco-Modus',
     duration: '01:01 min',
     episodeNumber: 'Neu',
-    category: 'bahndidos',
-    categoryLabel: 'Bahndidos',
-    characters: 'Omma & Bahndidos',
+    cast: ['bahndidos', 'omma'],
     isVip: false
   },
   {
@@ -106,9 +103,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Kevin leer',
     duration: '00:15 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa & Kevin',
+    cast: ['opa', 'kevin'],
     isVip: false
   },
   {
@@ -118,9 +113,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Punk bei Schaschlik',
     duration: '00:30 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa & Punk',
+    cast: ['opa', 'punk'],
     isVip: false
   },
   {
@@ -130,9 +123,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Chantal bei Plastiknägeln',
     duration: '00:23 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa & Chantal',
+    cast: ['opa', 'chantal'],
     isVip: false
   },
   {
@@ -142,9 +133,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Talahons, Ramadan fürs Gehirn',
     duration: '00:39 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa & Talahons',
+    cast: ['opa', 'talahons'],
     isVip: false
   },
   {
@@ -154,9 +143,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Bahnhofsklo als Meldeadresse',
     duration: '00:24 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa',
+    cast: ['opa'],
     isVip: false
   },
   {
@@ -166,9 +153,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Hippie Hohlkopf',
     duration: '00:17 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa & Hippie',
+    cast: ['opa', 'hippie'],
     isVip: false
   },
   {
@@ -178,9 +163,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Barfuß durchs Waschbecken',
     duration: '00:31 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -190,9 +173,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Fremdsprachen-Akrobatinnen',
     duration: '00:21 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa',
+    cast: ['opa'],
     isVip: false
   },
   {
@@ -202,9 +183,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Oma ist weg',
     duration: '02:40 min',
     episodeNumber: 'Neu',
-    category: 'sonst',
-    categoryLabel: 'Sonstiges',
-    characters: 'Rollstuhl',
+    cast: ['parkbank'],
     isVip: false
   },
   {
@@ -214,9 +193,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Kappenfraktion oder Hutbürger',
     duration: '01:02 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa & Omma',
+    cast: ['opa', 'omma'],
     isVip: false
   },
   {
@@ -226,9 +203,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: No-Go-Area, andere Idee',
     duration: '01:03 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -238,9 +213,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Parkverbot für Almans',
     duration: '01:15 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -250,9 +223,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Bahndidos: Tramdidos',
     duration: '00:28 min',
     episodeNumber: 'Neu',
-    category: 'bahndidos',
-    categoryLabel: 'Bahndidos',
-    characters: 'Bahndidos',
+    cast: ['bahndidos', 'omma'],
     isVip: false
   },
   {
@@ -262,9 +233,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Bahndidos: Ubahndidos',
     duration: '00:29 min',
     episodeNumber: 'Neu',
-    category: 'bahndidos',
-    categoryLabel: 'Bahndidos',
-    characters: 'Bahndidos',
+    cast: ['bahndidos', 'omma'],
     isVip: false
   },
   {
@@ -274,9 +243,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Was haben Sie gesagt',
     duration: '02:47 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -286,9 +253,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Weichspüler auf Lunge',
     duration: '01:01 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa',
+    cast: ['opa'],
     isVip: false
   },
   {
@@ -298,9 +263,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Kassa blanko',
     duration: '01:02 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa',
+    cast: ['opa'],
     isVip: false
   },
   {
@@ -310,9 +273,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Kevin: Zeugnis',
     duration: '01:03 min',
     episodeNumber: 'Abo',
-    category: 'kevin',
-    categoryLabel: 'Kevin',
-    characters: 'Kevin',
+    cast: ['kevin'],
     isVip: true
   },
   {
@@ -322,9 +283,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Stricknadelkommando Teil 1',
     duration: '00:35 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -334,9 +293,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: Stricknadelkommando Teil 2',
     duration: '00:37 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -346,9 +303,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Bahndidos: Bimmelbahndidos',
     duration: '00:29 min',
     episodeNumber: 'Neu',
-    category: 'bahndidos',
-    categoryLabel: 'Bahndidos',
-    characters: 'Bahndidos',
+    cast: ['bahndidos', 'opa'],
     isVip: false
   },
   {
@@ -358,9 +313,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Blocksberg Brigade: Strohbesen-Bataillon',
     duration: '01:03 min',
     episodeNumber: 'Neu',
-    category: 'blocksberg',
-    categoryLabel: 'Blocksberg Brigade',
-    characters: 'Blocksberg Brigade',
+    cast: ['pimpelhuber'],
     isVip: false
   },
   {
@@ -370,9 +323,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Reichszeitglocke',
     duration: '01:33 min',
     episodeNumber: 'Neu',
-    category: 'sonst',
-    categoryLabel: 'Sonstiges',
-    characters: 'Reichszeitglocke',
+    cast: ['pimpelhuber'],
     isVip: false
   },
   {
@@ -382,9 +333,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Hauptschulabschluss aus der Wunderlampe',
     duration: '01:01 min',
     episodeNumber: 'Neu',
-    category: 'opa',
-    categoryLabel: 'Opa Sketche',
-    characters: 'Alman Opa',
+    cast: ['opa'],
     isVip: false
   },
   {
@@ -394,9 +343,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Kevin: ist KI-generiert',
     duration: '01:01 min',
     episodeNumber: 'Neu',
-    category: 'kevin',
-    categoryLabel: 'Kevin',
-    characters: 'Kevin',
+    cast: ['kevin'],
     isVip: false
   },
   {
@@ -406,9 +353,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Omma: No-Go-Area an der Bushaltestelle',
     duration: '01:07 min',
     episodeNumber: 'Neu',
-    category: 'oma',
-    categoryLabel: 'Omma Sketche',
-    characters: 'Omma',
+    cast: ['omma'],
     isVip: false
   },
   {
@@ -418,9 +363,128 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Bahndidos: Flixtrain Angels',
     duration: '00:42 min',
     episodeNumber: 'Neu',
-    category: 'bahndidos',
-    categoryLabel: 'Bahndidos',
-    characters: 'Bahndidos',
+    cast: ['bahndidos', 'opa'],
+    isVip: false
+  },
+
+  {
+    id: 'r2-luftgitarre',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Alman-opa-luftgitarre-im-park.mp4',
+    poster: '/assets/posters/luftgitarre.jpg?v=frame',
+    title: 'Alman Opa: Luftgitarre im Park',
+    duration: '00:16 min',
+    episodeNumber: 'Neu',
+    cast: ['opa'],
+    isVip: false
+  },
+  {
+    id: 'r2-spardidos',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bahndidos-Spardidos-mit-oma-schelle.mp4',
+    poster: '/assets/posters/spardidos.jpg?v=frame',
+    title: 'Bahndidos: Spardidos mit Oma Schelle',
+    duration: '00:20 min',
+    episodeNumber: 'Neu',
+    cast: ['bahndidos', 'omaschelle'],
+    isVip: false
+  },
+  {
+    id: 'r2-pinguin',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bankgeheimnis-Pinguin-im-park.mp4',
+    poster: '/assets/posters/pinguin.jpg?v=frame',
+    title: 'Pinguin im Park',
+    duration: '00:30 min',
+    episodeNumber: 'Neu',
+    cast: ['parkbank'],
+    isVip: false
+  },
+  {
+    id: 'r2-groenland',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Blocksberg-Brigade-Gr%C3%B6nland-bleibt-besenrein.mp4',
+    poster: '/assets/posters/groenland.jpg?v=frame',
+    title: 'Pimpelhuber: Grönland bleibt besenrein',
+    duration: '00:29 min',
+    episodeNumber: 'Neu',
+    cast: ['pimpelhuber'],
+    isVip: false
+  },
+  {
+    id: 'r2-stroh2000',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Blocksberg-Brigade-strohbesen2000.mp4',
+    poster: '/assets/posters/strohbesen2000.jpg?v=frame',
+    title: 'Pimpelhuber: Strohbesen 2000',
+    duration: '00:38 min',
+    episodeNumber: 'Neu',
+    cast: ['pimpelhuber'],
+    isVip: false
+  },
+  {
+    id: 'r2-schelle-original',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Oma-Schelle-Bahndidos-orginal.mp4',
+    poster: '/assets/posters/oma-schelle-original.jpg?v=frame',
+    title: 'Bahndidos: Oma Schelle, Original',
+    duration: '00:21 min',
+    episodeNumber: 'Neu',
+    cast: ['bahndidos', 'omaschelle'],
+    isVip: false
+  },
+  {
+    id: 'r2-pass',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Omma-talahons-deutschen-pass-im-app-store.mp4',
+    poster: '/assets/posters/pass-appstore.jpg?v=frame',
+    title: 'Omma: Deutscher Pass im App Store',
+    duration: '01:04 min',
+    episodeNumber: 'Neu',
+    cast: ['omma', 'talahons'],
+    isVip: false
+  },
+  {
+    id: 'r2-sbahn',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/omma-s-bahndidos.mp4',
+    poster: '/assets/posters/s-bahndidos.jpg?v=frame',
+    title: 'Bahndidos: S-Bahndidos',
+    duration: '00:22 min',
+    episodeNumber: 'Neu',
+    cast: ['bahndidos', 'omma'],
+    isVip: false
+  },
+  {
+    id: 'r2-alltag-1',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Park-Alltag-Teil-1.mp4',
+    poster: '/assets/posters/park-alltag-1.jpg?v=frame',
+    title: 'Park Alltag Teil 1',
+    duration: '03:36 min',
+    episodeNumber: 'Teil 1',
+    cast: ['parkbank'],
+    isVip: false
+  },
+  {
+    id: 'r2-alltag-2',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Park-Alltag-Teil-2.mp4',
+    poster: '/assets/posters/park-alltag-2.jpg?v=frame',
+    title: 'Park Alltag Teil 2',
+    duration: '03:17 min',
+    episodeNumber: 'Teil 2',
+    cast: ['parkbank'],
+    isVip: false
+  },
+  {
+    id: 'r2-alltag-3',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Park-Alltag-Teil-3.mp4',
+    poster: '/assets/posters/park-alltag-3.jpg?v=frame',
+    title: 'Park Alltag Teil 3',
+    duration: '02:38 min',
+    episodeNumber: 'Teil 3',
+    cast: ['parkbank'],
+    isVip: false
+  },
+  {
+    id: 'r2-alltag-4',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Park-Alltag-Teil-4.mp4',
+    poster: '/assets/posters/park-alltag-4.jpg?v=frame',
+    title: 'Park Alltag Teil 4',
+    duration: '02:55 min',
+    episodeNumber: 'Teil 4',
+    cast: ['parkbank'],
     isVip: false
   },
 ];
@@ -437,6 +501,34 @@ const CHARACTER_NAMES: Record<string, string> = {
   opa: 'Alman Opa',
   schild: 'Bankgeheimnis im Park'
 };
+
+const CAST_LABEL: Record<CastId, string> = {
+  omma: 'Omma',
+  opa: 'Alman Opa',
+  bahndidos: 'Bahndidos',
+  punk: 'Punks',
+  talahons: 'Talahons',
+  chantal: 'Chantal',
+  kevin: 'Kevin',
+  hippie: 'Hippie',
+  pimpelhuber: 'Pimpelhuber',
+  omaschelle: 'Oma Schelle',
+  parkbank: 'Parkbank'
+};
+
+const CAST_FILTERS: CastId[] = [
+  'omma',
+  'opa',
+  'bahndidos',
+  'punk',
+  'talahons',
+  'chantal',
+  'kevin',
+  'hippie',
+  'pimpelhuber',
+  'omaschelle',
+  'parkbank'
+];
 
 interface LeafParticle {
   x: number;
@@ -507,7 +599,7 @@ export default function App() {
     window.innerWidth > window.innerHeight
   );
   const bannerCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeCategory, setActiveCategory] = useState<VideoCategory>('all');
+  const [castFilter, setCastFilter] = useState<CastId[]>([]);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [likedVideos, setLikedVideos] = useState<Record<string, boolean>>({});
 
@@ -784,50 +876,17 @@ export default function App() {
     showToast('Erfolgreich abgemeldet.');
   };
 
-  const clipSeconds = (duration: string) => {
-    const [minutes, seconds] = duration.split(' ')[0].split(':').map(Number);
-    return minutes * 60 + seconds;
+  const toggleCast = (id: CastId) => {
+    setCastFilter((current) => {
+      if (current.includes(id)) return current.filter((item) => item !== id);
+      if (current.length >= 2) return [current[1], id];
+      return [...current, id];
+    });
   };
 
-  const byLength = (list: RealVideo[]) =>
-    [...list].sort((a, b) => clipSeconds(a.duration) - clipSeconds(b.duration));
-
-  const of = (who: RealVideo['category']) => REAL_VIDEOS.filter((video) => video.category === who);
-
-  const lengthSections = (who: 'oma' | 'opa', label: string) => {
-    const list = of(who);
-    const kurz = byLength(list.filter((video) => clipSeconds(video.duration) < 60));
-    const lang = byLength(list.filter((video) => clipSeconds(video.duration) >= 60));
-    const prefix = activeCategory === 'all' ? `${label} · ` : '';
-    return [
-      kurz.length ? { title: `${prefix}Unter einer Minute`, videos: kurz } : null,
-      lang.length ? { title: `${prefix}Über einer Minute`, videos: lang } : null,
-    ].filter((section): section is { title: string; videos: RealVideo[] } => section !== null);
-  };
-
-  const videoSections =
-    activeCategory === 'oma'
-      ? lengthSections('oma', 'Omma')
-      : activeCategory === 'opa'
-        ? lengthSections('opa', 'Opa')
-        : activeCategory === 'bahndidos'
-          ? [{ title: 'Bahndidos', videos: byLength(of('bahndidos')) }]
-          : activeCategory === 'blocksberg'
-            ? [{ title: 'Blocksberg Brigade', videos: byLength(of('blocksberg')) }]
-            : activeCategory === 'kevin'
-              ? [{ title: 'Kevin', videos: byLength(of('kevin')) }]
-              : activeCategory === 'sonst'
-                ? [{ title: 'Sonstiges', videos: of('sonst') }]
-                : activeCategory === 'vip'
-                  ? []
-                  : [
-                      ...lengthSections('oma', 'Omma'),
-                      ...lengthSections('opa', 'Opa'),
-                      { title: 'Bahndidos', videos: byLength(of('bahndidos')) },
-                      { title: 'Blocksberg Brigade', videos: byLength(of('blocksberg')) },
-                      { title: 'Kevin', videos: byLength(of('kevin')) },
-                      { title: 'Sonstiges', videos: of('sonst') },
-                    ].filter((section) => section.videos.length);
+  const visibleVideos = REAL_VIDEOS.filter((video) =>
+    castFilter.every((id) => video.cast.includes(id))
+  );
 
   // Render-Funktion für das Namensschild direkt AUF der jeweils angeklickten Figur
   const renderCharBadge = (charKey: string, posClasses: string = "bottom-1 left-1/2 -translate-x-1/2") => {
@@ -1333,155 +1392,41 @@ export default function App() {
           </p>
         </div>
 
-        {/* Kategorie-Filter */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8">
-          <button 
-            onClick={() => setActiveCategory('all')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
-              activeCategory === 'all' 
-                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
-                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
-            }`}
-          >
-            Alle Sketche ({REAL_VIDEOS.length})
-          </button>
-
-          <button 
-            onClick={() => setActiveCategory('oma')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
-              activeCategory === 'oma' 
-                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
-                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
-            }`}
-          >
-            Oma ({REAL_VIDEOS.filter((video) => video.category === 'oma').length})
-          </button>
-
-          <button 
-            onClick={() => setActiveCategory('opa')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
-              activeCategory === 'opa' 
-                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
-                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
-            }`}
-          >
-            Opa ({REAL_VIDEOS.filter((video) => video.category === 'opa').length})
-          </button>
-
-          <button 
-            onClick={() => setActiveCategory('bahndidos')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeCategory === 'bahndidos' 
-                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
-                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
-            }`}
-          >
-            <span>Bahndidos</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveCategory('blocksberg')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
-              activeCategory === 'blocksberg' 
-                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
-                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
-            }`}
-          >
-            Blocksberg ({REAL_VIDEOS.filter((video) => video.category === 'blocksberg').length})
-          </button>
-
-          <button 
-            onClick={() => setActiveCategory('kevin')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
-              activeCategory === 'kevin' 
-                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
-                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
-            }`}
-          >
-            Kevin ({REAL_VIDEOS.filter((video) => video.category === 'kevin').length})
-          </button>
-
-          <button 
-            onClick={() => setActiveCategory('sonst')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer ${
-              activeCategory === 'sonst' 
-                ? 'bg-[#6d3c17] text-white shadow-lg scale-105 border border-[#c89346]' 
-                : 'bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white border border-neutral-800'
-            }`}
-          >
-            Sonstiges ({REAL_VIDEOS.filter((video) => video.category === 'sonst').length})
-          </button>
-
-          <button 
-            onClick={() => setActiveCategory('vip')}
-            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeCategory === 'vip' 
-                ? 'bg-[#c89346] text-black shadow-lg scale-105 font-extrabold' 
-                : 'bg-neutral-900 text-[#c89346] hover:bg-neutral-800 border border-[#c89346]/40'
-            }`}
-          >
-            <Lock className="w-3.5 h-3.5" />
-            <span>VIP Special</span>
-          </button>
+        <div className="mb-8 rounded-3xl border border-neutral-800 bg-neutral-950 p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              onClick={() => setCastFilter([])}
+              className={`px-4 py-2 rounded-xl text-sm sm:text-base font-bold cursor-pointer border ${
+                castFilter.length === 0
+                  ? 'bg-[#6d3c17] text-white border-[#c89346]'
+                  : 'bg-neutral-900 text-neutral-300 border-neutral-800'
+              }`}
+            >
+              Alle ({REAL_VIDEOS.length})
+            </button>
+            {CAST_FILTERS.map((id) => {
+              const selected = castFilter.includes(id);
+              const count = REAL_VIDEOS.filter((video) => video.cast.includes(id)).length;
+              return (
+                <button
+                  key={id}
+                  onClick={() => toggleCast(id)}
+                  className={`px-4 py-2 rounded-xl text-sm sm:text-base font-bold cursor-pointer border ${
+                    selected
+                      ? 'bg-[#6d3c17] text-white border-[#c89346]'
+                      : 'bg-neutral-900 text-neutral-300 border-neutral-800'
+                  }`}
+                >
+                  {CAST_LABEL[id]} ({count})
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* VIDEOLISTE IM RASTER */}
-        {activeCategory === 'kevin' && !REAL_VIDEOS.some((video) => video.category === 'kevin') ? (
-          /* ============================================================ */
-          /* KEVIN STATUS-KARTE: NOCH KEIN VIDEO ONLINE                    */
-          /* ============================================================ */
-          <div className="max-w-2xl mx-auto p-8 sm:p-10 rounded-3xl bg-neutral-900/90 border-2 border-[#c89346]/60 text-center flex flex-col items-center shadow-2xl">
-            <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-black/80 border-2 border-[#c89346] flex items-center justify-center overflow-hidden mb-5 shadow-inner">
-              <img 
-                src="/assets/characters/kevin_crop.webp" 
-                alt="Kevin" 
-                className="w-full h-auto object-contain translate-y-3 scale-125" 
-              />
-            </div>
-            
-            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-950/80 text-[#e8b568] border border-amber-600/50 text-xs font-black uppercase tracking-wider mb-3">
-              <Clock className="w-3.5 h-3.5" />
-              <span>Noch kein Video online • In Produktion</span>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {visibleVideos.map((vid) => {
 
-            <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
-              Kevin
-            </h3>
-            
-            <p className="mt-3 text-neutral-300 text-base sm:text-lg max-w-lg leading-relaxed">
-              Für <strong>Kevin</strong> gibt es aktuell noch kein fertiges Video online. Die erste Folge befindet sich gerade im Dreh und Schnitt!
-            </p>
-            <p className="mt-1 text-sm text-neutral-400">
-              Die Sketche von <strong>Bahndidos</strong> sowie von <strong>Omma & Opa</strong> kannst du dir bereits jetzt in voller Länge anschauen!
-            </p>
-
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-              <button 
-                onClick={() => setActiveCategory('bahndidos')}
-                className="px-5 py-3 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-sm sm:text-base border border-[#c89346] shadow cursor-pointer transition-all"
-              >
-                Bahndidos Sketche ansehen (Bereits online)
-              </button>
-              <button 
-                onClick={() => setActiveCategory('oma')}
-                className="px-5 py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white font-bold text-sm sm:text-base border border-neutral-700 cursor-pointer transition-all"
-              >
-                Oma und Opa Sketche ansehen
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-10">
-            {activeCategory === 'vip' && (
-              <p className="text-center text-neutral-300 text-lg">Noch keine VIP-Folge.</p>
-            )}
-            {videoSections.map((section) => (
-              <div key={section.title}>
-                <h3 className="mb-4 text-xl sm:text-2xl font-black uppercase tracking-wide text-[#e8b568]">
-                  {section.title}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {section.videos.map((vid) => {
               const isLiked = likedVideos[vid.id];
 
               return (
@@ -1536,12 +1481,11 @@ export default function App() {
                       
                       {/* Echte Kategorien & Rollen statt erfundener Aufrufzahlen */}
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-md bg-[#6d3c17]/40 text-[#e8b568] border border-[#c89346]/40 text-xs font-bold">
-                          {vid.categoryLabel}
-                        </span>
-                        <span className="text-xs text-neutral-400 font-medium">
-                          Mit: {vid.characters}
-                        </span>
+                        {vid.cast.map((id) => (
+                          <span key={id} className="px-2.5 py-0.5 rounded-md bg-[#6d3c17]/40 text-[#e8b568] border border-[#c89346]/40 text-xs font-bold">
+                            {CAST_LABEL[id]}
+                          </span>
+                        ))}
                       </div>
                     </div>
 
@@ -1569,42 +1513,9 @@ export default function App() {
                 </div>
               );
             })}
-                </div>
-              </div>
-            ))}
-
-            {activeCategory === 'all' && (
-              <div 
-                onClick={() => setActiveCategory('kevin')}
-                className="bg-neutral-900/50 rounded-2xl p-6 border-2 border-dashed border-neutral-800 hover:border-[#c89346]/70 transition-all flex flex-col justify-between items-center text-center cursor-pointer group shadow-lg"
-              >
-                <div className="w-full flex flex-col items-center">
-                  <div className="relative w-24 h-24 rounded-full bg-neutral-950 border border-neutral-700 group-hover:border-[#c89346] transition-colors overflow-hidden mb-3 flex items-center justify-center">
-                    <img 
-                      src="/assets/characters/kevin_crop.webp" 
-                      alt="Kevin" 
-                      className="w-full h-auto object-contain translate-y-1.5 scale-125" 
-                    />
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 text-[#e8b568] border border-amber-600/40 text-[11px] font-black uppercase tracking-wider mb-2">
-                    <Clock className="w-3 h-3" />
-                    <span>In Produktion</span>
-                  </div>
-                  <h3 className="font-extrabold text-lg text-white group-hover:text-[#c89346] transition-colors">
-                    Kevin
-                  </h3>
-                  <p className="text-xs sm:text-sm text-neutral-400 mt-1.5 leading-relaxed">
-                    Für Kevin gibt es noch kein Video online. Die erste Folge ist im Dreh.
-                  </p>
-                </div>
-
-                <div className="mt-5 w-full pt-3 border-t border-neutral-800/80 flex items-center justify-center text-xs text-[#e8b568] font-bold group-hover:underline">
-                  <span>Status zu Kevin ansehen</span>
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </div>
-              </div>
-            )}
-          </div>
+        </div>
+        {visibleVideos.length === 0 && (
+          <p className="mt-8 text-center text-neutral-300 text-lg">Keine Szene mit beiden.</p>
         )}
 
         {/* On-Site Parkbank Info-Box (Keine externen YouTube-Verlinkungen) */}
