@@ -159,6 +159,7 @@
 /* Animationsklassen für das Banner */
 .anim-banner-schild {
   animation: schildShootUp 0.85s cubic-bezier(0.15, 0.85, 0.35, 1.2) 0.05s both;
+  transform: translate3d(-50%, 0, 0);
 }
 
 /* Köpfe kommen nach dem Schild-Wackeln zügig rein */

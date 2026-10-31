@@ -5,9 +5,10 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  Play, Lock, User, X, ChevronRight, ThumbsUp,
+  Play, Lock, User, X, ChevronRight, ChevronDown, Filter, ThumbsUp,
   Check, LogOut, ShieldCheck, Sparkles,
-  Film, Users, Gamepad2, Trophy, RotateCcw, ExternalLink
+  Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink, Gift, Copy, Eye,
+  Ticket, Award
 } from 'lucide-react';
 
 export type CastId =
@@ -16,6 +17,7 @@ export type CastId =
   | 'bahndidos'
   | 'punk'
   | 'talahons'
+  | 'talahinnen'
   | 'chantal'
   | 'kevin'
   | 'hippie'
@@ -43,8 +45,8 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/no-go-area.jpg?v=frame',
     title: 'Alman Opa: No-Go-Area',
     duration: '01:01 min',
-    episodeNumber: 'Neu',
-    cast: ['opa'],
+    episodeNumber: '',
+    cast: ['opa', 'talahinnen'],
     isVip: false
   },
   {
@@ -53,7 +55,7 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/waschenverbotszone.jpg?v=frame',
     title: 'Omma: Punk bei Waschverbotszone',
     duration: '01:01 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['omma', 'punk'],
     isVip: false
   },
@@ -63,9 +65,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/komissar-blitzbirne.jpg?v=frame',
     title: 'Omma: Komissar Blitzbirne',
     duration: '00:45 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['omma'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-gemuese',
@@ -73,7 +75,7 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/oma-gemuese.jpg?v=frame',
     title: 'Omma: Gemüse im Obstladen',
     duration: '01:02 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['omma', 'chantal'],
     isVip: false
   },
@@ -83,9 +85,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/oma-punk-nullpunkt.jpg?v=frame',
     title: 'Omma: Punk bei Nullpunkt',
     duration: '00:27 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['omma', 'punk'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-eco',
@@ -93,7 +95,7 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/oma-rocker-eco.jpg?v=frame',
     title: 'Oma und Rocker im Eco-Modus',
     duration: '01:01 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'omma'],
     isVip: false
   },
@@ -103,9 +105,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/opa-genz-leer.jpg?v=frame',
     title: 'Alman Opa: Chantal, leer',
     duration: '00:15 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['opa', 'chantal'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-shaschlik',
@@ -113,19 +115,19 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/opa-punk-shaschlik.jpg?v=frame',
     title: 'Alman Opa: Punk bei Schaschlik',
     duration: '00:30 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['opa', 'punk'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-naegel',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_talahinnen_Plastikn%C3%A4gel_kartell_Full%20HD%201080p_HIGH_FR24.mp4',
     poster: '/assets/posters/opa-talahinnen-naegel.jpg?v=frame',
-    title: 'Alman Opa: Chantal bei Plastiknägeln',
+    title: 'Alman Opa: Plastiknägeln Kartell',
     duration: '00:23 min',
-    episodeNumber: 'Neu',
-    cast: ['opa', 'chantal'],
-    isVip: false
+    episodeNumber: '',
+    cast: ['opa', 'talahinnen'],
+    isVip: true
   },
   {
     id: 'r2-ramadan',
@@ -133,9 +135,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/opa-talahons-ramadan.jpg?v=frame',
     title: 'Alman Opa: Talahons, Ramadan fürs Gehirn',
     duration: '00:39 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['opa', 'talahons'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-bahnhofsklo',
@@ -143,9 +145,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/bahnhofsklo.jpg?v=frame',
     title: 'Alman Opa: Bahnhofsklo als Meldeadresse',
     duration: '00:24 min',
-    episodeNumber: 'Neu',
-    cast: ['opa'],
-    isVip: false
+    episodeNumber: '',
+    cast: ['opa', 'punk'],
+    isVip: true
   },
   {
     id: 'r2-hippie',
@@ -153,9 +155,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/hippie-hohlkopf.jpg?v=frame',
     title: 'Alman Opa: Hippie Hohlkopf',
     duration: '00:17 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['opa', 'hippie'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-barfuss',
@@ -163,9 +165,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/barfuss-waschbecken.jpg?v=frame',
     title: 'Omma: Barfuß durchs Waschbecken',
     duration: '00:31 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['omma'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-fremdsprachen',
@@ -173,9 +175,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/fremdsprachen.jpg?v=frame',
     title: 'Alman Opa: Fremdsprachen-Akrobatinnen',
     duration: '00:21 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['opa'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-oma-weg',
@@ -183,9 +185,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/oma-ist-weg.jpg?v=frame',
     title: 'Oma ist weg',
     duration: '02:40 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['chantal', 'bahndidos', 'hippie'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-kappen',
@@ -193,18 +195,18 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/kappenfraktion.jpg?v=frame',
     title: 'Alman Opa: Kappenfraktion oder Hutbürger',
     duration: '01:02 min',
-    episodeNumber: 'Neu',
-    cast: ['opa', 'omma'],
-    isVip: false
+    episodeNumber: '',
+    cast: ['opa'],
+    isVip: true
   },
   {
     id: 'r2-handtasche',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/No%20Go%20Area%20f%C3%BCr%20wen_%20-%20Oma%20hat%20ne%20andere%20Idee%20in%20der%20Handtasche%20_%20Comedy%20Sketch.mp4',
     poster: '/assets/posters/nogo-handtasche.jpg?v=frame',
-    title: 'Omma: No-Go-Area, andere Idee',
+    title: 'Omma: keine Go Area für Deutsche',
     duration: '01:03 min',
-    episodeNumber: 'Neu',
-    cast: ['omma'],
+    episodeNumber: '',
+    cast: ['omma', 'talahons'],
     isVip: false
   },
   {
@@ -213,8 +215,8 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/parkverbot-almans.jpg?v=frame',
     title: 'Omma: Parkverbot für Almans',
     duration: '01:15 min',
-    episodeNumber: 'Neu',
-    cast: ['omma'],
+    episodeNumber: '',
+    cast: ['omma', 'talahons'],
     isVip: false
   },
   {
@@ -223,9 +225,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/tramdidos.jpg?v=frame',
     title: 'Bahndidos: Tramdidos',
     duration: '00:28 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'omma'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-ubahn',
@@ -233,9 +235,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/ubahndidos.jpg?v=frame',
     title: 'Bahndidos: Ubahndidos',
     duration: '00:29 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'omma'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-gesagt',
@@ -243,9 +245,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/was-haben-sie-gesagt.jpg?v=frame',
     title: 'Omma: Was haben Sie gesagt',
     duration: '02:47 min',
-    episodeNumber: 'Neu',
-    cast: ['omma'],
-    isVip: false
+    episodeNumber: '',
+    cast: ['omma', 'opa', 'bahndidos'],
+    isVip: true
   },
   {
     id: 'r2-weich',
@@ -253,8 +255,8 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/weichspueler.jpg?v=frame',
     title: 'Alman Opa: Weichspüler auf Lunge',
     duration: '01:01 min',
-    episodeNumber: 'Neu',
-    cast: ['opa'],
+    episodeNumber: '',
+    cast: ['opa', 'talahons'],
     isVip: false
   },
   {
@@ -263,8 +265,8 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/kassa-blanko.jpg?v=frame',
     title: 'Alman Opa: Kassa blanko',
     duration: '01:02 min',
-    episodeNumber: 'Neu',
-    cast: ['opa'],
+    episodeNumber: '',
+    cast: ['opa', 'talahinnen'],
     isVip: false
   },
   {
@@ -273,7 +275,7 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/kevin-zeugnis.jpg?v=frame',
     title: 'Kevin: Zeugnis',
     duration: '01:03 min',
-    episodeNumber: 'Abo',
+    episodeNumber: 'Neu',
     cast: ['kevin'],
     isVip: true
   },
@@ -283,9 +285,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/stricknadel-1.jpg?v=frame',
     title: 'Omma: Stricknadelkommando Teil 1',
     duration: '00:35 min',
-    episodeNumber: 'Neu',
-    cast: ['omma'],
-    isVip: false
+    episodeNumber: '',
+    cast: ['omma', 'talahinnen'],
+    isVip: true
   },
   {
     id: 'r2-strick-2',
@@ -293,9 +295,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/stricknadel-2.jpg?v=frame2',
     title: 'Omma: Stricknadelkommando Teil 2',
     duration: '00:37 min',
-    episodeNumber: 'Neu',
-    cast: ['omma'],
-    isVip: false
+    episodeNumber: '',
+    cast: ['omma', 'punk'],
+    isVip: true
   },
   {
     id: 'r2-bimmel',
@@ -303,9 +305,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/bimmelbahndidos.jpg?v=frame',
     title: 'Bahndidos: Bimmelbahndidos',
     duration: '00:29 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'opa'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-blocksberg',
@@ -313,9 +315,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/blocksberg.jpg?v=frame',
     title: 'Blocksberg Brigade: Strohbesen-Bataillon',
     duration: '01:03 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['blocksberg', 'pimpelhuber'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-glocke',
@@ -323,9 +325,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/reichszeitglocke.jpg?v=frame',
     title: 'Reichszeitglocke',
     duration: '01:33 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['pimpelhuber'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-hauptschule',
@@ -333,8 +335,8 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/hauptschule.jpg?v=frame',
     title: 'Alman Opa: Hauptschulabschluss aus der Wunderlampe',
     duration: '01:01 min',
-    episodeNumber: 'Neu',
-    cast: ['opa'],
+    episodeNumber: '',
+    cast: ['opa', 'talahinnen'],
     isVip: false
   },
   {
@@ -343,9 +345,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/kevin-ki.jpg?v=frame',
     title: 'Kevin: ist KI-generiert',
     duration: '01:01 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['kevin'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-bus',
@@ -353,9 +355,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/bushaltestelle.jpg?v=frame',
     title: 'Omma: No-Go-Area an der Bushaltestelle',
     duration: '01:07 min',
-    episodeNumber: 'Neu',
-    cast: ['omma'],
-    isVip: false
+    episodeNumber: '',
+    cast: ['omma', 'talahons'],
+    isVip: true
   },
   {
     id: 'r2-flixtrain',
@@ -363,20 +365,19 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/flixtrain-angels.jpg?v=frame',
     title: 'Bahndidos: Flixtrain Angels',
     duration: '00:42 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'opa'],
-    isVip: false
+    isVip: true
   },
-
   {
     id: 'r2-luftgitarre',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Alman-opa-luftgitarre-im-park.mp4',
     poster: '/assets/posters/luftgitarre.jpg?v=frame',
     title: 'Alman Opa: Luftgitarre im Park',
     duration: '00:16 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['opa'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-spardidos',
@@ -384,9 +385,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/spardidos.jpg?v=frame',
     title: 'Bahndidos: Spardidos mit Oma Schelle',
     duration: '00:20 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'omaschelle'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-pinguin',
@@ -394,9 +395,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/pinguin.jpg?v=frame',
     title: 'Pinguin im Park',
     duration: '00:30 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['parkbank'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-groenland',
@@ -404,9 +405,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/groenland.jpg?v=frame',
     title: 'Blocksberg Brigade: Grönland bleibt besenrein',
     duration: '00:29 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['blocksberg'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-stroh2000',
@@ -414,9 +415,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/strohbesen2000.jpg?v=frame',
     title: 'Blocksberg Brigade: Strohbesen 2000',
     duration: '00:38 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['blocksberg'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-schelle-original',
@@ -424,9 +425,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/oma-schelle-original.jpg?v=frame',
     title: 'Bahndidos: Oma Schelle, Original',
     duration: '00:21 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'omaschelle'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-pass',
@@ -434,7 +435,7 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/pass-appstore.jpg?v=frame',
     title: 'Omma: Deutscher Pass im App Store',
     duration: '01:04 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['omma', 'talahons'],
     isVip: false
   },
@@ -444,9 +445,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/s-bahndidos.jpg?v=frame',
     title: 'Bahndidos: S-Bahndidos',
     duration: '00:22 min',
-    episodeNumber: 'Neu',
+    episodeNumber: '',
     cast: ['bahndidos', 'omma'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-alltag-1',
@@ -454,9 +455,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/park-alltag-1.jpg?v=frame',
     title: 'Park Alltag Teil 1',
     duration: '03:36 min',
-    episodeNumber: 'Teil 1',
+    episodeNumber: '',
     cast: ['parkbank'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-alltag-2',
@@ -464,9 +465,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/park-alltag-2.jpg?v=frame',
     title: 'Park Alltag Teil 2',
     duration: '03:17 min',
-    episodeNumber: 'Teil 2',
+    episodeNumber: '',
     cast: ['parkbank'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-alltag-3',
@@ -474,9 +475,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/park-alltag-3.jpg?v=frame',
     title: 'Park Alltag Teil 3',
     duration: '02:38 min',
-    episodeNumber: 'Teil 3',
+    episodeNumber: '',
     cast: ['parkbank'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-alltag-4',
@@ -484,9 +485,9 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/park-alltag-4.jpg?v=frame',
     title: 'Park Alltag Teil 4',
     duration: '02:55 min',
-    episodeNumber: 'Teil 4',
+    episodeNumber: '',
     cast: ['parkbank'],
-    isVip: false
+    isVip: true
   },
 ];
 
@@ -509,6 +510,7 @@ const CAST_LABEL: Record<CastId, string> = {
   bahndidos: 'Bahndidos',
   punk: 'Punks',
   talahons: 'Talahons',
+  talahinnen: 'Talahinnen',
   chantal: 'Chantal',
   kevin: 'Kevin',
   hippie: 'Hippie',
@@ -524,6 +526,7 @@ const CAST_FILTERS: CastId[] = [
   'bahndidos',
   'punk',
   'talahons',
+  'talahinnen',
   'chantal',
   'kevin',
   'hippie',
@@ -557,6 +560,12 @@ const LEAF_COLORS = [
   '#5ea855',
   '#7fa33b'
 ];
+
+const parseDurationSeconds = (dur: string): number => {
+  const match = dur.match(/(\d+):(\d+)/);
+  if (!match) return 0;
+  return parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+};
 
 interface UserAccount {
   name: string;
@@ -594,7 +603,7 @@ export default function App() {
 
   // Video Player State
   const [playingVideo, setPlayingVideo] = useState<RealVideo | null>(null);
-  const [filmPhase, setFilmPhase] = useState<'intro' | 'film' | 'ende'>('intro');
+  const [filmPhase, setFilmPhase] = useState<'intro' | 'film' | 'guestLock' | 'ende'>('intro');
   const [introReady, setIntroReady] = useState(false);
   const [tvLogo, setTvLogo] = useState(() =>
     typeof window !== 'undefined' &&
@@ -603,6 +612,10 @@ export default function App() {
   );
   const bannerCanvasRef = useRef<HTMLCanvasElement>(null);
   const [castFilter, setCastFilter] = useState<CastId[]>([]);
+  const [isCategoryBoxOpen, setIsCategoryBoxOpen] = useState(false);
+  const [onlyAbo, setOnlyAbo] = useState<boolean>(false);
+  const [durationFilter, setDurationFilter] = useState<'all' | 'under1' | 'over1'>('all');
+  const [visibleCount, setVisibleCount] = useState<number>(3);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [likedVideos, setLikedVideos] = useState<Record<string, boolean>>({});
 
@@ -622,8 +635,52 @@ export default function App() {
     setIntroReady(false);
   }, [playingVideo]);
 
-  // Offizielles Parkbank-Duell Browsergame Modal State
-  const [isGameOpen, setIsGameOpen] = useState(false);
+  // Geschenkcode State & Feedback
+  const [isGiftCodeRevealed, setIsGiftCodeRevealed] = useState(false);
+  const [isGiftCodeCopied, setIsGiftCodeCopied] = useState(false);
+
+  // Autoplay State (Exklusiv für Ehren-Parkausweis / VIP)
+  const [isAutoplay, setIsAutoplay] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('bankgeheimnis_autoplay');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleAutoplay = () => {
+    if (!isVipUnlocked) {
+      showToast('Autoplay ist exklusiv mit dem Ehren-Parkausweis verfügbar!');
+      setAuthTab('register');
+      setRegisterForVip(true);
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsAutoplay((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('bankgeheimnis_autoplay', JSON.stringify(next));
+      } catch {
+        // Fallback
+      }
+      showToast(next ? 'Autoplay: AN' : 'Autoplay: AUS');
+      return next;
+    });
+  };
+
+  // Aktive Playlist basierend auf gewählter Kategorie (oder allen zugänglichen Sketchen)
+  const currentCategoryPlaylist = React.useMemo(() => {
+    let list = REAL_VIDEOS.filter((v) => !v.isVip || isVipUnlocked);
+    if (castFilter.length > 0) {
+      list = list.filter((v) => castFilter.some((c) => v.cast.includes(c)));
+    }
+    return list;
+  }, [castFilter, isVipUnlocked]);
+
+  const currentPlaylistIndex = playingVideo 
+    ? currentCategoryPlaylist.findIndex((v) => v.id === playingVideo.id) 
+    : -1;
 
   // Speichern in localStorage
   const saveUser = (user: UserAccount | null) => {
@@ -826,11 +883,15 @@ export default function App() {
   };
 
   const handleWatchVideo = (vid: RealVideo) => {
+    // Bei Premium-Videos (mit Schloss im Thumbnail): Weder für Gäste noch für Standard-Nutzer das Intro abspielen!
     if (vid.isVip && !isVipUnlocked) {
-      showToast('🔒 Für VIP-Videos bitte einloggen oder VIP-Abo aktivieren!');
+      showToast('🔒 Für diesen Sketch wird der Ehren-Parkausweis benötigt!');
+      setRegisterForVip(true);
+      setAuthTab('register');
       setIsAuthModalOpen(true);
       return;
     }
+    // Intro & Player NUR für Standard-Clips (bei Gästen und Standard-Nutzern) sowie für VIP-Nutzer
     setPlayingVideo(vid);
   };
 
@@ -859,6 +920,9 @@ export default function App() {
       };
       saveUser(user);
       showToast(`Erfolgreich angemeldet als ${user.name}`);
+      if (playingVideo && (user.isVip || !playingVideo.isVip)) {
+        setFilmPhase('film');
+      }
     } else {
       const user: UserAccount = {
         name: authName.trim() || authEmail.split('@')[0],
@@ -868,6 +932,9 @@ export default function App() {
       };
       saveUser(user);
       showToast(registerForVip ? 'Konto erstellt & VIP-Abo aktiviert!' : 'Konto erfolgreich erstellt!');
+      if (playingVideo && (user.isVip || !playingVideo.isVip)) {
+        setFilmPhase('film');
+      }
     }
 
     setIsAuthModalOpen(false);
@@ -885,11 +952,25 @@ export default function App() {
       if (current.length >= 2) return [current[1], id];
       return [...current, id];
     });
+    setVisibleCount(3);
   };
 
-  const visibleVideos = REAL_VIDEOS.filter((video) =>
-    castFilter.every((id) => video.cast.includes(id))
-  );
+  const filteredVideos = REAL_VIDEOS.filter((video) => {
+    if (onlyAbo && !video.isVip) {
+      return false;
+    }
+    if (castFilter.length > 0 && !castFilter.every((id) => video.cast.includes(id))) {
+      return false;
+    }
+    if (durationFilter !== 'all') {
+      const sec = parseDurationSeconds(video.duration);
+      if (durationFilter === 'under1' && sec >= 60) return false;
+      if (durationFilter === 'over1' && sec < 60) return false;
+    }
+    return true;
+  });
+
+  const visibleVideos = filteredVideos.slice(0, visibleCount);
 
   // Render-Funktion für das Namensschild direkt AUF der jeweils angeklickten Figur
   const renderCharBadge = (charKey: string, posClasses: string = "bottom-1 left-1/2 -translate-x-1/2") => {
@@ -1134,15 +1215,15 @@ export default function App() {
                   triggerLeafExplosion();
                   handleCharacterClick('schild'); 
                 }}
-                className={`absolute left-1/2 -translate-x-1/2 bottom-0 w-[20%] max-w-[230px] h-[72%] z-15 anim-banner-schild cursor-pointer pointer-events-auto flex items-end justify-center transition-transform duration-300 ${
-                  activeChar === 'schild' ? 'scale-105 z-30' : 'hover:scale-[1.02]'
-                }`}
+                className="absolute left-1/2 bottom-[7%] w-[21%] max-w-[240px] h-[75%] z-15 anim-banner-schild cursor-pointer pointer-events-auto flex items-end justify-center"
                 title="Bankgeheimnis im Park Schild"
               >
                 <img 
                   src="/assets/characters/schild_crop.webp" 
                   alt="Bankgeheimnis im Park Schild" 
-                  className="h-full w-auto object-contain drop-shadow-[0_12px_35px_rgba(0,0,0,0.95)]"
+                  className={`h-full w-auto object-contain drop-shadow-[0_12px_35px_rgba(0,0,0,0.95)] transition-transform duration-300 ${
+                    activeChar === 'schild' ? 'scale-105' : 'hover:scale-[1.03]'
+                  }`}
                 />
                 {renderCharBadge('schild', 'top-[22%] left-1/2 -translate-x-1/2')}
               </div>
@@ -1154,16 +1235,16 @@ export default function App() {
               />
 
               {/* 5. TITEL & BUTTON: DIREKT IM BANNER ZWISCHEN OMMA UND ALMAN OPA */}
-              <div className="absolute bottom-[3%] sm:bottom-[4%] left-0 right-0 z-30 flex flex-col items-center text-center px-2 anim-cta-banner pointer-events-auto">
-                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)] leading-none select-none">
+              <div className="absolute bottom-[2%] sm:bottom-[3%] left-0 right-0 z-30 flex flex-col items-center text-center px-2 anim-cta-banner pointer-events-auto">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)] leading-none select-none">
                   BANKGEHEIMNIS
                 </h1>
-                <p className="text-[9px] sm:text-xs md:text-sm font-extrabold tracking-[0.25em] text-[#c89346] uppercase mt-0.5 sm:mt-1 mb-1 sm:mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] select-none">
+                <p className="text-[10px] sm:text-xs md:text-sm font-extrabold tracking-[0.25em] text-[#c89346] uppercase mt-0.5 sm:mt-1 mb-1 sm:mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] select-none">
                   COMEDY KANAL
                 </p>
                 <button 
                   onClick={(e) => { e.stopPropagation(); scrollToVideos(); }}
-                  className="py-1.5 sm:py-2 px-4 sm:px-6 md:px-7 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-xs sm:text-sm md:text-base uppercase tracking-wider border border-[#c89346] shadow-[0_4px_16px_rgba(0,0,0,0.7)] transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  className="py-2 sm:py-2.5 px-5 sm:px-7 md:px-8 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-xs sm:text-sm md:text-base uppercase tracking-wider border-2 border-[#c89346] shadow-[0_4px_16px_rgba(0,0,0,0.7)] transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>JETZT ANSCHAUEN</span>
                   <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 fill-white text-white" />
@@ -1327,17 +1408,17 @@ export default function App() {
                   triggerLeafExplosion();
                   handleCharacterClick('schild'); 
                 }}
-                className={`absolute left-1/2 bottom-0 w-[44%] h-[74%] z-15 anim-banner-schild cursor-pointer pointer-events-auto flex items-end justify-center transition-transform duration-300 ${
-                  activeChar === 'schild' ? 'scale-105 z-30' : 'hover:scale-[1.02]'
-                }`}
+                className="absolute left-1/2 bottom-[21%] w-[42%] h-[62%] z-15 anim-banner-schild cursor-pointer pointer-events-auto flex items-end justify-center"
                 title="Bankgeheimnis im Park Schild"
               >
                 <img 
                   src="/assets/characters/schild_crop.webp" 
                   alt="Bankgeheimnis im Park Schild" 
-                  className="h-full w-auto object-contain drop-shadow-[0_12px_35px_rgba(0,0,0,0.95)]"
+                  className={`h-full w-auto object-contain drop-shadow-[0_12px_35px_rgba(0,0,0,0.95)] transition-transform duration-300 ${
+                    activeChar === 'schild' ? 'scale-105' : 'hover:scale-[1.03]'
+                  }`}
                 />
-                {renderCharBadge('schild', 'top-[20%] left-1/2 -translate-x-1/2')}
+                {renderCharBadge('schild', 'top-[18%] left-1/2 -translate-x-1/2')}
               </div>
 
               {/* 4. CANVAS PARTIKEL: WEGFLIEGENDE BLÄTTER */}
@@ -1347,19 +1428,19 @@ export default function App() {
               />
 
               {/* 5. TITEL & BUTTON: DIREKT IM BANNER UNTER DEM SCHILD ZWISCHEN DEN KÖPFEN */}
-              <div className="absolute bottom-[23%] sm:bottom-[24%] left-0 right-0 z-30 flex flex-col items-center text-center px-3 anim-cta-banner pointer-events-auto">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)] leading-none select-none">
+              <div className="absolute bottom-[18%] sm:bottom-[19%] left-0 right-0 z-30 flex flex-col items-center text-center px-3 anim-cta-banner pointer-events-auto">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)] leading-none select-none">
                   BANKGEHEIMNIS
                 </h1>
-                <p className="text-[10px] sm:text-xs font-extrabold tracking-[0.25em] text-[#c89346] uppercase mt-1 mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] select-none">
+                <p className="text-xs sm:text-sm font-extrabold tracking-[0.25em] text-[#c89346] uppercase mt-1 mb-2.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] select-none">
                   COMEDY KANAL
                 </p>
                 <button 
                   onClick={(e) => { e.stopPropagation(); scrollToVideos(); }}
-                  className="w-full max-w-[220px] sm:max-w-[250px] py-2 sm:py-2.5 px-4 sm:px-5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-xs sm:text-sm uppercase tracking-wider border border-[#c89346] shadow-[0_4px_16px_rgba(0,0,0,0.7)] transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full max-w-[250px] sm:max-w-[290px] py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-sm sm:text-base uppercase tracking-wider border-2 border-[#c89346] shadow-[0_4px_16px_rgba(0,0,0,0.7)] transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>JETZT ANSCHAUEN</span>
-                  <Play className="w-3.5 h-3.5 fill-white text-white" />
+                  <Play className="w-4 h-4 fill-white text-white" />
                 </button>
               </div>
 
@@ -1395,35 +1476,260 @@ export default function App() {
           </p>
         </div>
 
-        <div className="mb-8 rounded-3xl border border-neutral-800 bg-neutral-950 p-4 sm:p-5">
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <button
-              onClick={() => setCastFilter([])}
-              className={`px-4 py-2 rounded-xl text-sm sm:text-base font-bold cursor-pointer border ${
-                castFilter.length === 0
-                  ? 'bg-[#6d3c17] text-white border-[#c89346]'
-                  : 'bg-neutral-900 text-neutral-300 border-neutral-800'
-              }`}
-            >
-              Alle ({REAL_VIDEOS.length})
-            </button>
-            {CAST_FILTERS.map((id) => {
-              const selected = castFilter.includes(id);
-              const count = REAL_VIDEOS.filter((video) => video.cast.includes(id)).length;
-              return (
+        <div className="mb-8 rounded-2xl sm:rounded-3xl border border-neutral-800 bg-neutral-950 p-3.5 sm:p-5">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            
+            {/* Filter-Auslöser & Aktive Filter Chips - zentriert im Hochformat / auf Mobile */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 w-full sm:w-auto">
+              
+              {/* Filter Button */}
+              <div>
                 <button
-                  key={id}
-                  onClick={() => toggleCast(id)}
-                  className={`px-4 py-2 rounded-xl text-sm sm:text-base font-bold cursor-pointer border ${
-                    selected
-                      ? 'bg-[#6d3c17] text-white border-[#c89346]'
-                      : 'bg-neutral-900 text-neutral-300 border-neutral-800'
+                  type="button"
+                  onClick={() => setIsCategoryBoxOpen(!isCategoryBoxOpen)}
+                  className={`bg-neutral-900 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-2.5 shadow-sm ${
+                    isCategoryBoxOpen || castFilter.length > 0 || onlyAbo || durationFilter !== 'all'
+                      ? 'border-[#c89346] text-[#e8b568] bg-[#6d3c17]/30'
+                      : 'border-neutral-700 hover:border-[#c89346]'
                   }`}
                 >
-                  {CAST_LABEL[id]} ({count})
+                  <Filter className="w-4 h-4 text-[#c89346] shrink-0" />
+                  <span>Kategorien & Filter</span>
+                  {((castFilter.length > 0 ? castFilter.length : 0) + (onlyAbo ? 1 : 0) + (durationFilter !== 'all' ? 1 : 0)) > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-[#c89346] text-black text-[11px] font-black flex items-center justify-center shrink-0">
+                      {(castFilter.length > 0 ? castFilter.length : 0) + (onlyAbo ? 1 : 0) + (durationFilter !== 'all' ? 1 : 0)}
+                    </span>
+                  )}
+                  <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${isCategoryBoxOpen ? 'rotate-180' : ''}`} />
                 </button>
-              );
-            })}
+              </div>
+
+              {/* Auswahl-Kasten Modal: Kategorien, Abo-Clips & Dauer - PERFEKT ZENTRIERT IM HOCHFORMAT & DESKTOP */}
+              {isCategoryBoxOpen && (
+                <div 
+                  className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
+                  onClick={() => setIsCategoryBoxOpen(false)}
+                >
+                  <div 
+                    className="w-full max-w-[500px] my-auto p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-[#0e0e0e] border-2 border-[#c89346] shadow-[0_0_50px_rgba(200,147,70,0.25)] flex flex-col"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    
+                    {/* Modal Header */}
+                    <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-neutral-800">
+                      <div>
+                        <h4 className="text-white font-black text-base sm:text-lg uppercase tracking-wide flex items-center gap-2">
+                          <Filter className="w-4 h-4 text-[#c89346]" />
+                          <span>Kategorien & Filter</span>
+                        </h4>
+                        <p className="text-neutral-400 text-xs mt-0.5">
+                          Wähle Kategorien, Abo-Status oder Clip-Länge
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {(castFilter.length > 0 || onlyAbo || durationFilter !== 'all') && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCastFilter([]);
+                              setOnlyAbo(false);
+                              setDurationFilter('all');
+                              setVisibleCount(3);
+                            }}
+                            className="text-xs font-bold text-[#e8b568] hover:underline cursor-pointer px-1 py-0.5"
+                          >
+                            Zurücksetzen
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setIsCategoryBoxOpen(false)}
+                          className="p-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-800 cursor-pointer transition-colors"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Kategorien-Grid inklusive ABO-CLIPS - VOLLSTÄNDIG SICHTBAR OHNE SCROLLBALKEN */}
+                    <div className="mb-3">
+                      <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-2 block">
+                        Kategorien & Rollen
+                      </span>
+                      <div className="grid grid-cols-2 gap-2">
+                        
+                        {/* Abo-Clips direkt als Kategorie in der Liste */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOnlyAbo(!onlyAbo);
+                            setVisibleCount(3);
+                          }}
+                          className={`px-3 py-2.5 rounded-xl text-xs sm:text-sm font-black text-left transition-all border flex items-center justify-between gap-1 cursor-pointer ${
+                            onlyAbo
+                              ? 'bg-[#6d3c17] text-[#fcd34d] border-[#c89346] shadow-md'
+                              : 'bg-neutral-900 text-[#e8b568] border-[#c89346]/40 hover:border-[#c89346]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 truncate">
+                            <Lock className="w-3.5 h-3.5 text-[#e8b568] shrink-0" />
+                            <span className="truncate">Abo-Clips</span>
+                          </div>
+                          {onlyAbo && <Check className="w-3.5 h-3.5 text-[#e8b568] shrink-0" />}
+                        </button>
+
+                        {/* Alle weiteren Rollen-Kategorien */}
+                        {CAST_FILTERS.map((id) => {
+                          const isSelected = castFilter.includes(id);
+                          return (
+                            <button
+                              key={id}
+                              type="button"
+                              onClick={() => toggleCast(id)}
+                              className={`px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left transition-all border flex items-center justify-between gap-1 cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#6d3c17] text-white border-[#c89346] shadow-md'
+                                  : 'bg-neutral-900 text-neutral-300 border-neutral-800 hover:border-neutral-600'
+                              }`}
+                            >
+                              <span className="truncate">{CAST_LABEL[id]}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-[#e8b568] shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Länge / Dauer direkt hier als Buttons statt Dropdown */}
+                    <div className="pt-3 border-t border-neutral-800">
+                      <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-2 block">
+                        Clip-Länge
+                      </span>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDurationFilter('all');
+                            setVisibleCount(3);
+                          }}
+                          className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
+                            durationFilter === 'all'
+                              ? 'bg-[#6d3c17] text-white border-[#c89346] shadow-sm'
+                              : 'bg-neutral-900 text-neutral-300 border-neutral-800 hover:border-neutral-600'
+                          }`}
+                        >
+                          Alle Längen
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDurationFilter('under1');
+                            setVisibleCount(3);
+                          }}
+                          className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
+                            durationFilter === 'under1'
+                              ? 'bg-[#6d3c17] text-white border-[#c89346] shadow-sm'
+                              : 'bg-neutral-900 text-neutral-300 border-neutral-800 hover:border-neutral-600'
+                          }`}
+                        >
+                          Unter 1 Min.
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDurationFilter('over1');
+                            setVisibleCount(3);
+                          }}
+                          className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
+                            durationFilter === 'over1'
+                              ? 'bg-[#6d3c17] text-white border-[#c89346] shadow-sm'
+                              : 'bg-neutral-900 text-neutral-300 border-neutral-800 hover:border-neutral-600'
+                          }`}
+                        >
+                          Über 1 Min.
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Modal Footer */}
+                    <div className="mt-4 pt-3.5 border-t border-neutral-800 flex items-center justify-between">
+                      <span className="text-xs text-neutral-400 font-medium">
+                        {filteredVideos.length === 1 ? '1 Video gefunden' : `${filteredVideos.length} Videos gefunden`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsCategoryBoxOpen(false)}
+                        className="px-6 py-2 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white text-xs font-black uppercase tracking-wider border border-[#c89346] cursor-pointer shadow-md transition-all active:scale-95"
+                      >
+                        Fertig
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+
+              {/* Aktive Filter Chips im Hauptbalken (Schnelles Entfernen) */}
+              {onlyAbo && (
+                <button
+                  type="button"
+                  onClick={() => setOnlyAbo(false)}
+                  className="px-2.5 py-1 rounded-lg bg-[#6d3c17]/50 text-[#fcd34d] border border-[#c89346]/60 text-xs font-bold flex items-center gap-1.5 hover:bg-[#6d3c17] transition-colors cursor-pointer"
+                  title="Abo-Filter entfernen"
+                >
+                  <Lock className="w-3 h-3 text-[#e8b568]" />
+                  <span>Abo-Clips</span>
+                  <X className="w-3 h-3 text-neutral-400 hover:text-white" />
+                </button>
+              )}
+
+              {castFilter.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => toggleCast(id)}
+                  className="px-2.5 py-1 rounded-lg bg-neutral-900 text-white border border-neutral-700 text-xs font-bold flex items-center gap-1.5 hover:border-[#c89346] transition-colors cursor-pointer"
+                  title={`${CAST_LABEL[id]} entfernen`}
+                >
+                  <span>{CAST_LABEL[id]}</span>
+                  <X className="w-3 h-3 text-neutral-400 hover:text-white" />
+                </button>
+              ))}
+
+              {durationFilter !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setDurationFilter('all')}
+                  className="px-2.5 py-1 rounded-lg bg-neutral-900 text-white border border-neutral-700 text-xs font-bold flex items-center gap-1.5 hover:border-[#c89346] transition-colors cursor-pointer"
+                  title="Dauer-Filter zurücksetzen"
+                >
+                  <span>{durationFilter === 'under1' ? '< 1 Min.' : '> 1 Min.'}</span>
+                  <X className="w-3 h-3 text-neutral-400 hover:text-white" />
+                </button>
+              )}
+
+              {(castFilter.length > 0 || onlyAbo || durationFilter !== 'all') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCastFilter([]);
+                    setOnlyAbo(false);
+                    setDurationFilter('all');
+                    setVisibleCount(3);
+                  }}
+                  className="text-xs text-[#e8b568] hover:underline cursor-pointer ml-1"
+                >
+                  Alle löschen
+                </button>
+              )}
+
+            </div>
+
+            {/* Ergebnis-Anzahl (nur Gesamtergebnis, keine Zahlen in Klammern bei Kategorien) */}
+            <div className="text-xs sm:text-sm font-semibold text-neutral-400 text-center sm:text-right pt-0.5 sm:pt-0 shrink-0 w-full sm:w-auto">
+              {filteredVideos.length === 1 ? '1 Video gefunden' : `${filteredVideos.length} Videos gefunden`}
+            </div>
+
           </div>
         </div>
 
@@ -1447,25 +1753,33 @@ export default function App() {
                       loading="lazy"
                     />
                     
-                    {/* Play-Icon Overlay */}
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    {/* Play- / Lock-Icon Overlay */}
+                    <div className={`absolute inset-0 transition-colors flex items-center justify-center ${
+                      vid.isVip && !isVipUnlocked ? 'bg-black/60 group-hover:bg-black/50' : 'bg-black/40 group-hover:bg-black/20'
+                    }`}>
                       <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#6d3c17] group-hover:bg-[#7d441a] text-white flex items-center justify-center shadow-2xl border border-[#c89346] transform group-hover:scale-110 transition-transform">
                         {vid.isVip && !isVipUnlocked ? (
-                          <Lock className="w-7 h-7 text-[#c89346] fill-[#c89346]" />
+                          <Lock className="w-7 h-7 text-[#fcd34d] fill-[#fcd34d]" />
                         ) : (
                           <Play className="w-7 h-7 fill-white text-white ml-1" />
                         )}
                       </div>
                     </div>
 
-                    {/* Badges */}
+                    {/* Badges: ABO Ehren-Pass vs Standart-Pass; 'Neu' nur bei Kevin Zeugnis */}
                     <div className="absolute top-3 left-3 flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-lg bg-black/85 backdrop-blur-md text-white font-extrabold text-xs uppercase tracking-wider border border-white/10">
-                        {vid.episodeNumber}
-                      </span>
-                      {vid.isVip && (
+                      {vid.id === 'r2-kevin-zeugnis' && (
+                        <span className="px-2.5 py-1 rounded-lg bg-red-600 text-white font-black text-xs uppercase tracking-wider shadow">
+                          Neu
+                        </span>
+                      )}
+                      {vid.isVip ? (
                         <span className="px-2.5 py-1 rounded-lg bg-[#c89346] text-black font-black text-xs uppercase flex items-center gap-1 shadow">
-                          <Lock className="w-3 h-3" /> VIP
+                          <Lock className="w-3 h-3" /> ABO Ehren-Pass
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 text-neutral-100 border border-neutral-400/80 font-black text-xs uppercase tracking-wider shadow-md">
+                          Standart-Pass
                         </span>
                       )}
                     </div>
@@ -1495,7 +1809,7 @@ export default function App() {
                     {/* Klickleiste unten */}
                     <div className="mt-5 pt-4 border-t border-neutral-800 flex items-center justify-between">
                       <span className="text-[#c89346] font-bold text-sm sm:text-base flex items-center gap-1.5 group-hover:underline">
-                        <span>{vid.isVip && !isVipUnlocked ? 'VIP Freischalten' : 'Jetzt abspielen'}</span>
+                        <span>{vid.isVip && !isVipUnlocked ? 'Ehren-Pass erforderlich' : 'Jetzt abspielen'}</span>
                         <ChevronRight className="w-4 h-4" />
                       </span>
 
@@ -1518,20 +1832,33 @@ export default function App() {
             })}
         </div>
         {visibleVideos.length === 0 && (
-          <p className="mt-8 text-center text-neutral-300 text-lg">Keine Szene mit beiden.</p>
+          <p className="mt-8 text-center text-neutral-300 text-lg">Keine Videos gefunden.</p>
+        )}
+
+        {/* Mehr anzeigen Button */}
+        {filteredVideos.length > visibleCount && (
+          <div className="mt-10 flex justify-center">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 3)}
+              className="px-8 py-3.5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-base uppercase tracking-wider border-2 border-[#c89346] shadow-[0_4px_16px_rgba(0,0,0,0.6)] transition-all transform active:scale-95 flex items-center gap-2 cursor-pointer"
+            >
+              <span>Mehr anzeigen</span>
+              <ChevronRight className="w-5 h-5 text-[#e8b568]" />
+            </button>
+          </div>
         )}
 
         {/* On-Site Parkbank Info-Box (Keine externen YouTube-Verlinkungen) */}
-        <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#6d3c17]/40 text-[#e8b568] flex items-center justify-center shrink-0 border border-[#c89346]/40">
-              <Sparkles className="w-8 h-8" />
+        <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-left">
+          <div className="flex flex-col items-start text-left">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#6d3c17]/40 text-[#e8b568] flex items-center justify-center shrink-0 border border-[#c89346]/40 mb-4">
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div>
               <h4 className="text-xl sm:text-2xl font-bold text-white">
                 Direkt hier auf der Parkbank anschauen
               </h4>
-              <p className="text-neutral-400 text-base sm:text-lg">
+              <p className="mt-2 text-neutral-400 text-base sm:text-lg">
                 Neue Sketche & Episoden erscheinen regelmäßig direkt hier auf der offiziellen Seite!
               </p>
             </div>
@@ -1676,29 +2003,105 @@ export default function App() {
                 </span>
               </div>
 
-              {/* Cover Art Preview */}
-              <div className="w-full aspect-video rounded-xl overflow-hidden mb-4 border border-[#c89346]/30 bg-black shadow-lg">
-                <img 
-                  src="/assets/parkbank-duell.webp" 
-                  alt="Parkbank Duell" 
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                />
+              {/* Cover Art Preview - Icon komplett sichtbar */}
+              <div className="w-full flex justify-center mb-4">
+                <div className="w-36 sm:w-44 aspect-square rounded-2xl overflow-hidden border-2 border-[#c89346]/40 shadow-xl bg-black">
+                  <img 
+                    src="/assets/parkbank-duell.webp" 
+                    alt="Parkbank Duell" 
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
               </div>
 
-              <h4 className="text-xl font-black text-white uppercase group-hover:text-[#c89346] transition-colors">
+              <h4 className="text-xl font-black text-white uppercase group-hover:text-[#c89346] transition-colors text-center sm:text-left">
                 Parkbank-Duell
               </h4>
-              <p className="mt-2 text-sm text-neutral-300 leading-relaxed">
-                Zocke unser offizielles Retro-Game direkt hier im Browser – komplett ohne Download am Smartphone oder PC.
+              <p className="mt-2 text-sm text-neutral-300 leading-relaxed text-center sm:text-left">
+                Jetzt sitzt du selbst auf der Bank! Zeig im Wort-Duell, wie schlagfertig du bist. Direkt im Browser, ohne Download
               </p>
+
+              {/* Geschenkcode ALMANOPA (verdeckt, erst durch Antippen sichtbar) */}
+              <div className="mt-4 pt-4 border-t border-neutral-800/80 w-full">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#e8b568] flex items-center gap-1.5">
+                    <Gift className="w-3.5 h-3.5 text-[#c89346]" />
+                    <span>Geschenkcode</span>
+                  </span>
+                  <span className="text-[10px] text-neutral-400">
+                    {isGiftCodeRevealed ? 'Antippen zum Kopieren' : 'Antippen zum Aufdecken'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isGiftCodeRevealed) {
+                      setIsGiftCodeRevealed(true);
+                    }
+                    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                      navigator.clipboard.writeText('ALMANOPA');
+                    }
+                    setIsGiftCodeCopied(true);
+                    showToast(isGiftCodeRevealed ? 'Code ALMANOPA kopiert!' : 'Code ALMANOPA aufgedeckt & kopiert!');
+                    setTimeout(() => setIsGiftCodeCopied(false), 2500);
+                  }}
+                  className={`w-full py-2 px-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
+                    isGiftCodeRevealed
+                      ? 'bg-[#1e1308] border-[#c89346] text-[#fcd34d] shadow-[0_0_15px_rgba(200,147,70,0.2)]'
+                      : 'bg-neutral-950 hover:bg-neutral-900 border-neutral-700 hover:border-neutral-500 text-neutral-300'
+                  }`}
+                  title={isGiftCodeRevealed ? 'Code kopieren' : 'Code aufdecken'}
+                >
+                  <div className="flex items-center gap-2">
+                    {isGiftCodeRevealed ? (
+                      <span className="font-mono font-black text-sm sm:text-base tracking-widest text-[#fcd34d]">
+                        ALMANOPA
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono tracking-widest text-neutral-400 select-none text-sm font-bold">
+                          ••••••••
+                        </span>
+                        <span className="text-[11px] font-bold text-neutral-400">
+                          (Code aufdecken)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-400">
+                    {isGiftCodeCopied ? (
+                      <span className="text-emerald-400 flex items-center gap-1 text-[11px]">
+                        <Check className="w-3.5 h-3.5" /> Kopiert!
+                      </span>
+                    ) : isGiftCodeRevealed ? (
+                      <span className="text-[#e8b568] flex items-center gap-1 text-[11px]">
+                        <Copy className="w-3.5 h-3.5" /> Kopieren
+                      </span>
+                    ) : (
+                      <Eye className="w-3.5 h-3.5 text-neutral-400" />
+                    )}
+                  </div>
+                </button>
+
+                <p className="mt-2 text-[11px] text-neutral-400 leading-snug">
+                  💡 <strong className="text-neutral-300">Einlösen:</strong> Im Spiel unter <span className="text-[#e8b568] font-semibold">Einstellungen – Einlösen</span>
+                </p>
+              </div>
             </div>
-            <button 
-              onClick={() => setIsGameOpen(true)}
-              className="mt-6 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white text-xs sm:text-sm font-bold border border-[#c89346] shadow transition-transform active:scale-95 cursor-pointer"
+
+            {/* Jetzt spielen Button - öffnet direkt im neuen Tab ohne Kasten */}
+            <a 
+              href="https://parkbank-duell.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white text-sm sm:text-base font-black border-2 border-[#c89346] shadow-lg transition-transform active:scale-95 cursor-pointer text-center"
             >
               <Gamepad2 className="w-4 h-4 text-[#e8b568]" />
-              <span>Parkbank-Duell spielen</span>
-            </button>
+              <span>Jetzt spielen</span>
+              <ExternalLink className="w-3.5 h-3.5 text-[#e8b568]/80" />
+            </a>
           </div>
 
         </div>
@@ -1721,13 +2124,16 @@ export default function App() {
               <span>Zu den aktuellen Clips</span>
             </button>
 
-            <button 
-              onClick={() => setIsGameOpen(true)}
+            <a 
+              href="https://parkbank-duell.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-[#e8b568] hover:text-white font-bold text-sm sm:text-base border border-neutral-700 hover:border-[#c89346] shadow transition-all cursor-pointer flex items-center gap-2"
             >
               <Gamepad2 className="w-4 h-4" />
-              <span>Parkbank-Duell spielen (Ohne Download)</span>
-            </button>
+              <span>Jetzt spielen (Parkbank-Duell)</span>
+              <ExternalLink className="w-3.5 h-3.5 text-[#e8b568]/70" />
+            </a>
           </div>
         </div>
 
@@ -1742,68 +2148,142 @@ export default function App() {
       >
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-[#c89346] font-extrabold text-sm uppercase tracking-widest">
-            Exklusiver Parkbank-Club
+            Offizielle Parkbank-Pässe
           </span>
           <h2 className="text-3xl sm:text-4xl font-black text-white uppercase mt-1">
-            VIP-ABO & VORAB-FOLGEN
+            PARK-SCHEIN & PARKAUSWEIS
           </h2>
           <p className="mt-2 text-lg text-neutral-300">
-            Unterstützen Sie das Bankgeheimnis-Team und sehen Sie neue Sketche 48 Stunden vor allen anderen!
+            Wähle deinen Zugang: Kostenloser Einstieg oder voller VIP-Zugang mit dem Ehren-Parkausweis!
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {/* Basis Fan */}
-          <div className="bg-neutral-900 p-6 sm:p-8 rounded-2xl border-2 border-neutral-800 flex flex-col justify-between">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
+          {/* Karte 1: Standard-Parkschein (Ticket-Karten-Design) */}
+          <div className="bg-gradient-to-b from-neutral-900 via-neutral-900 to-neutral-950 p-6 sm:p-8 rounded-3xl border-2 border-neutral-800 hover:border-neutral-700 transition-all shadow-xl flex flex-col justify-between relative group">
+            {/* Karten-Kopfstreifen */}
             <div>
-              <h3 className="text-2xl font-black text-white">Parkbank-Fan</h3>
-              <p className="text-sm text-neutral-400 mt-1">Für treue Zuschauer</p>
-              <div className="text-3xl font-black text-white mt-4">Kostenlos</div>
-              <ul className="mt-6 space-y-3 text-base text-neutral-300">
-                <li className="flex items-center gap-2">
-                  <span className="text-[#c89346] font-bold">✓</span> Alle regulären Sketche
+              <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-neutral-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-neutral-800 flex items-center justify-center text-neutral-300 border border-neutral-700">
+                    <Ticket className="w-4 h-4 text-neutral-300" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-wider text-neutral-300">
+                    PARK-SCHEIN
+                  </span>
+                </div>
+                <span className="text-xs font-black uppercase tracking-wider text-neutral-200 bg-neutral-800/90 border border-neutral-700 px-2.5 py-1 rounded-lg shadow-sm">
+                  Standart-Pass
+                </span>
+              </div>
+
+              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                Standard-Parkschein
+              </h3>
+              <p className="text-sm font-semibold text-neutral-400 mt-1">
+                Kostenloser Einstieg auf der Parkbank
+              </p>
+
+              <div className="mt-4 pt-4 border-t border-dashed border-neutral-800 flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-black text-white">Kostenlos</span>
+                <span className="text-xs text-neutral-500 font-medium">/ Dauerhafter Zugriff</span>
+              </div>
+
+              {/* Bullet-Liste laut Vorgabe */}
+              <ul className="mt-6 space-y-3 text-sm sm:text-base text-neutral-300">
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-neutral-800 text-[#e8b568] flex items-center justify-center shrink-0 mt-0.5 text-xs font-black">✓</span>
+                  <span>Feste Auswahl beliebter Park-Sketche</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[#c89346] font-bold">✓</span> YouTube Kanalzugriff
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-neutral-800 text-[#e8b568] flex items-center justify-center shrink-0 mt-0.5 text-xs font-black">✓</span>
+                  <span>Alle Highlights übersichtlich an einem Ort</span>
                 </li>
-                <li className="flex items-center gap-2 text-neutral-500">
-                  <span>✗</span> Keine Vorab-Veröffentlichungen
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-neutral-800 text-[#e8b568] flex items-center justify-center shrink-0 mt-0.5 text-xs font-black">✓</span>
+                  <span>Kein nerviges Suchen im Social-Media-Feed</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-neutral-800 text-[#e8b568] flex items-center justify-center shrink-0 mt-0.5 text-xs font-black">✓</span>
+                  <span>Direkt und komplett kostenlos abspielen</span>
                 </li>
               </ul>
             </div>
+
             <button 
-              onClick={scrollToVideos}
-              className="mt-8 w-full py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-lg cursor-pointer transition-colors"
+              onClick={() => {
+                if (currentUser) {
+                  showToast('Du bist bereits angemeldet! Viel Spaß beim Reinschauen.');
+                  setIsAuthModalOpen(true);
+                } else {
+                  setAuthTab('register');
+                  setRegisterForVip(false);
+                  setIsAuthModalOpen(true);
+                }
+              }}
+              className="mt-8 w-full py-3.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-base sm:text-lg cursor-pointer transition-all border border-neutral-700 flex items-center justify-center gap-2"
             >
-              Kostenlos ansehen
+              <span>Kostenlos reinschauen</span>
+              <ChevronRight className="w-4 h-4 text-neutral-400" />
             </button>
           </div>
 
-          {/* VIP Club */}
-          <div className="bg-gradient-to-b from-neutral-900 to-neutral-950 p-6 sm:p-8 rounded-2xl border-2 border-[#c89346] shadow-[0_0_40px_rgba(200,147,70,0.15)] flex flex-col justify-between relative">
-            <span className="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-[#c89346] text-black font-extrabold text-xs uppercase tracking-wider">
-              Empfohlen
-            </span>
+          {/* Karte 2: Ehren-Parkausweis (Premium Parkausweis-Karten-Design) */}
+          <div className="bg-gradient-to-b from-[#1b120a] via-neutral-900 to-neutral-950 p-6 sm:p-8 rounded-3xl border-2 border-[#c89346] shadow-[0_0_50px_rgba(200,147,70,0.22)] flex flex-col justify-between relative group">
             <div>
-              <h3 className="text-2xl font-black text-[#c89346] flex items-center gap-2">
-                <Lock className="w-5 h-5" /> VIP Ehren-Rentner
-              </h3>
-              <p className="text-sm text-neutral-400 mt-1">Exklusiver Vorab-Zugang</p>
-              <div className="text-3xl font-black text-white mt-4">
-                3,99 € <span className="text-sm font-normal text-neutral-400">/ Monat</span>
+              {/* Karten-Kopfstreifen */}
+              <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#c89346]/40">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#6d3c17] flex items-center justify-center text-[#e8b568] border border-[#c89346]/50 shadow">
+                    <Award className="w-4 h-4 text-[#e8b568]" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-wider text-[#e8b568]">
+                    PARKAUSWEIS
+                  </span>
+                </div>
+                <span className="text-xs font-black uppercase tracking-wider text-[#fcd34d] bg-[#6d3c17]/90 border border-[#c89346] px-2.5 py-1 rounded-lg shadow-sm">
+                  Ehren-Pass
+                </span>
               </div>
-              <ul className="mt-6 space-y-3 text-base text-neutral-200">
-                <li className="flex items-center gap-2">
-                  <span className="text-[#c89346] font-bold">✓</span> Alle Folgen 48 Std früher
+
+              <h3 className="text-2xl sm:text-3xl font-black text-[#e8b568] tracking-tight flex items-center gap-2">
+                <Lock className="w-5 h-5 text-[#c89346]" />
+                <span>Ehren-Parkausweis</span>
+              </h3>
+              <p className="text-sm font-semibold text-neutral-300 mt-1">
+                Voller Zugang zum kompletten Park
+              </p>
+
+              <div className="mt-4 pt-4 border-t border-dashed border-[#c89346]/40 flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-black text-white">3,99 €</span>
+                <span className="text-xs sm:text-sm font-medium text-neutral-400">/ Monat (Jederzeit kündbar)</span>
+              </div>
+
+              {/* Bullet-Liste laut Vorgabe */}
+              <ul className="mt-6 space-y-3 text-sm sm:text-base text-neutral-200">
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#6d3c17] text-[#e8b568] border border-[#c89346]/50 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black shadow-sm">✓</span>
+                  <span>Zugriff auf das komplette Video-Archiv</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[#c89346] font-bold">✓</span> Unzensierte Outtakes & Pannen
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#6d3c17] text-[#e8b568] border border-[#c89346]/50 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black shadow-sm">✓</span>
+                  <span>Bekannte Social-Media-Clips in 16:9 & 4K</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[#c89346] font-bold">✓</span> Namentliche Nennung im Abspann
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#6d3c17] text-[#e8b568] border border-[#c89346]/50 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black shadow-sm">✓</span>
+                  <span>Exklusive, unveröffentlichte Premium-Sketche</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-[#c89346] font-bold">✓</span> Exklusiver Mitglieds-Rang
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#6d3c17] text-[#e8b568] border border-[#c89346]/50 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black shadow-sm">✓</span>
+                  <span>Neue Videos vorab vor allen anderen sehen</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#6d3c17] text-[#e8b568] border border-[#c89346]/50 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black shadow-sm">✓</span>
+                  <span>Entspanntes Durchschauen dank Autoplay-Funktion</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#6d3c17] text-[#e8b568] border border-[#c89346]/50 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black shadow-sm">✓</span>
+                  <span>Monatlicher Bonus für „Parkbank-Duell“ (Charaktere, Sticker & mehr)</span>
                 </li>
               </ul>
             </div>
@@ -1811,7 +2291,7 @@ export default function App() {
             <button 
               onClick={() => {
                 if (isVipUnlocked) {
-                  showToast('Du bist bereits stolzes VIP-Mitglied!');
+                  showToast('Dein Ehren-Parkausweis ist aktiv!');
                   setIsAuthModalOpen(true);
                 } else {
                   setAuthTab('register');
@@ -1819,15 +2299,18 @@ export default function App() {
                   setIsAuthModalOpen(true);
                 }
               }}
-              className="mt-8 w-full py-3.5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-lg transition-transform active:scale-95 shadow-lg border border-[#c89346] cursor-pointer flex items-center justify-center gap-2"
+              className="mt-8 w-full py-3.5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-base sm:text-lg transition-transform active:scale-95 shadow-xl border-2 border-[#c89346] cursor-pointer flex items-center justify-center gap-2"
             >
               {isVipUnlocked ? (
                 <>
                   <Check className="w-5 h-5 text-[#e8b568]" />
-                  <span>VIP Aktiviert (Freigeschaltet)</span>
+                  <span>Ehren-Parkausweis aktiv</span>
                 </>
               ) : (
-                <span>Jetzt VIP werden (3,99 €)</span>
+                <>
+                  <Award className="w-5 h-5 text-[#e8b568]" />
+                  <span>Ehren-Parkausweis sichern</span>
+                </>
               )}
             </button>
           </div>
@@ -1906,94 +2389,13 @@ export default function App() {
         </div>
       </footer>
 
-      {/* ============================================================ */}
-      {/* MODAL: OFFIZIELLES BROWSERGAME - PARKBANK-DUELL              */}
-      {/* ============================================================ */}
-      {isGameOpen && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
-          <div className="w-full max-w-5xl h-[92vh] max-h-[92vh] bg-neutral-900 rounded-3xl overflow-hidden border-2 border-[#c89346] shadow-2xl flex flex-col">
-            
-            {/* Header */}
-            <div className="px-4 sm:px-6 py-3 sm:py-4 bg-neutral-950 flex items-center justify-between border-b border-neutral-800 shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
-                <img 
-                  src="/assets/parkbank-duell.webp" 
-                  alt="Parkbank Duell" 
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover border border-[#c89346] shrink-0 shadow"
-                />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-wide truncate">
-                      Parkbank-Duell
-                    </h3>
-                    <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-[#6d3c17]/70 text-[#e8b568] text-[10px] font-black uppercase border border-[#c89346]/40">
-                      Offizielles Game
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-neutral-400 truncate">
-                    Online im Browser spielen • Ohne Download
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href="https://parkbank-duell.vercel.app/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white text-xs font-bold transition-colors cursor-pointer border border-neutral-700"
-                  title="In separatem Tab / Vollbild öffnen"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#e8b568]" />
-                  <span>Vollbild-Tab</span>
-                </a>
-
-                <button 
-                  onClick={() => setIsGameOpen(false)}
-                  className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors cursor-pointer"
-                  title="Spiel schließen"
-                >
-                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* Echtes Spiel iFrame: https://parkbank-duell.vercel.app/ */}
-            <div className="relative flex-1 w-full bg-black overflow-hidden flex items-center justify-center">
-              <iframe
-                src="https://parkbank-duell.vercel.app/"
-                title="Parkbank-Duell"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                allowFullScreen
-                className="w-full h-full border-0 bg-black"
-              ></iframe>
-            </div>
-
-            {/* Footer Bar */}
-            <div className="px-4 py-2.5 bg-neutral-950 border-t border-neutral-800 flex items-center justify-between text-xs text-neutral-400 shrink-0">
-              <span className="truncate">
-                🎮 Steuerung direkt im Spiel • Kompatibel mit Touch & Maus
-              </span>
-              <a
-                href="https://parkbank-duell.vercel.app/"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#e8b568] hover:underline font-bold flex items-center gap-1 shrink-0 ml-2"
-              >
-                <span>Direktlink</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-
-          </div>
-        </div>
-      )}
 
       {/* ============================================================ */}
       {/* MODAL: ANMELDUNG & MITGLIEDERKONTO                           */}
       {/* ============================================================ */}
       {isAuthModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-[80] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-md bg-neutral-900 rounded-3xl overflow-hidden border-2 border-[#c89346] shadow-2xl flex flex-col">
             
             {/* Header */}
@@ -2030,7 +2432,7 @@ export default function App() {
                     </p>
                     <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#6d3c17]/60 text-[#e8b568] border border-[#c89346]/40 text-xs font-bold">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>{currentUser.isVip ? 'VIP Ehren-Rentner (Aktiv)' : 'Kostenloser Fan'}</span>
+                      <span>{currentUser.isVip ? 'Ehren-Parkausweis (Aktiv)' : 'Standard-Parkschein'}</span>
                     </div>
                   </div>
                 </div>
@@ -2041,9 +2443,9 @@ export default function App() {
                     <span className="font-bold text-white">{currentUser.memberSince}</span>
                   </div>
                   <div className="flex justify-between text-neutral-300">
-                    <span>VIP-Status:</span>
+                    <span>Ausweis-Status:</span>
                     <span className={`font-bold ${currentUser.isVip ? 'text-[#e8b568]' : 'text-neutral-400'}`}>
-                      {currentUser.isVip ? 'Freigeschaltet (Unbegrenzt)' : 'Nicht abonniert'}
+                      {currentUser.isVip ? 'Ehren-Parkausweis aktiv' : 'Standard-Parkschein'}
                     </span>
                   </div>
                   <div className="flex justify-between text-neutral-300">
@@ -2059,11 +2461,11 @@ export default function App() {
                     onClick={() => {
                       const updated = { ...currentUser, isVip: true };
                       saveUser(updated);
-                      showToast('🎉 VIP-Abo erfolgreich aktiviert!');
+                      showToast('🎉 Ehren-Parkausweis erfolgreich aktiviert!');
                     }}
                     className="w-full py-3 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-base border border-[#c89346] shadow cursor-pointer transition-all"
                   >
-                    Jetzt auf VIP upgraden (3,99 €/Monat)
+                    Jetzt Ehren-Parkausweis sichern (3,99 €/Monat)
                   </button>
                 )}
 
@@ -2106,6 +2508,7 @@ export default function App() {
                       </label>
                       <input 
                         type="text" 
+                        autoFocus
                         value={authName}
                         onChange={(e) => setAuthName(e.target.value)}
                         placeholder="Ihr Name" 
@@ -2151,7 +2554,7 @@ export default function App() {
                           onChange={(e) => setRegisterForVip(e.target.checked)}
                           className="w-4 h-4 accent-[#c89346] rounded"
                         />
-                        <span>VIP Ehren-Rentner Abo aktivieren (3,99 €/Monat)</span>
+                        <span>Ehren-Parkausweis aktivieren (3,99 €/Monat)</span>
                       </label>
                     </div>
                   )}
@@ -2178,29 +2581,109 @@ export default function App() {
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
           <div className="w-full max-w-4xl bg-neutral-900 rounded-3xl overflow-hidden border-2 border-neutral-700 shadow-2xl flex flex-col max-h-[95vh]">
             
-            {/* Modal Kopfzeile */}
-            <div className="px-5 py-4 bg-neutral-950 flex items-center justify-between border-b border-neutral-800">
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-md bg-[#6d3c17]/50 text-[#c89346] font-extrabold text-sm uppercase">
-                  {playingVideo.episodeNumber}
+            {/* Modal Kopfzeile mit Autoplay-Schalter */}
+            <div className="px-4 sm:px-6 py-3.5 bg-neutral-950 flex items-center justify-between border-b border-neutral-800 gap-2">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                {playingVideo.id === 'r2-kevin-zeugnis' && (
+                  <span className="px-2 py-0.5 rounded-md bg-red-600 text-white font-black text-xs uppercase shrink-0">
+                    Neu
+                  </span>
+                )}
+                <span className={`px-2.5 py-0.5 rounded-md font-extrabold text-xs sm:text-sm uppercase shrink-0 ${
+                  playingVideo.isVip 
+                    ? 'bg-[#6d3c17]/50 text-[#c89346] border border-[#c89346]/40' 
+                    : 'bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 text-neutral-100 border border-neutral-400/80 shadow-sm'
+                }`}>
+                  {playingVideo.isVip ? 'ABO Ehren-Pass' : 'Standart-Pass'}
                 </span>
-                <span className="text-white font-bold text-base sm:text-lg truncate max-w-md sm:max-w-xl">
+                <span className="text-white font-bold text-sm sm:text-base md:text-lg truncate">
                   {playingVideo.title}
                 </span>
               </div>
-              <button 
-                onClick={() => setPlayingVideo(null)}
-                className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors cursor-pointer"
-                title="Video schließen"
-              >
-                <X className="w-6 h-6" />
-              </button>
+
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Autoplay Schalter direkt im Videoplayer (nur wenn nicht im guestLock) */}
+                {filmPhase !== 'guestLock' && (
+                  <button
+                    type="button"
+                    onClick={toggleAutoplay}
+                    className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      isAutoplay && isVipUnlocked
+                        ? 'bg-[#6d3c17] text-[#fcd34d] border-[#c89346] shadow-[0_0_12px_rgba(200,147,70,0.3)]'
+                        : 'bg-neutral-800 text-neutral-400 border-neutral-700 hover:text-white'
+                    }`}
+                    title={isVipUnlocked ? "Autoplay ein-/ausschalten" : "Autoplay benötigt den Ehren-Parkausweis"}
+                  >
+                    <RotateCw className={`w-3.5 h-3.5 ${isAutoplay && isVipUnlocked ? 'text-[#fcd34d]' : 'text-neutral-400'}`} />
+                    <span className="hidden sm:inline">Autoplay:</span>
+                    <span className="font-black uppercase">
+                      {isVipUnlocked ? (isAutoplay ? 'An' : 'Aus') : 'VIP'}
+                    </span>
+                    {!isVipUnlocked && <Lock className="w-3 h-3 text-[#c89346]" />}
+                  </button>
+                )}
+
+                <button 
+                  onClick={() => {
+                    setPlayingVideo(null);
+                    setIsAuthModalOpen(false);
+                  }}
+                  className="p-1.5 sm:p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors cursor-pointer"
+                  title="Video schließen"
+                >
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </div>
             </div>
 
             {/* Echtes iFrame Video Player */}
-            <div className="relative aspect-video w-full bg-black">
+            <div className={`relative w-full bg-black ${filmPhase === 'guestLock' ? 'py-8 px-4 sm:px-6 flex items-center justify-center min-h-[300px]' : 'aspect-video'}`}>
               {playingVideo.src ? (
-                filmPhase === 'ende' ? (
+                filmPhase === 'guestLock' ? (
+                  <div className="w-full max-w-sm flex flex-col items-center justify-center text-center">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-neutral-800/90 border border-neutral-600 flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(255,255,255,0.06)]">
+                      <Lock className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-300" />
+                    </div>
+
+                    <span className="px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 text-neutral-100 border border-neutral-400/80 mb-2.5 shadow-sm">
+                      Standart-Pass
+                    </span>
+
+                    <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight mb-2">
+                      Kostenlos schauen nach Anmeldung
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-neutral-300 max-w-xs mb-5 leading-relaxed">
+                      Melde dich jetzt kostenlos an, um diesen Sketch sofort und komplett gratis anzusehen.
+                    </p>
+
+                    <div className="flex flex-col gap-2.5 w-full">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPlayingVideo(null);
+                          setRegisterForVip(false);
+                          setAuthTab('register');
+                          setIsAuthModalOpen(true);
+                        }}
+                        className="w-full py-3 px-5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-xs sm:text-sm uppercase tracking-wider border-2 border-[#c89346] shadow-[0_4px_16px_rgba(200,147,70,0.35)] transition-all transform active:scale-95 cursor-pointer"
+                      >
+                        Jetzt kostenlos anmelden
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPlayingVideo(null);
+                          setIsAuthModalOpen(false);
+                        }}
+                        className="w-full py-2.5 px-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                      >
+                        Zurück zur Übersicht
+                      </button>
+                    </div>
+                  </div>
+                ) : filmPhase === 'ende' ? (
                   <div className="absolute inset-0 flex items-center justify-center bg-black">
                     <img
                       src="/assets/logo_gross.webp"
@@ -2222,7 +2705,32 @@ export default function App() {
                       onPlaying={() => {
                         if (filmPhase === 'intro') setIntroReady(true);
                       }}
-                      onEnded={() => setFilmPhase(filmPhase === 'intro' ? 'film' : 'ende')}
+                      onEnded={() => {
+                        if (filmPhase === 'intro') {
+                          if (!currentUser) {
+                            setFilmPhase('guestLock');
+                          } else {
+                            setFilmPhase('film');
+                          }
+                        } else if (filmPhase === 'film') {
+                          // Autoplay Logik: Spielt nur die gewählte Kategorie ab, am Ende wieder von vorn
+                          if (isAutoplay && isVipUnlocked && currentCategoryPlaylist.length > 0) {
+                            const currentIndex = currentCategoryPlaylist.findIndex((v) => v.id === playingVideo.id);
+                            const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % currentCategoryPlaylist.length : 0;
+                            const nextVid = currentCategoryPlaylist[nextIndex];
+                            
+                            showToast(`Autoplay: Nächster Clip (${nextIndex + 1}/${currentCategoryPlaylist.length})`);
+                            if (nextVid.id === playingVideo.id) {
+                              setFilmPhase('intro');
+                              setIntroReady(false);
+                            } else {
+                              setPlayingVideo(nextVid);
+                            }
+                          } else {
+                            setFilmPhase('ende');
+                          }
+                        }
+                      }}
                       onContextMenu={(event) => event.preventDefault()}
                       className="w-full h-full bg-black"
                     />
@@ -2248,26 +2756,59 @@ export default function App() {
               )}
             </div>
 
-            {/* Modal Fußzeile & Interaktion (Keine externen YouTube-Links) */}
-            <div className="p-4 sm:p-6 bg-neutral-950 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <p className="text-lg font-bold text-white">
-                  {playingVideo.title}
-                </p>
-                <p className="text-sm text-neutral-400">
-                  Offizielle Episode von Bankgeheimnis im Park
-                </p>
-              </div>
+            {/* Modal Fußzeile & Interaktion - nur anzeigen wenn nicht im guestLock Modus */}
+            {filmPhase !== 'guestLock' && (
+              <div className="p-4 sm:p-5 bg-neutral-950 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-neutral-800">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-base sm:text-lg font-bold text-white truncate">
+                      {playingVideo.title}
+                    </p>
+                    {/* Playlist-Status */}
+                    {isAutoplay && isVipUnlocked && currentCategoryPlaylist.length > 0 && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#6d3c17]/60 text-[#fcd34d] border border-[#c89346]/40 text-[11px] font-black uppercase tracking-wider">
+                        {castFilter.length > 0 
+                          ? `Kategorie: ${castFilter.map(id => CAST_LABEL[id]).join(' + ')} (${currentPlaylistIndex + 1}/${currentCategoryPlaylist.length})` 
+                          : `Alle Sketche (${currentPlaylistIndex + 1}/${currentCategoryPlaylist.length})`}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">
+                    {isAutoplay && isVipUnlocked 
+                      ? (castFilter.length > 0 ? 'Autoplay aktiv: Spielt automatisch alle Clips dieser Kategorie ab' : 'Autoplay aktiv: Spielt alle Sketche nacheinander ab')
+                      : 'Offizielle Episode von Bankgeheimnis im Park'}
+                  </p>
+                </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <button 
-                  onClick={() => setPlayingVideo(null)}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-sm sm:text-base border border-[#c89346] shadow cursor-pointer transition-all"
-                >
-                  Schließen
-                </button>
+                <div className="flex items-center gap-2.5 shrink-0 justify-end">
+                  {/* Schneller Vorwärts-Button für Kategorie-Playlist */}
+                  {isAutoplay && isVipUnlocked && currentCategoryPlaylist.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextIndex = (currentPlaylistIndex + 1) % currentCategoryPlaylist.length;
+                        setPlayingVideo(currentCategoryPlaylist[nextIndex]);
+                      }}
+                      className="px-3 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white text-xs font-bold transition-all border border-neutral-700 cursor-pointer flex items-center gap-1.5"
+                      title="Nächster Clip der Kategorie"
+                    >
+                      <span>Nächster Clip</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#e8b568]" />
+                    </button>
+                  )}
+
+                  <button 
+                    onClick={() => {
+                      setPlayingVideo(null);
+                      setIsAuthModalOpen(false);
+                    }}
+                    className="px-5 py-2 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-xs sm:text-sm border border-[#c89346] shadow cursor-pointer transition-all"
+                  >
+                    Schließen
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
           </div>
         </div>
