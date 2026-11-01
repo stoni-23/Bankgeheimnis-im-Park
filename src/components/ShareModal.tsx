@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { X, Share2, Download, Copy, Check, Sparkles, ExternalLink } from 'lucide-react';
+import React from 'react';
+import { X, Share2 } from 'lucide-react';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -13,55 +13,27 @@ interface ShareModalProps {
 }
 
 export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, showToast }) => {
-  const [copied, setCopied] = useState(false);
-
   if (!isOpen) return null;
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : 'https://bankgeheimnisimpark.de';
   const shareText = 'Comedy Deutsch & unzensierte Parkbank-Satire mit den Bahndidos, Alman Opa & Omma – schau mal rein!';
 
-  // Nativer Web-Share
   const handleNativeShare = async () => {
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Bankgeheimnis im Park',
-          text: shareText,
-          url: currentUrl
-        });
-        showToast('🎉 Danke fürs Weitersagen!');
-        onClose();
-        return;
-      } catch (err: any) {
-        if (err?.name === 'AbortError') return;
-      }
+    if (typeof navigator === 'undefined' || !navigator.share) {
+      showToast('Teilen geht auf diesem Gerät nicht.');
+      return;
     }
-    handleCopyLink();
-  };
-
-  // Link kopieren
-  const handleCopyLink = async () => {
     try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(currentUrl);
-        setCopied(true);
-        showToast('📋 Link zur Homepage in Zwischenablage kopiert!');
-        setTimeout(() => setCopied(false), 2500);
-      }
-    } catch {
-      showToast('🔗 Homepage: ' + currentUrl);
+      await navigator.share({
+        title: 'Bankgeheimnis im Park',
+        text: shareText,
+        url: currentUrl
+      });
+      showToast('Danke fürs Weitersagen!');
+      onClose();
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return;
     }
-  };
-
-  // Offizielles Logo herunterladen
-  const handleDownloadLogo = () => {
-    const link = document.createElement('a');
-    link.href = '/assets/aistudio/logo_icon_8e8b5bd2.png';
-    link.download = 'bankgeheimnis_im_park_logo.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast('📥 Offizielles Logo wird heruntergeladen!');
   };
 
   // Social Share URLs
@@ -111,43 +83,14 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, showToa
             </p>
           </div>
 
-          {/* Hauptaktionen: Logo herunterladen & Teilen */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={handleDownloadLogo}
-              className="py-2.5 px-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs border border-neutral-700 hover:border-[#c89346] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow"
-              title="Logo als Bilddatei speichern"
-            >
-              <Download className="w-3.5 h-3.5 text-[#e8b568]" />
-              <span>Logo sichern</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleNativeShare}
-              className="py-2.5 px-3 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-xs uppercase tracking-wider border border-[#c89346] shadow transition-transform active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Jetzt teilen</span>
-            </button>
-          </div>
-
-          {/* Link kopieren */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                copied
-                  ? 'bg-[#6d3c17] text-[#e8b568] border-[#c89346]'
-                  : 'bg-neutral-900 text-neutral-300 border-neutral-800 hover:text-white hover:border-[#c89346]'
-              }`}
-            >
-              {copied ? <Check className="w-4 h-4 text-[#e8b568]" /> : <Copy className="w-4 h-4 text-[#e8b568]" />}
-              <span>{copied ? 'Link kopiert!' : 'Homepage-Link kopieren'}</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleNativeShare}
+            className="w-full py-3 px-4 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-sm uppercase tracking-wider border border-[#c89346] shadow transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Share2 className="w-4 h-4" />
+            <span>Jetzt teilen</span>
+          </button>
 
           {/* Schnellauswahl Direkt-Apps */}
           <div className="pt-2 border-t border-neutral-900">
