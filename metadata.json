@@ -1,0 +1,6 @@
+{
+  "name": "Bankgeheimnis im Park - Comedy Landing Page",
+  "description": "Die offizielle Landing Page zum beliebten Social Media & YouTube Comedy-Kanal 'Bankgeheimnis im Park'. Lustige Geheimnisse von der Parkbank, animierte Charaktere, eigener Videoplayer und exklusiver VIP-Abo-Bereich für Jung & Alt 50+.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

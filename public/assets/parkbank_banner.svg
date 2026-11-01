@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="100%" height="100%">
+  <defs>
+    <radialGradient id="ambientLight" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#1c2024" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#0e1012" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="groundShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.98)"/>
+      <stop offset="50%" stop-color="rgba(0,0,0,0.7)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+    <linearGradient id="woodSlat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9c5123"/>
+      <stop offset="20%" stop-color="#b3622c"/>
+      <stop offset="50%" stop-color="#7a3811"/>
+      <stop offset="100%" stop-color="#421a05"/>
+    </linearGradient>
+    <linearGradient id="woodSlatTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cf7b3e"/>
+      <stop offset="30%" stop-color="#9c5123"/>
+      <stop offset="100%" stop-color="#572407"/>
+    </linearGradient>
+    <linearGradient id="castIron" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3a3a3a"/>
+      <stop offset="30%" stop-color="#1f1f1f"/>
+      <stop offset="70%" stop-color="#2e2e2e"/>
+      <stop offset="100%" stop-color="#121212"/>
+    </linearGradient>
+    <linearGradient id="castIronHighlight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5e5e5e"/>
+      <stop offset="50%" stop-color="#262626"/>
+      <stop offset="100%" stop-color="#121212"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient background glow -->
+  <rect x="0" y="0" width="1600" height="900" fill="url(#ambientLight)"/>
+
+  <!-- Ground Shadows -->
+  <ellipse cx="750" cy="785" rx="620" ry="65" fill="url(#groundShadow)"/>
+  <ellipse cx="750" cy="775" rx="500" ry="30" fill="rgba(0,0,0,0.9)"/>
+  <ellipse cx="1260" cy="775" rx="110" ry="22" fill="rgba(0,0,0,0.85)"/>
+
+  <!-- SCHILD IM HINTERGRUND RECHTS: Steht fest auf dem Parkboden hinter der Bank -->
+  <g id="schild-group" class="animate-schild" style="transform-origin: 1260px 760px;">
+    <image href="/assets/characters/schild_clean.webp" x="1120" y="110" width="280" height="660" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <!-- PARKBANK: Handwerklich detaillierte Holzlatten & Gusseisen -->
+  <g id="parkbank">
+    <!-- Gusseisen Rückenstreben -->
+    <path d="M 320 410 Q 310 560 330 640 L 365 640 Q 350 560 355 410 Z" fill="url(#castIron)"/>
+    <path d="M 690 410 Q 685 560 695 640 L 725 640 Q 720 560 725 410 Z" fill="url(#castIron)"/>
+    <path d="M 1060 410 Q 1055 560 1065 640 L 1095 640 Q 1090 560 1095 410 Z" fill="url(#castIron)"/>
+
+    <!-- Rückenlehnen Latten -->
+    <g filter="drop-shadow(0 5px 8px rgba(0,0,0,0.7))">
+      <rect x="230" y="400" width="930" height="38" rx="7" fill="url(#woodSlatTop)" stroke="#2e1404" stroke-width="2"/>
+      <circle cx="340" cy="419" r="4.5" fill="#111"/><circle cx="710" cy="419" r="4.5" fill="#111"/><circle cx="1080" cy="419" r="4.5" fill="#111"/>
+    </g>
+    <g filter="drop-shadow(0 5px 8px rgba(0,0,0,0.7))">
+      <rect x="230" y="452" width="930" height="38" rx="7" fill="url(#woodSlat)" stroke="#2e1404" stroke-width="2"/>
+      <circle cx="340" cy="471" r="4.5" fill="#111"/><circle cx="710" cy="471" r="4.5" fill="#111"/><circle cx="1080" cy="471" r="4.5" fill="#111"/>
+    </g>
+    <g filter="drop-shadow(0 5px 8px rgba(0,0,0,0.7))">
+      <rect x="230" y="504" width="930" height="38" rx="7" fill="url(#woodSlat)" stroke="#2e1404" stroke-width="2"/>
+      <circle cx="340" cy="523" r="4.5" fill="#111"/><circle cx="710" cy="523" r="4.5" fill="#111"/><circle cx="1080" cy="523" r="4.5" fill="#111"/>
+    </g>
+    <g filter="drop-shadow(0 5px 8px rgba(0,0,0,0.7))">
+      <rect x="230" y="556" width="930" height="38" rx="7" fill="url(#woodSlat)" stroke="#2e1404" stroke-width="2"/>
+      <circle cx="340" cy="575" r="4.5" fill="#111"/><circle cx="710" cy="575" r="4.5" fill="#111"/><circle cx="1080" cy="575" r="4.5" fill="#111"/>
+    </g>
+
+    <!-- Sitzfläche Latten -->
+    <rect x="220" y="616" width="950" height="30" rx="5" fill="url(#woodSlat)" stroke="#2e1404" stroke-width="2"/>
+    <rect x="215" y="642" width="960" height="32" rx="5" fill="url(#woodSlatTop)" stroke="#2e1404" stroke-width="2"/>
+    <rect x="210" y="670" width="970" height="35" rx="6" fill="url(#woodSlatTop)" stroke="#2e1404" stroke-width="2"/>
+
+    <!-- Beine und geschwungene Armlehnen (Gusseisen) -->
+    <!-- Links -->
+    <g filter="drop-shadow(0 10px 15px rgba(0,0,0,0.9))">
+      <path d="M 320 510 C 275 510, 260 585, 295 640 C 310 660, 335 660, 345 640 C 355 620, 335 595, 315 595 C 295 595, 305 535, 330 530 Z" fill="url(#castIronHighlight)" stroke="#111" stroke-width="3"/>
+      <path d="M 295 640 Q 275 715 285 768 L 320 768 Q 325 715 335 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="3"/>
+      <ellipse cx="302" cy="768" rx="25" ry="8" fill="#111"/>
+      <path d="M 330 640 Q 360 720 375 762 L 405 760 Q 375 710 355 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="2"/>
+      <ellipse cx="390" cy="761" rx="20" ry="7" fill="#111"/>
+    </g>
+
+    <!-- Mitte -->
+    <g filter="drop-shadow(0 10px 15px rgba(0,0,0,0.9))">
+      <path d="M 700 640 Q 690 715 695 768 L 730 768 Q 735 715 740 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="3"/>
+      <ellipse cx="712" cy="768" rx="25" ry="8" fill="#111"/>
+    </g>
+
+    <!-- Rechts -->
+    <g filter="drop-shadow(0 10px 15px rgba(0,0,0,0.9))">
+      <path d="M 1060 510 C 1015 510, 1000 585, 1035 640 C 1050 660, 1075 660, 1085 640 C 1095 620, 1075 595, 1055 595 C 1035 595, 1045 535, 1070 530 Z" fill="url(#castIronHighlight)" stroke="#111" stroke-width="3"/>
+      <path d="M 1035 640 Q 1015 715 1025 768 L 1060 768 Q 1065 715 1075 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="3"/>
+      <ellipse cx="1042" cy="768" rx="25" ry="8" fill="#111"/>
+      <path d="M 1070 640 Q 1100 720 1115 762 L 1145 760 Q 1115 710 1095 640 Z" fill="url(#castIron)" stroke="#111" stroke-width="2"/>
+      <ellipse cx="1130" cy="761" rx="20" ry="7" fill="#111"/>
+    </g>
+  </g>
+</svg>
