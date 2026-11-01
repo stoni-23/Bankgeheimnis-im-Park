@@ -6,10 +6,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Play, Lock, User, X, ChevronRight, ChevronDown, Filter, ThumbsUp,
-  Check, LogOut, ShieldCheck, Sparkles,
+  Check, LogOut, ShieldCheck, Sparkles, Shield, Share2,
   Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink, Gift, Copy, Eye,
   Ticket, Award, Heart, Tv, Maximize2, Minimize2, ChevronLeft, SkipForward
 } from 'lucide-react';
+import { AdminPanel } from './components/AdminPanel';
+import { AdminAuthModal } from './components/AdminAuthModal';
+import { ShareModal } from './components/ShareModal';
+import { AdminBackupData } from './types/admin';
 
 export type CastId =
   | 'omma'
@@ -36,7 +40,10 @@ interface RealVideo {
   episodeNumber: string;
   cast: CastId[];
   isVip: boolean;
+  isExclusive?: boolean;
   description?: string;
+  isCustom?: boolean;
+  createdAt?: string;
 }
 
 const getVideoDescription = (vid: RealVideo): string => {
@@ -302,9 +309,11 @@ const REAL_VIDEOS: RealVideo[] = [
     poster: '/assets/posters/kevin-zeugnis.jpg?v=frame',
     title: 'Kevin: Zeugnis',
     duration: '01:03 min',
-    episodeNumber: 'Neu',
+    episodeNumber: 'Exklusiv',
     cast: ['kevin'],
-    isVip: true
+    isVip: true,
+    isExclusive: true,
+    description: 'Nur Kevin. Den Clip gibt es nur hier auf der Seite, nicht auf YouTube.'
   },
   {
     id: 'r2-strick-1',
@@ -599,7 +608,16 @@ interface UserAccount {
   email: string;
   isVip: boolean;
   memberSince: string;
+  status?: 'active' | 'suspended';
+  notes?: string;
 }
+
+const INITIAL_USERS: UserAccount[] = [
+  { name: 'Alman Werner', email: 'opa.werner@web.de', isVip: true, memberSince: '2025', status: 'active' },
+  { name: 'Chantal', email: 'chantal.berlin@gmail.com', isVip: true, memberSince: '2026', status: 'active' },
+  { name: 'Bahndidos Rapper', email: 'bahndidos@berlin.de', isVip: false, memberSince: '2026', status: 'active' },
+  { name: 'Kevin', email: 'kevin.park@gmx.de', isVip: false, memberSince: '2026', status: 'active' }
+];
 
 export default function App() {
   const [animKey, setAnimKey] = useState(1);
@@ -613,6 +631,69 @@ export default function App() {
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
+    }
+  });
+
+  // Admin-Panel & Authentifizierung State
+  const [isAdminAuthModalOpen, setIsAdminAuthModalOpen] = useState(false);
+  const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [adminPin, setAdminPin] = useState<string>(() => {
+    try {
+      return localStorage.getItem('bankgeheimnis_admin_pin') || '1870';
+    } catch {
+      return '1870';
+    }
+  });
+
+  // Nutzerverwaltung (Gesamtliste aller Konten)
+  const [allUsers, setAllUsers] = useState<UserAccount[]>(() => {
+    try {
+      const saved = localStorage.getItem('bankgeheimnis_users_list');
+      if (saved) return JSON.parse(saved);
+      return INITIAL_USERS;
+    } catch {
+      return INITIAL_USERS;
+    }
+  });
+
+  const updateUsersList = (newUsers: UserAccount[]) => {
+    setAllUsers(newUsers);
+    try {
+      localStorage.setItem('bankgeheimnis_users_list', JSON.stringify(newUsers));
+    } catch {
+      // Fallback
+    }
+    // Falls aktueller angemeldeter Nutzer in der Liste aktualisiert wurde (z.B. VIP getoggelt)
+    if (currentUser) {
+      const matched = newUsers.find((u) => u.email.toLowerCase() === currentUser.email.toLowerCase());
+      if (matched && (matched.isVip !== currentUser.isVip || matched.name !== currentUser.name)) {
+        const updatedCurrent = { ...currentUser, isVip: matched.isVip, name: matched.name, status: matched.status };
+        setCurrentUser(updatedCurrent);
+        try {
+          localStorage.setItem('bankgeheimnis_user', JSON.stringify(updatedCurrent));
+        } catch {}
+      }
+    }
+  };
+
+  // Eigene vom Admin hochgeladene/eingepflegte Videos
+  const [customVideos, setCustomVideos] = useState<RealVideo[]>(() => {
+    try {
+      const saved = localStorage.getItem('bankgeheimnis_custom_videos');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Klickzahlen / Video-Aufrufe Tracking
+  const [videoViews, setVideoViews] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('bankgeheimnis_video_views');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
     }
   });
 
@@ -646,7 +727,9 @@ export default function App() {
   const [castFilter, setCastFilter] = useState<CastId[]>([]);
   const [isCategoryBoxOpen, setIsCategoryBoxOpen] = useState(false);
   const [onlyAbo, setOnlyAbo] = useState<boolean>(false);
+  const [onlyExclusive, setOnlyExclusive] = useState<boolean>(false);
   const [onlyFavorites, setOnlyFavorites] = useState<boolean>(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('bankgeheimnis_favorites');
@@ -656,7 +739,7 @@ export default function App() {
     }
   });
   const [durationFilter, setDurationFilter] = useState<'all' | 'under1' | 'over1'>('all');
-  const [visibleCount, setVisibleCount] = useState<number>(3);
+  const [visibleCount, setVisibleCount] = useState<number>(4);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [likedVideos, setLikedVideos] = useState<Record<string, boolean>>({});
 
@@ -846,9 +929,17 @@ export default function App() {
     });
   };
 
+  // Alle Videos (Eigene Videos vorangestellt, gefolgt von Original-Clips)
+  const allVideos = React.useMemo(() => {
+    return [...customVideos, ...REAL_VIDEOS];
+  }, [customVideos]);
+
   const filteredVideos = React.useMemo(() => {
-    return REAL_VIDEOS.filter((video) => {
+    return allVideos.filter((video) => {
       if (onlyAbo && !video.isVip) {
+        return false;
+      }
+      if (onlyExclusive && !video.isExclusive) {
         return false;
       }
       if (onlyFavorites && !favoriteIds.includes(video.id)) {
@@ -864,7 +955,7 @@ export default function App() {
       }
       return true;
     });
-  }, [onlyAbo, onlyFavorites, favoriteIds, castFilter, durationFilter]);
+  }, [allVideos, onlyAbo, onlyExclusive, onlyFavorites, favoriteIds, castFilter, durationFilter]);
 
   // Aktive Playlist basierend auf exakt den gefilterten Videos (oder allen zugänglichen Sketchen)
   const currentCategoryPlaylist = React.useMemo(() => {
@@ -942,6 +1033,38 @@ export default function App() {
       window.removeEventListener('orientationchange', handleResize);
     };
   }, []);
+
+  const heroSlides = [
+    {
+      src: '/assets/banner/banner-landing.webp',
+      alt: 'Die ganze Parkbank',
+      title: 'Bankgeheimnis im Park',
+      action: 'videos' as const,
+      label: 'Jetzt anschauen',
+    },
+    {
+      src: '/assets/banner/banner-landing-kevin.webp',
+      alt: 'Kevin mit dem Zeugnis',
+      title: 'Kevin: Zeugnis',
+      action: 'kevin' as const,
+      label: 'Jetzt anschauen',
+    },
+    {
+      src: '/assets/banner/duell-landing.webp?v=align',
+      alt: 'Parkbank Duell',
+      title: 'Parkbank Duell',
+      action: 'code' as const,
+      label: 'Zum Code',
+    },
+  ];
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroIndex((current) => (current + 1) % heroSlides.length);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, [heroSlides.length]);
 
   // Sound-Effekte
   const playSoundEffect = (type: 'shoot' | 'wobble' | 'pop') => {
@@ -1120,7 +1243,30 @@ export default function App() {
     videoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const openHero = () => {
+    const slide = heroSlides[heroIndex];
+    if (slide.action === 'kevin') {
+      const vid = REAL_VIDEOS.find((video) => video.id === 'r2-kevin-zeugnis');
+      if (vid) handleWatchVideo(vid);
+      return;
+    }
+    if (slide.action === 'code') {
+      document.getElementById('spiel-code')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    scrollToVideos();
+  };
+
   const handleWatchVideo = (vid: RealVideo) => {
+    // Aufrufe / Klickzahlen erfassen & persistieren
+    setVideoViews((prev) => {
+      const updated = { ...prev, [vid.id]: (prev[vid.id] || 0) + 1 };
+      try {
+        localStorage.setItem('bankgeheimnis_video_views', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
     // Bei Premium-Videos (mit Schloss im Thumbnail): Registrierung/VIP Hinweis
     if (vid.isVip && !isVipUnlocked) {
       showToast('🔒 Für diesen Sketch wird der Ehren-Parkausweis benötigt!');
@@ -1140,7 +1286,7 @@ export default function App() {
     }));
   };
 
-  // Echter Login / Registrierungs-Handler
+  // Echter Login / Registrierungs-Handler mit Admin-Nutzerlisten-Synchronisation
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!authEmail) {
@@ -1149,13 +1295,19 @@ export default function App() {
     }
 
     if (authTab === 'login') {
+      const existingInList = allUsers.find(u => u.email.toLowerCase() === authEmail.trim().toLowerCase());
+      const isVip = existingInList ? existingInList.isVip : isVipUnlocked;
       const user: UserAccount = {
-        name: authEmail.split('@')[0],
-        email: authEmail,
-        isVip: isVipUnlocked,
-        memberSince: '2026'
+        name: existingInList?.name || authEmail.split('@')[0],
+        email: authEmail.trim(),
+        isVip,
+        memberSince: existingInList?.memberSince || '2026',
+        status: existingInList?.status || 'active'
       };
       saveUser(user);
+      if (!existingInList) {
+        updateUsersList([user, ...allUsers]);
+      }
       showToast(`Erfolgreich angemeldet als ${user.name}`);
       if (playingVideo && (user.isVip || !playingVideo.isVip)) {
         setFilmPhase('film');
@@ -1163,11 +1315,14 @@ export default function App() {
     } else {
       const user: UserAccount = {
         name: authName.trim() || authEmail.split('@')[0],
-        email: authEmail,
+        email: authEmail.trim(),
         isVip: registerForVip,
-        memberSince: '2026'
+        memberSince: '2026',
+        status: 'active'
       };
       saveUser(user);
+      const filtered = allUsers.filter(u => u.email.toLowerCase() !== authEmail.trim().toLowerCase());
+      updateUsersList([user, ...filtered]);
       showToast(registerForVip ? 'Konto erstellt & VIP-Abo aktiviert!' : 'Konto erfolgreich erstellt!');
       if (playingVideo && (user.isVip || !playingVideo.isVip)) {
         setFilmPhase('film');
@@ -1177,10 +1332,138 @@ export default function App() {
     setIsAuthModalOpen(false);
   };
 
+  // Admin Aktionen: Videos, Backups & PIN
+  const handleAddCustomVideo = (video: RealVideo) => {
+    const updated = [video, ...customVideos];
+    setCustomVideos(updated);
+    try {
+      localStorage.setItem('bankgeheimnis_custom_videos', JSON.stringify(updated));
+    } catch {}
+  };
+
+  const handleDeleteCustomVideo = (videoId: string) => {
+    const updated = customVideos.filter((v) => v.id !== videoId);
+    setCustomVideos(updated);
+    try {
+      localStorage.setItem('bankgeheimnis_custom_videos', JSON.stringify(updated));
+    } catch {}
+  };
+
+  const handleToggleVideoVip = (videoId: string) => {
+    const updated = customVideos.map((v) => {
+      if (v.id === videoId) {
+        return { ...v, isVip: !v.isVip };
+      }
+      return v;
+    });
+    setCustomVideos(updated);
+    try {
+      localStorage.setItem('bankgeheimnis_custom_videos', JSON.stringify(updated));
+    } catch {}
+  };
+
+  const handleUpdateAdminPin = (newPin: string) => {
+    setAdminPin(newPin);
+    try {
+      localStorage.setItem('bankgeheimnis_admin_pin', newPin);
+    } catch {}
+  };
+
+  const handleImportBackup = (backup: AdminBackupData, mode: 'merge' | 'replace') => {
+    if (mode === 'replace') {
+      if (Array.isArray(backup.users)) updateUsersList(backup.users);
+      if (Array.isArray(backup.customVideos)) {
+        setCustomVideos(backup.customVideos);
+        try {
+          localStorage.setItem('bankgeheimnis_custom_videos', JSON.stringify(backup.customVideos));
+        } catch {}
+      }
+      if (backup.videoViews && typeof backup.videoViews === 'object') {
+        setVideoViews(backup.videoViews);
+        try {
+          localStorage.setItem('bankgeheimnis_video_views', JSON.stringify(backup.videoViews));
+        } catch {}
+      }
+      if (backup.adminPin) {
+        handleUpdateAdminPin(backup.adminPin);
+      }
+      if (Array.isArray(backup.favorites)) {
+        setFavoriteIds(backup.favorites);
+        try {
+          localStorage.setItem('bankgeheimnis_favorites', JSON.stringify(backup.favorites));
+        } catch {}
+      }
+    } else {
+      // Merge
+      if (Array.isArray(backup.users)) {
+        const existingEmails = new Set(allUsers.map((u) => u.email.toLowerCase()));
+        const toAdd = backup.users.filter((u) => !existingEmails.has(u.email.toLowerCase()));
+        updateUsersList([...allUsers, ...toAdd]);
+      }
+      if (Array.isArray(backup.customVideos)) {
+        const existingIds = new Set(customVideos.map((v) => v.id));
+        const toAdd = backup.customVideos.filter((v) => !existingIds.has(v.id));
+        const combined = [...customVideos, ...toAdd];
+        setCustomVideos(combined);
+        try {
+          localStorage.setItem('bankgeheimnis_custom_videos', JSON.stringify(combined));
+        } catch {}
+      }
+      if (backup.videoViews && typeof backup.videoViews === 'object') {
+        const merged = { ...videoViews };
+        for (const [k, v] of Object.entries(backup.videoViews)) {
+          merged[k] = (merged[k] || 0) + v;
+        }
+        setVideoViews(merged);
+        try {
+          localStorage.setItem('bankgeheimnis_video_views', JSON.stringify(merged));
+        } catch {}
+      }
+      if (Array.isArray(backup.favorites)) {
+        const merged = Array.from(new Set([...favoriteIds, ...backup.favorites]));
+        setFavoriteIds(merged);
+        try {
+          localStorage.setItem('bankgeheimnis_favorites', JSON.stringify(merged));
+        } catch {}
+      }
+    }
+  };
+
   const handleLogout = () => {
     saveUser(null);
     setIsAuthModalOpen(false);
     showToast('Erfolgreich abgemeldet.');
+  };
+
+  // Homepage Teilen Funktion (Web Share API mit Zwischenablage-Fallback)
+  const handleShareHomepage = async () => {
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://bankgeheimnisimpark.de';
+    const shareData = {
+      title: 'Bankgeheimnis im Park',
+      text: 'Comedy Deutsch & unzensierte Parkbank-Satire mit den Bahndidos, Alman Opa & Omma – schau mal rein!',
+      url: shareUrl,
+    };
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData);
+        showToast('🎉 Danke fürs Weitersagen!');
+        return;
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('📋 Link zur Homepage in Zwischenablage kopiert!');
+      } else {
+        showToast('🔗 Homepage-Link: ' + shareUrl);
+      }
+    } catch {
+      showToast('🔗 Homepage-Link: ' + shareUrl);
+    }
   };
 
   const toggleCast = (id: CastId) => {
@@ -1189,7 +1472,7 @@ export default function App() {
       if (current.length >= 2) return [current[1], id];
       return [...current, id];
     });
-    setVisibleCount(3);
+    setVisibleCount(4);
   };
 
   const visibleVideos = filteredVideos.slice(0, visibleCount);
@@ -1230,22 +1513,32 @@ export default function App() {
       {/* ============================================================ */}
       {/* HEADER: FESTSTEHEND IN EINER REIHE (KEIN YT ZEICHEN)         */}
       {/* ============================================================ */}
-      <header className="w-full max-w-6xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between z-40 border-b border-neutral-900 bg-black/95 backdrop-blur-md sticky top-0 shrink-0">
+      <header className="w-full max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between z-40 border-b border-neutral-900 bg-black/95 backdrop-blur-md sticky top-0 shrink-0">
         
         {/* Logo und Kanalname nebeneinander in einer Reihe */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
           <img 
             src="/assets/logo_gross.webp" 
             alt="Bankgeheimnis im Park Logo" 
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-contain border border-[#c89346]/40 shadow shrink-0"
+            className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0"
           />
-          <span className="font-extrabold text-sm sm:text-lg md:text-xl text-white tracking-tight truncate whitespace-nowrap">
+          <span className="font-extrabold text-sm sm:text-lg text-white tracking-tight whitespace-nowrap">
             Bankgeheimnis im Park
           </span>
         </div>
 
-        {/* Rechte Seite: Nur Login/Konto (garantiert ohne YouTube Icon) */}
-        <div className="flex items-center shrink-0">
+        {/* Rechte Seite: Teilen & Login/Konto */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <button 
+            type="button"
+            onClick={() => setIsShareModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-[#e8b568] text-xs font-bold border border-neutral-800 hover:border-[#c89346] shadow cursor-pointer transition-all"
+            title="Homepage & Logo teilen"
+          >
+            <Share2 className="w-3.5 h-3.5 text-[#e8b568] shrink-0" />
+            <span className="hidden md:inline">Teilen</span>
+          </button>
+
           <button 
             onClick={() => setIsAuthModalOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white text-xs sm:text-sm font-bold border border-[#c89346] shadow cursor-pointer transition-all whitespace-nowrap"
@@ -1273,404 +1566,52 @@ export default function App() {
       {/* - NUR DIE ECHTEN BEZEICHNUNGEN (PUNKS, TALAHONS, BAHNDIDOS) */}
       {/* - TITEL & BUTTON DIREKT IM BILD                             */}
       {/* ============================================================ */}
-      <section 
-        className="w-full h-[calc(100vh-56px)] max-h-[calc(100vh-56px)] flex items-center justify-center p-2 sm:p-3 relative bg-black overflow-hidden select-none shrink-0"
-      >
-        
-        {/* CONTAINER FÜR DAS BANNER */}
-        <div key={animKey} className="w-full h-full max-h-full flex items-center justify-center">
+      {/* ============================================================ */}
+      {/* SEKTION 1: RESPONSIVER HERO-SLIDER                           */}
+      {/* ============================================================ */}
+      {/* SEKTION 1: BANNER (QUER-OPTIMIERT, OHNE ANIMATION)           */}
+      {/* ============================================================ */}
+      <section className="w-full relative bg-black overflow-hidden border-b border-neutral-900 h-[calc(100dvh-4rem)]">
+        <div
+          className={`w-full h-full ${
+            isWidescreen
+              ? 'px-8 flex flex-row items-center justify-center gap-10'
+              : 'max-w-6xl mx-auto px-3 sm:px-6 flex flex-col items-center justify-center text-center pb-8'
+          }`}
+        >
+          <div
+            className={
+              isWidescreen
+                ? 'h-[88%] aspect-[896/1200] shrink-0 relative'
+                : 'h-[min(58dvh,calc(100dvh-16rem))] aspect-[896/1200] relative'
+            }
+          >
+            {heroSlides.map((slide, index) => (
+              <img
+                key={slide.src}
+                src={slide.src}
+                alt={slide.alt}
+                className={`absolute inset-0 h-full w-full object-contain ${index === heroIndex ? 'opacity-100' : 'opacity-0'}`}
+              />
+            ))}
+          </div>
 
-          {isWidescreen ? (
-            /* ------------------------------------------------------------ */
-            /* A) QUERFORMAT 16:9 BANNER                                    */
-            /* - Passt genau in die Höhe (max-h-full) -> KEIN SCROLLEN      */
-            /* - Alle 8 Figuren frei sichtbar, werden beim Klick größer     */
-            /* - Name erscheint direkt auf der jeweiligen Figur             */
-            /* ------------------------------------------------------------ */
-            <div 
-              onClick={triggerLeafExplosion}
-              className="relative aspect-[16/9] h-full max-h-full max-w-full w-auto rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.9)] border-2 border-neutral-800 select-none bg-neutral-950 cursor-pointer mx-auto"
-              title="Klicke auf das Banner, um Blätter aufzuwirbeln!"
+          <div className={isWidescreen ? 'w-64 shrink-0 flex flex-col items-start text-left' : 'shrink-0 mt-1 flex flex-col items-center'}>
+            <h1 className={`font-black tracking-tight text-white uppercase leading-tight ${isWidescreen ? 'text-2xl' : 'text-3xl'}`}>
+              {heroSlides[heroIndex].title}
+            </h1>
+            <button
+              type="button"
+              onClick={openHero}
+              className={`rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black uppercase tracking-wider border-2 border-[#c89346] shadow-[0_4px_20px_rgba(200,147,70,0.4)] transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer ${
+                isWidescreen ? 'mt-4 py-3 px-6 text-sm' : 'mt-4 py-4 px-10 text-base'
+              }`}
             >
-              {/* 1. HINTERGRUND: Parkhecke */}
-              <img 
-                src="/assets/banner/banner_bush_bg.jpg" 
-                alt="Parkhecke Hintergrund" 
-                className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none z-0"
-              />
-
-              {/* 2. CHARAKTER-FIGUREN (WERDEN BEIM ANKLICKEN LEICHT GRÖSSER & NAME ERSCHEINT DIREKT AUF DER FIGUR) */}
-              
-              {/* Rocker: Bahndidos (hängt oben zentriert links vom Schild, Schnittkante oben verborgen) */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('rocker'); }}
-                className={`absolute top-[-6%] left-[32%] w-[16%] max-w-[170px] z-10 anim-banner-rocker cursor-pointer pointer-events-auto transition-transform duration-300 origin-top ${
-                  activeChar === 'rocker' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Bahndidos"
-              >
-                <img 
-                  src="/assets/characters/rocker_crop.webp" 
-                  alt="Bahndidos" 
-                  className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('rocker', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Murat: Talahons (hängt oben zentriert rechts vom Schild, Schnittkante oben verborgen) */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('talahon'); }}
-                className={`absolute top-[-6%] right-[32%] w-[15.5%] max-w-[165px] z-10 anim-banner-talahon cursor-pointer pointer-events-auto transition-transform duration-300 origin-top ${
-                  activeChar === 'talahon' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Talahons"
-              >
-                <img 
-                  src="/assets/characters/talahon_crop.webp" 
-                  alt="Talahons" 
-                  className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('talahon', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Punk: Punks (oben links aus der Hecke) */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('punk'); }}
-                className={`absolute left-[-2%] top-[12%] w-[15%] max-w-[160px] z-10 anim-banner-punk cursor-pointer pointer-events-auto transition-transform duration-300 origin-left ${
-                  activeChar === 'punk' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Punks"
-              >
-                <img 
-                  src="/assets/characters/punk_crop.webp" 
-                  alt="Punks" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('punk', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Chantal: Talahinnen (unten links aus der Hecke, unter Punk) */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('genz'); }}
-                className={`absolute left-[2%] top-[38%] w-[14.5%] max-w-[155px] z-10 anim-banner-genz cursor-pointer pointer-events-auto transition-transform duration-300 origin-left ${
-                  activeChar === 'genz' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Chantal"
-              >
-                <img 
-                  src="/assets/characters/genz_crop.webp" 
-                  alt="Chantal" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('genz', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Kevin: Gen Z (oben rechts aus der Hecke) */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('kevin'); }}
-                className={`absolute right-[-2%] top-[11%] w-[12.5%] max-w-[135px] z-10 anim-banner-kevin cursor-pointer pointer-events-auto transition-transform duration-300 origin-right ${
-                  activeChar === 'kevin' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Kevin"
-              >
-                <img 
-                  src="/assets/characters/kevin_crop.webp" 
-                  alt="Kevin" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('kevin', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Hippie: Hippie (unten rechts aus der Hecke, unter Kevin) */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('hippi'); }}
-                className={`absolute right-[3%] top-[36%] w-[14.5%] max-w-[155px] z-10 anim-banner-hippi cursor-pointer pointer-events-auto transition-transform duration-300 origin-right ${
-                  activeChar === 'hippi' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Hippie"
-              >
-                <img 
-                  src="/assets/characters/hippi_crop.webp" 
-                  alt="Hippie" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('hippi', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Oma: Omma */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('omma'); }}
-                className={`absolute bottom-[-3%] left-[17%] w-[20%] max-w-[215px] z-15 anim-banner-omma cursor-pointer pointer-events-auto transition-transform duration-300 origin-bottom-left ${
-                  activeChar === 'omma' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Omma"
-              >
-                <img 
-                  src="/assets/characters/omma_crop.webp" 
-                  alt="Omma" 
-                  className="w-full h-auto object-contain drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-                />
-                {renderCharBadge('omma', 'top-4 sm:top-6 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Opa: Alman Opa */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('opa'); }}
-                className={`absolute bottom-[-3%] right-[16%] w-[20%] max-w-[215px] z-15 anim-banner-opa cursor-pointer pointer-events-auto transition-transform duration-300 origin-bottom-right ${
-                  activeChar === 'opa' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Alman Opa"
-              >
-                <img 
-                  src="/assets/characters/opa_crop.webp" 
-                  alt="Alman Opa" 
-                  className="w-full h-auto object-contain drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-                />
-                {renderCharBadge('opa', 'top-4 sm:top-6 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* 3. DAS SCHILD */}
-              <div 
-                onClick={(e) => { 
-                  e.stopPropagation(); 
-                  playSoundEffect('wobble'); 
-                  triggerLeafExplosion();
-                  handleCharacterClick('schild'); 
-                }}
-                className="absolute left-1/2 bottom-[7%] w-[21%] max-w-[240px] h-[75%] z-15 anim-banner-schild cursor-pointer pointer-events-auto flex items-end justify-center"
-                title="Bankgeheimnis im Park Schild"
-              >
-                <img 
-                  src="/assets/characters/schild_crop.webp" 
-                  alt="Bankgeheimnis im Park Schild" 
-                  className={`h-full w-auto object-contain drop-shadow-[0_12px_35px_rgba(0,0,0,0.95)] transition-transform duration-300 ${
-                    activeChar === 'schild' ? 'scale-105' : 'hover:scale-[1.03]'
-                  }`}
-                />
-                {renderCharBadge('schild', 'top-[22%] left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* 4. CANVAS PARTIKEL: WEGFLIEGENDE BLÄTTER */}
-              <canvas 
-                ref={bannerCanvasRef}
-                className="absolute inset-0 w-full h-full pointer-events-none z-25"
-              />
-
-              {/* 5. TITEL & BUTTON: DIREKT IM BANNER ZWISCHEN OMMA UND ALMAN OPA */}
-              <div className="absolute bottom-[2%] sm:bottom-[3%] left-0 right-0 z-30 flex flex-col items-center text-center px-2 anim-cta-banner pointer-events-auto">
-                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)] leading-none select-none">
-                  BANKGEHEIMNIS
-                </h1>
-                <p className="text-[10px] sm:text-xs md:text-sm font-extrabold tracking-[0.25em] text-[#c89346] uppercase mt-0.5 sm:mt-1 mb-1 sm:mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] select-none">
-                  COMEDY KANAL
-                </p>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); scrollToVideos(); }}
-                  className="py-2 sm:py-2.5 px-5 sm:px-7 md:px-8 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-xs sm:text-sm md:text-base uppercase tracking-wider border-2 border-[#c89346] shadow-[0_4px_16px_rgba(0,0,0,0.7)] transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>JETZT ANSCHAUEN</span>
-                  <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 fill-white text-white" />
-                </button>
-              </div>
-
-            </div>
-          ) : (
-            /* ------------------------------------------------------------ */
-            /* B) HOCHFORMAT 9:16 BANNER                                    */
-            /* - Köpfe weiter außen (keine Ränder abgeschnitten)           */
-            /* - Werden beim Anklicken leicht größer                        */
-            /* ------------------------------------------------------------ */
-            <div 
-              onClick={triggerLeafExplosion}
-              className="relative aspect-[9/16] h-full max-h-full max-w-full w-auto rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_15px_60px_rgba(0,0,0,0.9)] border-2 border-neutral-800 select-none bg-neutral-950 cursor-pointer mx-auto"
-              title="Klicke auf das Banner, um Blätter aufzuwirbeln!"
-            >
-              {/* 1. HINTERGRUND: Parkhecke */}
-              <img 
-                src="/assets/banner/banner_bush_bg.jpg" 
-                alt="Parkhecke Hintergrund" 
-                className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none z-0"
-              />
-
-              {/* 2. CHARAKTER-FIGUREN */}
-              
-              {/* Bahndidos */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('rocker'); }}
-                className={`absolute top-[-6%] left-[2%] w-[33%] z-10 anim-banner-rocker cursor-pointer pointer-events-auto transition-transform duration-300 origin-top ${
-                  activeChar === 'rocker' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Bahndidos"
-              >
-                <img 
-                  src="/assets/characters/rocker_crop.webp" 
-                  alt="Bahndidos" 
-                  className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('rocker', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Talahons */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('talahon'); }}
-                className={`absolute top-[-6%] right-[2%] w-[30%] z-10 anim-banner-talahon cursor-pointer pointer-events-auto transition-transform duration-300 origin-top ${
-                  activeChar === 'talahon' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Talahons"
-              >
-                <img 
-                  src="/assets/characters/talahon_crop.webp" 
-                  alt="Talahons" 
-                  className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('talahon', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Punks */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('punk'); }}
-                className={`absolute left-[-2%] top-[16%] w-[28%] z-10 anim-banner-punk cursor-pointer pointer-events-auto transition-transform duration-300 origin-left ${
-                  activeChar === 'punk' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Punks"
-              >
-                <img 
-                  src="/assets/characters/punk_crop.webp" 
-                  alt="Punks" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('punk', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Talahinnen */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('genz'); }}
-                className={`absolute left-[-2%] top-[34%] w-[26%] z-10 anim-banner-genz cursor-pointer pointer-events-auto transition-transform duration-300 origin-left ${
-                  activeChar === 'genz' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Chantal"
-              >
-                <img 
-                  src="/assets/characters/genz_crop.webp" 
-                  alt="Chantal" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('genz', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Gen Z */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('kevin'); }}
-                className={`absolute right-[-2%] top-[16%] w-[23%] z-10 anim-banner-kevin cursor-pointer pointer-events-auto transition-transform duration-300 origin-right ${
-                  activeChar === 'kevin' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Kevin"
-              >
-                <img 
-                  src="/assets/characters/kevin_crop.webp" 
-                  alt="Kevin" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('kevin', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Hippie */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('hippi'); }}
-                className={`absolute right-[-2%] top-[33%] w-[27%] z-10 anim-banner-hippi cursor-pointer pointer-events-auto transition-transform duration-300 origin-right ${
-                  activeChar === 'hippi' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Hippie"
-              >
-                <img 
-                  src="/assets/characters/hippi_crop.webp" 
-                  alt="Hippie" 
-                  className="w-full h-auto object-contain drop-shadow-[0_6px_20px_rgba(0,0,0,0.85)]"
-                />
-                {renderCharBadge('hippi', 'bottom-0 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Omma */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('omma'); }}
-                className={`absolute bottom-[-2%] left-0 w-[44%] z-15 anim-banner-omma cursor-pointer pointer-events-auto transition-transform duration-300 origin-bottom-left ${
-                  activeChar === 'omma' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Omma"
-              >
-                <img 
-                  src="/assets/characters/omma_crop.webp" 
-                  alt="Omma" 
-                  className="w-full h-auto object-contain drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-                />
-                {renderCharBadge('omma', 'top-4 sm:top-8 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* Alman Opa */}
-              <div 
-                onClick={(e) => { e.stopPropagation(); handleCharacterClick('opa'); }}
-                className={`absolute bottom-[-2%] right-0 w-[42%] z-15 anim-banner-opa cursor-pointer pointer-events-auto transition-transform duration-300 origin-bottom-right ${
-                  activeChar === 'opa' ? 'scale-110 z-30 drop-shadow-[0_0_20px_rgba(200,147,70,0.8)]' : 'hover:scale-105'
-                }`}
-                title="Alman Opa"
-              >
-                <img 
-                  src="/assets/characters/opa_crop.webp" 
-                  alt="Alman Opa" 
-                  className="w-full h-auto object-contain drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-                />
-                {renderCharBadge('opa', 'top-4 sm:top-8 left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* 3. DAS SCHILD */}
-              <div 
-                onClick={(e) => { 
-                  e.stopPropagation(); 
-                  playSoundEffect('wobble'); 
-                  triggerLeafExplosion();
-                  handleCharacterClick('schild'); 
-                }}
-                className="absolute left-1/2 bottom-[21%] w-[42%] h-[62%] z-15 anim-banner-schild cursor-pointer pointer-events-auto flex items-end justify-center"
-                title="Bankgeheimnis im Park Schild"
-              >
-                <img 
-                  src="/assets/characters/schild_crop.webp" 
-                  alt="Bankgeheimnis im Park Schild" 
-                  className={`h-full w-auto object-contain drop-shadow-[0_12px_35px_rgba(0,0,0,0.95)] transition-transform duration-300 ${
-                    activeChar === 'schild' ? 'scale-105' : 'hover:scale-[1.03]'
-                  }`}
-                />
-                {renderCharBadge('schild', 'top-[18%] left-1/2 -translate-x-1/2')}
-              </div>
-
-              {/* 4. CANVAS PARTIKEL: WEGFLIEGENDE BLÄTTER */}
-              <canvas 
-                ref={bannerCanvasRef}
-                className="absolute inset-0 w-full h-full pointer-events-none z-25"
-              />
-
-              {/* 5. TITEL & BUTTON: DIREKT IM BANNER UNTER DEM SCHILD ZWISCHEN DEN KÖPFEN */}
-              <div className="absolute bottom-[18%] sm:bottom-[19%] left-0 right-0 z-30 flex flex-col items-center text-center px-3 anim-cta-banner pointer-events-auto">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white uppercase drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)] leading-none select-none">
-                  BANKGEHEIMNIS
-                </h1>
-                <p className="text-xs sm:text-sm font-extrabold tracking-[0.25em] text-[#c89346] uppercase mt-1 mb-2.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] select-none">
-                  COMEDY KANAL
-                </p>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); scrollToVideos(); }}
-                  className="w-full max-w-[250px] sm:max-w-[290px] py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-sm sm:text-base uppercase tracking-wider border-2 border-[#c89346] shadow-[0_4px_16px_rgba(0,0,0,0.7)] transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>JETZT ANSCHAUEN</span>
-                  <Play className="w-4 h-4 fill-white text-white" />
-                </button>
-              </div>
-
-            </div>
-          )}
-
+              <span>{heroSlides[heroIndex].label}</span>
+              <Play className="w-5 h-5 fill-white text-white" />
+            </button>
+          </div>
         </div>
-
       </section>
 
       {/* ============================================================ */}
@@ -1711,57 +1652,21 @@ export default function App() {
                   type="button"
                   onClick={() => setIsCategoryBoxOpen(!isCategoryBoxOpen)}
                   className={`bg-neutral-900 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-2.5 shadow-sm ${
-                    isCategoryBoxOpen || castFilter.length > 0 || onlyAbo || onlyFavorites || durationFilter !== 'all'
+                    isCategoryBoxOpen || castFilter.length > 0 || onlyAbo || onlyExclusive || onlyFavorites || durationFilter !== 'all'
                       ? 'border-[#c89346] text-[#e8b568] bg-[#6d3c17]/30'
                       : 'border-neutral-700 hover:border-[#c89346]'
                   }`}
                 >
                   <Filter className="w-4 h-4 text-[#c89346] shrink-0" />
                   <span>Kategorien & Filter</span>
-                  {((castFilter.length > 0 ? castFilter.length : 0) + (onlyAbo ? 1 : 0) + (onlyFavorites ? 1 : 0) + (durationFilter !== 'all' ? 1 : 0)) > 0 && (
+                  {((castFilter.length > 0 ? castFilter.length : 0) + (onlyAbo ? 1 : 0) + (onlyExclusive ? 1 : 0) + (onlyFavorites ? 1 : 0) + (durationFilter !== 'all' ? 1 : 0)) > 0 && (
                     <span className="w-5 h-5 rounded-full bg-[#c89346] text-black text-[11px] font-black flex items-center justify-center shrink-0">
-                      {(castFilter.length > 0 ? castFilter.length : 0) + (onlyAbo ? 1 : 0) + (onlyFavorites ? 1 : 0) + (durationFilter !== 'all' ? 1 : 0)}
+                      {(castFilter.length > 0 ? castFilter.length : 0) + (onlyAbo ? 1 : 0) + (onlyExclusive ? 1 : 0) + (onlyFavorites ? 1 : 0) + (durationFilter !== 'all' ? 1 : 0)}
                     </span>
                   )}
                   <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${isCategoryBoxOpen ? 'rotate-180' : ''}`} />
                 </button>
               </div>
-
-              {/* Favoriten Schnell-Filter (VIP) */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!currentUser || !currentUser.isVip) {
-                      showToast('Favoriten mit Herz ist exklusiv für angemeldete VIP-Mitglieder!');
-                      setAuthTab(currentUser ? 'login' : 'register');
-                      setRegisterForVip(true);
-                      setIsAuthModalOpen(true);
-                      return;
-                    }
-                    setOnlyFavorites(!onlyFavorites);
-                    setVisibleCount(3);
-                  }}
-                  className={`font-bold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
-                    onlyFavorites
-                      ? 'bg-red-600 text-white border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]'
-                      : 'bg-neutral-900 text-neutral-300 border-neutral-700 hover:border-red-500/70 hover:text-white'
-                  }`}
-                  title={currentUser?.isVip ? "Nur gemerkte Favoriten anzeigen" : "Favoriten (VIP-exklusiv)"}
-                >
-                  <Heart className={`w-4 h-4 ${onlyFavorites || (currentUser?.isVip && favoriteIds.length > 0) ? 'fill-red-500 text-red-500' : 'text-neutral-400'}`} />
-                  <span>Favoriten</span>
-                  {currentUser?.isVip && favoriteIds.length > 0 && (
-                    <span className={`px-1.5 py-0.2 rounded-full text-[11px] font-black ${
-                      onlyFavorites ? 'bg-white text-red-600' : 'bg-red-600/80 text-white'
-                    }`}>
-                      {favoriteIds.length}
-                    </span>
-                  )}
-                  {!isVipUnlocked && <Lock className="w-3 h-3 text-[#c89346]" />}
-                </button>
-              </div>
-
 
               {/* Auswahl-Kasten Modal: Kategorien, Abo-Clips & Dauer - PERFEKT ZENTRIERT IM HOCHFORMAT & DESKTOP */}
               {isCategoryBoxOpen && (
@@ -1786,15 +1691,16 @@ export default function App() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        {(castFilter.length > 0 || onlyAbo || onlyFavorites || durationFilter !== 'all') && (
+                        {(castFilter.length > 0 || onlyAbo || onlyExclusive || onlyFavorites || durationFilter !== 'all') && (
                           <button
                             type="button"
                             onClick={() => {
                               setCastFilter([]);
                               setOnlyAbo(false);
+                              setOnlyExclusive(false);
                               setOnlyFavorites(false);
                               setDurationFilter('all');
-                              setVisibleCount(3);
+                              setVisibleCount(4);
                             }}
                             className="text-xs font-bold text-[#e8b568] hover:underline cursor-pointer px-1 py-0.5"
                           >
@@ -1811,19 +1717,19 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Kategorien-Grid inklusive ABO-CLIPS & FAVORITEN - VOLLSTÄNDIG SICHTBAR OHNE SCROLLBALKEN */}
+                    {/* Kategorien-Grid inklusive ABO-CLIPS, WEB-EXKLUSIV & FAVORITEN - VOLLSTÄNDIG SICHTBAR */}
                     <div className="mb-3">
                       <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider mb-2 block">
                         Kategorien & Rollen
                       </span>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         
                         {/* Abo-Clips direkt als Kategorie in der Liste */}
                         <button
                           type="button"
                           onClick={() => {
                             setOnlyAbo(!onlyAbo);
-                            setVisibleCount(3);
+                            setVisibleCount(4);
                           }}
                           className={`px-3 py-2.5 rounded-xl text-xs sm:text-sm font-black text-left transition-all border flex items-center justify-between gap-1 cursor-pointer ${
                             onlyAbo
@@ -1838,6 +1744,26 @@ export default function App() {
                           {onlyAbo && <Check className="w-3.5 h-3.5 text-[#e8b568] shrink-0" />}
                         </button>
 
+                        {/* Web-Exklusiv (Nicht auf Social Media) */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOnlyExclusive(!onlyExclusive);
+                            setVisibleCount(4);
+                          }}
+                          className={`px-3 py-2.5 rounded-xl text-xs sm:text-sm font-black text-left transition-all border flex items-center justify-between gap-1 cursor-pointer ${
+                            onlyExclusive
+                              ? 'bg-amber-700/80 text-white border-amber-400 shadow-md'
+                              : 'bg-neutral-900 text-amber-300 border-amber-500/40 hover:border-amber-400'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 truncate">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                            <span className="truncate">Web-Exklusiv</span>
+                          </div>
+                          {onlyExclusive && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
+                        </button>
+
                         {/* Favoriten direkt als Kategorie in der Liste */}
                         <button
                           type="button"
@@ -1850,7 +1776,7 @@ export default function App() {
                               return;
                             }
                             setOnlyFavorites(!onlyFavorites);
-                            setVisibleCount(3);
+                            setVisibleCount(4);
                           }}
                           className={`px-3 py-2.5 rounded-xl text-xs sm:text-sm font-black text-left transition-all border flex items-center justify-between gap-1 cursor-pointer ${
                             onlyFavorites
@@ -1901,7 +1827,7 @@ export default function App() {
                           type="button"
                           onClick={() => {
                             setDurationFilter('all');
-                            setVisibleCount(3);
+                            setVisibleCount(4);
                           }}
                           className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
                             durationFilter === 'all'
@@ -1915,7 +1841,7 @@ export default function App() {
                           type="button"
                           onClick={() => {
                             setDurationFilter('under1');
-                            setVisibleCount(3);
+                            setVisibleCount(4);
                           }}
                           className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
                             durationFilter === 'under1'
@@ -1929,7 +1855,7 @@ export default function App() {
                           type="button"
                           onClick={() => {
                             setDurationFilter('over1');
-                            setVisibleCount(3);
+                            setVisibleCount(4);
                           }}
                           className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
                             durationFilter === 'over1'
@@ -1974,6 +1900,19 @@ export default function App() {
                 </button>
               )}
 
+              {onlyExclusive && (
+                <button
+                  type="button"
+                  onClick={() => setOnlyExclusive(false)}
+                  className="px-2.5 py-1 rounded-lg bg-amber-600/30 text-amber-300 border border-amber-500/50 text-xs font-bold flex items-center gap-1.5 hover:bg-amber-600/50 transition-colors cursor-pointer"
+                  title="Web-Exklusiv-Filter entfernen"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span>Web-Exklusiv</span>
+                  <X className="w-3 h-3 text-neutral-400 hover:text-white" />
+                </button>
+              )}
+
               {onlyFavorites && (
                 <button
                   type="button"
@@ -2012,15 +1951,16 @@ export default function App() {
                 </button>
               )}
 
-              {(castFilter.length > 0 || onlyAbo || onlyFavorites || durationFilter !== 'all') && (
+              {(castFilter.length > 0 || onlyAbo || onlyExclusive || onlyFavorites || durationFilter !== 'all') && (
                 <button
                   type="button"
                   onClick={() => {
                     setCastFilter([]);
                     setOnlyAbo(false);
+                    setOnlyExclusive(false);
                     setOnlyFavorites(false);
                     setDurationFilter('all');
-                    setVisibleCount(3);
+                    setVisibleCount(4);
                   }}
                   className="text-xs text-[#e8b568] hover:underline cursor-pointer ml-1"
                 >
@@ -2071,11 +2011,16 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Badges: ABO Ehren-Pass vs Standart-Pass; 'Neu' nur bei Kevin Zeugnis */}
-                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                    {/* Badges: ABO Ehren-Pass vs Standart-Pass; 'Neu' nur bei Kevin Zeugnis; Web-Exklusiv */}
+                    <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
                       {vid.id === 'r2-kevin-zeugnis' && (
                         <span className="px-2.5 py-1 rounded-lg bg-red-600 text-white font-black text-xs uppercase tracking-wider shadow">
                           Neu
+                        </span>
+                      )}
+                      {vid.isExclusive && (
+                        <span className="px-2 py-1 rounded-lg bg-amber-500 text-black font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow">
+                          ⭐ Exklusiv
                         </span>
                       )}
                       {vid.isVip ? (
@@ -2226,8 +2171,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Steintor Bild: Ohne extra Kasten, ohne Beschreibung, auf voller Breite im Hauptkasten */}
-          <div className="w-full mt-8 sm:mt-10 flex items-center justify-center">
+          <div className={`mt-8 sm:mt-10 ${isWidescreen ? 'grid grid-cols-2 gap-6 items-center' : ''}`}>
             <img 
               src="/assets/group_frei.webp" 
               alt="Bankgeheimnis im Park Crew am Steineingang und Mauer" 
@@ -2235,61 +2179,39 @@ export default function App() {
               loading="lazy"
               decoding="async"
             />
+            <div className={`flex flex-col gap-4 ${isWidescreen ? '' : 'mt-6'}`}>
+              <div className="p-5 rounded-2xl bg-neutral-950/80 border-2 border-neutral-800">
+                <div className="w-12 h-12 rounded-xl bg-[#6d3c17] text-[#e8b568] flex items-center justify-center mb-4 border border-[#c89346]/40">
+                  <Film className="w-6 h-6" />
+                </div>
+                <h4 className="text-xl font-black text-white uppercase">Lustige Videos & Sketche</h4>
+                <p className="mt-2 text-sm text-neutral-300 leading-relaxed">
+                  Die besten Clips, Flachwitze und skurrilen Dialoge für deinen täglichen Lachflash.
+                </p>
+              </div>
+              <div className="p-5 rounded-2xl bg-neutral-950/80 border-2 border-neutral-800">
+                <div className="w-12 h-12 rounded-xl bg-[#6d3c17] text-[#e8b568] flex items-center justify-center mb-4 border border-[#c89346]/40">
+                  <Users className="w-6 h-6" />
+                </div>
+                <h4 className="text-xl font-black text-white uppercase">Kult-Charaktere</h4>
+                <p className="mt-2 text-sm text-neutral-300 leading-relaxed">
+                  Erlebe die Bahndidos und die komplette Park-Crew in ihren neuesten Abenteuern.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={scrollToVideos}
+                className="self-start flex items-center gap-1.5 text-sm font-bold text-[#c89346] hover:text-white transition-colors cursor-pointer"
+              >
+                <span>Zu den Videos scrollen</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* 3 Core Highlights Cards - untereinander im Quer- und Hochformat */}
-        <div className="flex flex-col gap-6 mb-12 text-left">
-          
-          {/* Card 1: Lustige Videos & Sketche */}
-          <div className="p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-[#6d3c17] text-[#e8b568] flex items-center justify-center mb-5 border border-[#c89346]/40 group-hover:scale-110 transition-transform">
-                <Film className="w-6 h-6" />
-              </div>
-              <h4 className="text-xl font-black text-white uppercase group-hover:text-[#c89346] transition-colors">
-                Lustige Videos & Sketche
-              </h4>
-              <p className="mt-3 text-sm sm:text-base text-neutral-300 leading-relaxed">
-                Die besten Clips, Flachwitze und skurrilen Dialoge für deinen täglichen Lachflash.
-              </p>
-            </div>
-            <button 
-              onClick={scrollToVideos}
-              className="mt-6 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#c89346] hover:text-white transition-colors cursor-pointer"
-            >
-              <span>Zu den Videos scrollen</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Card 2: Kult-Charaktere */}
-          <div className="p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-[#6d3c17] text-[#e8b568] flex items-center justify-center mb-5 border border-[#c89346]/40 group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6" />
-              </div>
-              <h4 className="text-xl font-black text-white uppercase group-hover:text-[#c89346] transition-colors">
-                Kult-Charaktere
-              </h4>
-              <p className="mt-3 text-sm sm:text-base text-neutral-300 leading-relaxed">
-                Erlebe die Bahndidos und die komplette Park-Crew in ihren neuesten Abenteuern.
-              </p>
-            </div>
-            <button 
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                showToast('Tippe auf die Köpfe im Banner, um die Charaktere zu erleben!');
-              }}
-              className="mt-6 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#c89346] hover:text-white transition-colors cursor-pointer"
-            >
-              <span>Charaktere im Banner ansehen</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Card 3: Parkbank-Duell (Offizielles Spiel) */}
-          <div className="p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
+        <div className={`mb-12 text-left ${isWidescreen ? 'grid grid-cols-2 gap-6 items-stretch' : 'flex flex-col gap-6'}`}>
+          <div className="h-full p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl bg-[#6d3c17] text-[#e8b568] flex items-center justify-center border border-[#c89346]/40 group-hover:scale-110 transition-transform">
@@ -2319,7 +2241,7 @@ export default function App() {
               </p>
 
               {/* Geschenkcode ALMANOPA (Nur für angemeldete Nutzer freischaltbar) */}
-              <div className="mt-4 pt-4 border-t border-neutral-800/80 w-full">
+              <div id="spiel-code" className="mt-4 pt-4 border-t border-neutral-800/80 w-full">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#e8b568] flex items-center gap-1.5">
                     <Gift className="w-3.5 h-3.5 text-[#c89346]" />
@@ -2408,8 +2330,8 @@ export default function App() {
                         <Lock className="w-3.5 h-3.5" /> Freischalten
                       </span>
                     ) : isGiftCodeCopied ? (
-                      <span className="text-emerald-400 flex items-center gap-1 text-[11px]">
-                        <Check className="w-3.5 h-3.5" /> Kopiert!
+                      <span className="text-[#e8b568] flex items-center gap-1 text-[11px]">
+                        <Check className="w-3.5 h-3.5 text-[#e8b568]" /> Kopiert!
                       </span>
                     ) : isGiftCodeRevealed ? (
                       <span className="text-[#e8b568] flex items-center gap-1 text-[11px]">
@@ -2440,37 +2362,29 @@ export default function App() {
             </a>
           </div>
 
+        {/* Deutscher Humor genau nach deinem Geschmack & CTA */}
+        <div className="h-full p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 flex flex-col justify-between">
+          <div>
+            <h3 className="text-2xl font-black text-white uppercase tracking-tight">
+              Deutscher Humor genau nach deinem Geschmack
+            </h3>
+            <p className="mt-3 text-neutral-300 text-base leading-relaxed">
+              Egal ob du nach Feierabend einfach abschalten willst oder die neuesten Videos unserer Parkbank-Legenden suchst: Bankgeheimnis im Park liefert dir tägliche Unterhaltung, die sitzt. Schau dir die aktuellen Clips an oder starte direkt eine Runde in unseren Online-Games!
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setAuthTab(currentUser ? 'login' : 'register');
+              setRegisterForVip(false);
+              setIsAuthModalOpen(true);
+            }}
+            className="mt-5 self-end px-6 py-3 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-sm border-2 border-[#c89346] shadow-lg transition-transform active:scale-95 cursor-pointer"
+          >
+            {currentUser ? 'Mein Konto' : 'Kostenlos anmelden'}
+          </button>
         </div>
 
-        {/* Deutscher Humor genau nach deinem Geschmack & CTA */}
-        <div className="p-8 sm:p-10 rounded-3xl bg-neutral-950 border-2 border-neutral-800 text-center flex flex-col items-center">
-          <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
-            Deutscher Humor genau nach deinem Geschmack
-          </h3>
-          <p className="mt-3 text-neutral-300 text-base sm:text-lg max-w-2xl leading-relaxed">
-            Egal ob du nach Feierabend einfach abschalten willst oder die neuesten Videos unserer Parkbank-Legenden suchst: Bankgeheimnis im Park liefert dir tägliche Unterhaltung, die sitzt. Schau dir die aktuellen Clips an oder starte direkt eine Runde in unseren Online-Games!
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <button 
-              onClick={scrollToVideos}
-              className="px-6 py-3 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-sm sm:text-base border border-[#c89346] shadow-lg transition-transform active:scale-95 cursor-pointer flex items-center gap-2"
-            >
-              <Play className="w-4 h-4 fill-white" />
-              <span>Zu den aktuellen Clips</span>
-            </button>
-
-            <a 
-              href="https://parkbank-duell.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-[#e8b568] hover:text-white font-bold text-sm sm:text-base border border-neutral-700 hover:border-[#c89346] shadow transition-all cursor-pointer flex items-center gap-2"
-            >
-              <Gamepad2 className="w-4 h-4" />
-              <span>Jetzt spielen (Parkbank-Duell)</span>
-              <ExternalLink className="w-3.5 h-3.5 text-[#e8b568]/70" />
-            </a>
-          </div>
         </div>
 
       </section>
@@ -2716,9 +2630,37 @@ export default function App() {
             </a>
           </div>
 
-          <p className="font-medium text-neutral-400 text-xs sm:text-sm">
-            © {new Date().getFullYear()} Bankgeheimnis im Park. Alle Rechte vorbehalten.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mt-1">
+            <p className="font-medium text-neutral-400 text-xs sm:text-sm">
+              © {new Date().getFullYear()} Bankgeheimnis im Park. Alle Rechte vorbehalten.
+            </p>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-[#e8b568] transition-colors cursor-pointer"
+                title="Homepage & Logo teilen"
+              >
+                <Share2 className="w-3.5 h-3.5 text-[#e8b568]" />
+                <span>Teilen</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isAdminAuthenticated) {
+                    setIsAdminPanelOpen(true);
+                  } else {
+                    setIsAdminAuthModalOpen(true);
+                  }
+                }}
+                className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-[#e8b568] transition-colors cursor-pointer"
+                title="Admin-Bereich öffnen (PIN geschützt)"
+              >
+                <Shield className="w-3.5 h-3.5 text-[#e8b568]" />
+                <span>Admin-Panel</span>
+              </button>
+            </div>
+          </div>
           <p className="text-sm sm:text-base text-[#c89346] font-extrabold mt-2 tracking-wide">
             Comedy, Sketche & Geheimnisse von der wohl berühmtesten Parkbank Deutschlands.
           </p>
@@ -2786,7 +2728,7 @@ export default function App() {
                   </div>
                   <div className="flex justify-between text-neutral-300">
                     <span>Vorab-Folgen:</span>
-                    <span className="font-bold text-green-400">
+                    <span className="font-bold text-[#e8b568]">
                       {currentUser.isVip ? 'Verfügbar' : 'Gesperrt'}
                     </span>
                   </div>
@@ -2797,6 +2739,10 @@ export default function App() {
                     onClick={() => {
                       const updated = { ...currentUser, isVip: true };
                       saveUser(updated);
+                      const updatedAll = allUsers.map((u) => 
+                        u.email.toLowerCase() === currentUser.email.toLowerCase() ? { ...u, isVip: true } : u
+                      );
+                      updateUsersList(updatedAll);
                       showToast('🎉 Ehren-Parkausweis erfolgreich aktiviert!');
                     }}
                     className="w-full py-3 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-base border border-[#c89346] shadow cursor-pointer transition-all"
@@ -3113,6 +3059,56 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* ============================================================ */}
+      {/* ADMIN AUTHENTIFIZIERUNG (PIN-ABFRAGE)                        */}
+      {/* ============================================================ */}
+      <AdminAuthModal
+        isOpen={isAdminAuthModalOpen}
+        onClose={() => setIsAdminAuthModalOpen(false)}
+        onSuccess={() => {
+          setIsAdminAuthModalOpen(false);
+          setIsAdminAuthenticated(true);
+          setIsAdminPanelOpen(true);
+          showToast('🔓 Admin-Bereich freigeschaltet!');
+        }}
+        adminPin={adminPin}
+      />
+
+      {/* ============================================================ */}
+      {/* ADMIN PANEL (DASHBOARD)                                      */}
+      {/* ============================================================ */}
+      <AdminPanel
+        isOpen={isAdminPanelOpen}
+        onClose={() => setIsAdminPanelOpen(false)}
+        users={allUsers}
+        onUpdateUsers={updateUsersList}
+        customVideos={customVideos}
+        officialVideos={REAL_VIDEOS}
+        onAddCustomVideo={handleAddCustomVideo}
+        onDeleteCustomVideo={handleDeleteCustomVideo}
+        onToggleVideoVip={handleToggleVideoVip}
+        videoViews={videoViews}
+        favorites={favoriteIds}
+        adminPin={adminPin}
+        onUpdateAdminPin={handleUpdateAdminPin}
+        onLogoutAdmin={() => {
+          setIsAdminAuthenticated(false);
+          setIsAdminPanelOpen(false);
+          showToast('Admin-Bereich gesperrt.');
+        }}
+        onImportBackup={handleImportBackup}
+        showToast={showToast}
+      />
+
+      {/* ============================================================ */}
+      {/* HOMEPAGE & LOGO TEILEN MODAL                                 */}
+      {/* ============================================================ */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        showToast={showToast}
+      />
 
     </div>
   );
