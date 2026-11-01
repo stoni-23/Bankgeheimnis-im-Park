@@ -74,6 +74,56 @@ const getVideoDescription = (vid: RealVideo): string => {
 
 const REAL_VIDEOS: RealVideo[] = [
   {
+    id: 'r2-plan',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_Ihr_plan_ist_aufgeflogen.mp4',
+    poster: '/assets/posters/plan-aufgeflogen.jpg?v=frame',
+    title: 'Alman Opa: Ihr Plan ist aufgeflogen',
+    duration: '01:09 min',
+    episodeNumber: '',
+    cast: ['opa'],
+    isVip: true
+  },
+  {
+    id: 'r2-halal',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Alman_opa_halal_in_der_birne_Full%20HD%201080p_MEDIUM_FR24.mp4',
+    poster: '/assets/posters/halal-birne.jpg?v=frame',
+    title: 'Alman Opa: Halal in der Birne',
+    duration: '01:03 min',
+    episodeNumber: '',
+    cast: ['opa', 'talahinnen'],
+    isVip: true
+  },
+  {
+    id: 'r2-ramadan',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_keine_almans_an_ramadan_Full%20HD%201080p_MEDIUM_FR24.mp4',
+    poster: '/assets/posters/ramadan.jpg?v=frame',
+    title: 'Alman Opa: Keine Almans an Ramadan',
+    duration: '01:08 min',
+    episodeNumber: '',
+    cast: ['opa', 'talahons'],
+    isVip: true
+  },
+  {
+    id: 'r2-oregano',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/hippie_omma_nur_oregano.mp4',
+    poster: '/assets/posters/oregano.jpg?v=frame',
+    title: 'Oregano, ich schwör!',
+    duration: '02:15 min',
+    episodeNumber: '',
+    cast: ['hippie', 'omma'],
+    isVip: true
+  },
+  {
+    id: 'r2-dunkelkammer',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/oma_schelle_dunkelkammer.mp4',
+    poster: '/assets/posters/dunkelkammer.jpg?v=frame',
+    title: 'Oma Schelle: Dunkelkammer Deko',
+    duration: '00:25 min',
+    episodeNumber: '',
+    cast: ['omaschelle'],
+    isVip: true
+  },
+  {
     id: 'r2-nogo',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Bankgeheimnis_no_go_area_fuer_alman_opa.mp4',
     poster: '/assets/posters/no-go-area.jpg?v=frame',
