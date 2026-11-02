@@ -1,4 +1,4 @@
-import { setVip, stripeClient } from './_lib/abo';
+import { setVip, stripeClient } from './lib/abo';
 
 export const config = { api: { bodyParser: false } };
 

@@ -1,4 +1,4 @@
-import { supabaseUrl } from './_lib/abo';
+import { supabaseUrl } from './lib/abo';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
