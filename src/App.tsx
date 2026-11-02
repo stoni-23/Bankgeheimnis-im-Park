@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Play, Lock, User, X, ChevronRight, ChevronDown, Filter, ThumbsUp,
   Check, LogOut, ShieldCheck, Sparkles, Shield, Share2,
-  Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink, Gift, Copy, Eye,
+  Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink,
   Ticket, Award, Heart, Tv, Maximize2, Minimize2, ChevronLeft, SkipForward
 } from 'lucide-react';
 import { AdminPanel } from './components/AdminPanel';
@@ -749,6 +749,8 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState('');
   const [authHint, setAuthHint] = useState('');
   const [registerForVip, setRegisterForVip] = useState(true);
+  const [isGiftCodeRevealed, setIsGiftCodeRevealed] = useState(false);
+  const [isGiftCodeCopied, setIsGiftCodeCopied] = useState(false);
 
   // Automatische Bildschirmanpassung (Quer- vs. Hochformat)
   const [isWidescreen, setIsWidescreen] = useState(() => 
@@ -940,10 +942,6 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [playingVideo]);
-
-  // Geschenkcode State & Feedback
-  const [isGiftCodeRevealed, setIsGiftCodeRevealed] = useState(false);
-  const [isGiftCodeCopied, setIsGiftCodeCopied] = useState(false);
 
   // Autoplay State (Exklusiv für Ehren-Parkausweis / VIP)
   const [isAutoplay, setIsAutoplay] = useState<boolean>(() => {
@@ -1159,8 +1157,8 @@ export default function App() {
       src: '/assets/banner/duell-landing.webp?v=align',
       alt: 'Parkbank Duell',
       title: 'Parkbank Duell',
-      action: 'code' as const,
-      label: 'Zum Code',
+      action: 'spiel' as const,
+      label: 'Zum Spiel',
     },
   ];
   const [heroIndex, setHeroIndex] = useState(0);
@@ -1356,8 +1354,8 @@ export default function App() {
       if (vid) handleWatchVideo(vid);
       return;
     }
-    if (slide.action === 'code') {
-      document.getElementById('spiel-code')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (slide.action === 'spiel') {
+      window.open('https://parkbank-duell.vercel.app/', '_blank', 'noopener,noreferrer');
       return;
     }
     scrollToVideos();
@@ -2433,9 +2431,8 @@ export default function App() {
                 Jetzt sitzt du selbst auf der Bank! Zeig im Wort-Duell, wie schlagfertig du bist. Direkt im Browser, ohne Download
               </p>
 
-              {/* Geschenkcode ALMANOPA (Nur für angemeldete Nutzer freischaltbar) */}
-              <div id="spiel-code" className="mt-4 pt-4 border-t border-neutral-800/80 w-full">
-                <div className="flex items-center justify-between mb-1.5">
+              <div className="mt-4 pt-4 border-t border-neutral-800/80 w-full">
+                <div className="flex items-center justify-between mb-1.5 gap-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#e8b568] flex items-center gap-1.5">
                     <Gift className="w-3.5 h-3.5 text-[#c89346]" />
                     <span>Geschenkcode</span>
@@ -2446,98 +2443,69 @@ export default function App() {
                       </span>
                     )}
                   </span>
-                  <span className="text-[10px] text-neutral-400">
-                    {!currentUser 
-                      ? 'Kostenlos anmelden zum Freischalten'
-                      : isGiftCodeRevealed 
-                      ? 'Antippen zum Kopieren' 
+                  <span className="text-[10px] text-neutral-400 text-right">
+                    {!currentUser
+                      ? 'Anmelden zum Aufdecken'
+                      : isGiftCodeRevealed
+                      ? 'Antippen zum Kopieren'
                       : 'Antippen zum Aufdecken'}
                   </span>
                 </div>
-
                 <button
                   type="button"
                   onClick={() => {
                     if (!currentUser) {
-                      showToast('🔒 Melde dich kostenlos an, um den Geschenkcode freizuschalten!');
-                      setAuthTab('register');
+                      setAuthHint('');
+                      setAuthTab('login');
                       setRegisterForVip(false);
                       setIsAuthModalOpen(true);
                       return;
                     }
-                    if (!isGiftCodeRevealed) {
-                      setIsGiftCodeRevealed(true);
-                    }
+                    if (!isGiftCodeRevealed) setIsGiftCodeRevealed(true);
                     if (typeof navigator !== 'undefined' && navigator.clipboard) {
                       navigator.clipboard.writeText('ALMANOPA');
                     }
                     setIsGiftCodeCopied(true);
-                    showToast(isGiftCodeRevealed ? 'Code ALMANOPA kopiert!' : 'Code ALMANOPA aufgedeckt & kopiert!');
+                    showToast(isGiftCodeRevealed ? 'Code ALMANOPA kopiert.' : 'Code ALMANOPA aufgedeckt.');
                     setTimeout(() => setIsGiftCodeCopied(false), 2500);
                   }}
                   className={`w-full py-2.5 px-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
                     !currentUser
                       ? 'bg-neutral-950/80 hover:bg-neutral-900 border-neutral-800 hover:border-[#c89346]/60 text-neutral-300'
                       : isGiftCodeRevealed
-                      ? 'bg-[#1e1308] border-[#c89346] text-[#fcd34d] shadow-[0_0_15px_rgba(200,147,70,0.2)]'
-                      : 'bg-neutral-950 hover:bg-neutral-900 border-neutral-700 hover:border-neutral-500 text-neutral-300'
+                      ? 'bg-[#1e1308] border-[#c89346] text-[#fcd34d]'
+                      : 'bg-neutral-950 hover:bg-neutral-900 border-neutral-700 text-neutral-300'
                   }`}
-                  title={
-                    !currentUser 
-                      ? 'Kostenlos anmelden, um den Geschenkcode zu sehen' 
-                      : isGiftCodeRevealed 
-                      ? 'Code kopieren' 
-                      : 'Code aufdecken'
-                  }
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
                     {!currentUser ? (
-                      <div className="flex items-center gap-2">
-                        <Lock className="w-4 h-4 text-[#e8b568]" />
-                        <span className="font-mono tracking-widest text-neutral-500 select-none text-sm font-bold">
-                          ••••••••
-                        </span>
-                        <span className="text-[11px] font-bold text-[#e8b568]">
-                          (Anmelden zum Freischalten)
-                        </span>
-                      </div>
+                      <>
+                        <Lock className="w-4 h-4 text-[#e8b568] shrink-0" />
+                        <span className="font-mono tracking-widest text-neutral-500 text-sm font-bold">••••••••</span>
+                      </>
                     ) : isGiftCodeRevealed ? (
-                      <span className="font-mono font-black text-sm sm:text-base tracking-widest text-[#fcd34d]">
-                        ALMANOPA
-                      </span>
+                      <span className="font-mono font-black text-sm sm:text-base tracking-widest text-[#fcd34d]">ALMANOPA</span>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono tracking-widest text-neutral-400 select-none text-sm font-bold">
-                          ••••••••
-                        </span>
-                        <span className="text-[11px] font-bold text-neutral-400">
-                          (Code aufdecken)
-                        </span>
-                      </div>
+                      <>
+                        <span className="font-mono tracking-widest text-neutral-400 text-sm font-bold">••••••••</span>
+                        <span className="text-[11px] font-bold text-neutral-400">Aufdecken</span>
+                      </>
                     )}
                   </div>
-
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-400">
+                  <div className="flex items-center gap-1 text-[11px] font-bold shrink-0">
                     {!currentUser ? (
-                      <span className="text-[#e8b568] flex items-center gap-1 text-[11px] font-bold">
-                        <Lock className="w-3.5 h-3.5" /> Freischalten
-                      </span>
+                      <span className="text-[#e8b568]">Anmelden</span>
                     ) : isGiftCodeCopied ? (
-                      <span className="text-[#e8b568] flex items-center gap-1 text-[11px]">
-                        <Check className="w-3.5 h-3.5 text-[#e8b568]" /> Kopiert!
-                      </span>
+                      <span className="text-emerald-400 flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Kopiert</span>
                     ) : isGiftCodeRevealed ? (
-                      <span className="text-[#e8b568] flex items-center gap-1 text-[11px]">
-                        <Copy className="w-3.5 h-3.5" /> Kopieren
-                      </span>
+                      <span className="text-[#e8b568] flex items-center gap-1"><Copy className="w-3.5 h-3.5" /> Kopieren</span>
                     ) : (
                       <Eye className="w-3.5 h-3.5 text-neutral-400" />
                     )}
                   </div>
                 </button>
-
                 <p className="mt-2 text-[11px] text-neutral-400 leading-snug">
-                  💡 <strong className="text-neutral-300">Einlösen:</strong> Im Spiel unter <span className="text-[#e8b568] font-semibold">Einstellungen – Einlösen</span>
+                  Einlösen im Spiel unter Einstellungen – Einlösen.
                 </p>
               </div>
             </div>
