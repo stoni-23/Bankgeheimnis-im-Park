@@ -1334,21 +1334,21 @@ export default function App() {
   const heroSlides = [
     {
       src: '/assets/banner/banner-landing.webp',
-      alt: 'Die ganze Parkbank',
+      alt: 'Deutsche Comedy-Sketche, die ganze Parkbank-Crew',
       title: 'Bankgeheimnis im Park',
       action: 'videos' as const,
       label: 'Jetzt anschauen',
     },
     {
       src: '/assets/banner/banner-landing-kevin.webp',
-      alt: 'Kevin mit dem Zeugnis',
+      alt: 'Comedy-Sketch: Kevin mit dem Zeugnis',
       title: 'Kevin: Zeugnis',
       action: 'kevin' as const,
       label: 'Jetzt anschauen',
     },
     {
       src: '/assets/banner/duell-landing.webp?v=align',
-      alt: 'Parkbank Duell',
+      alt: 'Parkbank-Duell, kostenloses Wort-Duell im Browser',
       title: 'Parkbank Duell',
       action: 'spiel' as const,
       label: 'Jetzt spielen',
@@ -1985,9 +1985,9 @@ export default function App() {
           </div>
 
           <div className={isWidescreen ? 'w-64 shrink-0 flex flex-col items-start text-left' : 'shrink-0 mt-1 flex flex-col items-center'}>
-            <h1 className={`font-black tracking-tight text-white uppercase leading-tight ${isWidescreen ? 'text-2xl' : 'text-3xl'}`}>
+            <p className={`font-black tracking-tight text-white uppercase leading-tight ${isWidescreen ? 'text-2xl' : 'text-3xl'}`}>
               {heroSlides[heroIndex].title}
-            </h1>
+            </p>
             <button
               type="button"
               onClick={openHero}
@@ -2018,7 +2018,11 @@ export default function App() {
             <span>Offizielle Sketche & Episoden</span>
           </div>
           
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase">
+          <h1 className="text-xl sm:text-2xl font-black text-white leading-snug">
+            Bankgeheimnis im Park – Deutsche Comedy-Sketche & kostenlose Browsergames
+          </h1>
+
+          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase">
             PARKBANK-SKETCHE & HIGHLIGHTS
           </h2>
           
@@ -2382,7 +2386,7 @@ export default function App() {
                   <div className="relative aspect-video w-full bg-neutral-950 overflow-hidden">
                     <img 
                       src={vid.poster ?? `https://img.youtube.com/vi/${vid.youtubeId}/hqdefault.jpg`} 
-                      alt={vid.title}
+                      alt={`Comedy-Sketch: ${vid.title}`}
                       title={vid.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none"
                       loading="lazy"
@@ -2479,6 +2483,12 @@ export default function App() {
             </button>
           </div>
         )}
+
+        <p className="mt-12 max-w-3xl mx-auto text-left text-base text-neutral-300 leading-relaxed">
+          Auf der Parkbank treffen Rentner, Alltagssatire und trockener deutscher Humor aufeinander. Die Comedy-Sketche zeigen die schrägsten Geschichten und Dialoge direkt aus dem Parkleben, ungefiltert, kurzweilig und in voller Länge. Alman Opa, Omma, die Bahndidos und der Rest der Crew sitzen auf derselben Bank: No-Go-Area, Waschverbotszone, Regionalexpress und der ganz normale Nachmittag im Park. Die Folgen laufen hier im eigenen Player. Ein Teil ist frei anschaubar, die längeren Sketche gibt es mit dem Ehren-Parkausweis. Neue Clips liegen oft zuerst auf dieser Seite, bevor sie auf{' '}
+          <a href="https://www.youtube.com/@bankgeheimnisimpark" title="Comedy-Sketche auf YouTube" className="text-[#e8b568] underline underline-offset-2">YouTube</a>
+          {' '}erscheinen.
+        </p>
 
         {/* On-Site Parkbank Info-Box (Keine externen YouTube-Verlinkungen) */}
         <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-left">
@@ -2618,7 +2628,7 @@ export default function App() {
                 <div className="w-36 sm:w-44 aspect-square rounded-2xl overflow-hidden border-2 border-[#c89346]/40 shadow-xl bg-black">
                   <img 
                     src="/assets/parkbank-duell.webp" 
-                    alt="Parkbank Duell" 
+                    alt="Parkbank-Duell, kostenloses Wort-Duell im Browser"
                     title="Parkbank Duell"
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
@@ -2629,8 +2639,15 @@ export default function App() {
                 Parkbank-Duell
               </h4>
               <p className="mt-2 text-sm text-neutral-300 leading-relaxed text-center sm:text-left">
-                Jetzt sitzt du selbst auf der Bank! Zeig im Wort-Duell, wie schlagfertig du bist. Direkt im Browser, ohne Download
+                Parkbank-Duell ist das kostenlose Wort-Duell direkt im Browser. Du sitzt selbst auf der Bank und zeigst, wie schlagfertig du bist. Kein Download und keine Extra-App. Wer angemeldet ist, löst den Geschenkcode im Spiel unter Einstellungen ein.
               </p>
+              <a
+                href="https://duell.bankgeheimnisimpark.de"
+                title="Parkbank-Duell spielen"
+                className="mt-3 inline-block text-sm font-bold text-[#e8b568] underline underline-offset-2"
+              >
+                Parkbank-Duell: kostenloses Wort-Duell online spielen
+              </a>
 
               <div className="mt-4 pt-4 border-t border-neutral-800/80 w-full">
                 <div className="flex items-center justify-between mb-1.5 gap-2">
@@ -2936,7 +2953,7 @@ export default function App() {
           <a href="/" title="Startseite">Start</a>
           <a href="#video-section" title="Zu den Sketchen">Sketche</a>
           <a href="#spiel" title="Zum Spiel und Geschenkcode">Spiel</a>
-          <a href="https://duell.bankgeheimnisimpark.de" title="Parkbank Duell spielen">Parkbank Duell</a>
+          <a href="https://duell.bankgeheimnisimpark.de" title="Parkbank-Duell spielen">Parkbank-Duell online spielen</a>
         </nav>
           <div className="mb-6 flex flex-row items-center justify-center gap-1 sm:gap-2.5 flex-nowrap w-full max-w-full px-1">
             {/* TikTok */}
