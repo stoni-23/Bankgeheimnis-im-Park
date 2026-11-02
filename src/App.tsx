@@ -14,6 +14,8 @@ import { AdminPanel } from './components/AdminPanel';
 import { AdminAuthModal } from './components/AdminAuthModal';
 import { ShareModal } from './components/ShareModal';
 import { AdminBackupData } from './types/admin';
+import { supabase } from './lib/supabase';
+import type { User } from '@supabase/supabase-js';
 
 export type CastId =
   | 'omma'
@@ -675,14 +677,7 @@ export default function App() {
   const [activeCharTimeout, setActiveCharTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // User Account & VIP Storage State
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
-    try {
-      const saved = localStorage.getItem('bankgeheimnis_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
 
   // Admin-Panel & Authentifizierung State
   const [isAdminAuthModalOpen, setIsAdminAuthModalOpen] = useState(false);
@@ -1071,6 +1066,34 @@ export default function App() {
     }
   };
 
+  const accountFromAuth = (user: User): UserAccount => {
+    const email = user.email || '';
+    const listed = allUsers.find((entry) => entry.email.toLowerCase() === email.toLowerCase());
+    const metaName = typeof user.user_metadata?.name === 'string' ? user.user_metadata.name : '';
+    return {
+      name: metaName || listed?.name || email.split('@')[0] || 'Gast',
+      email,
+      isVip: Boolean(listed?.isVip),
+      memberSince: listed?.memberSince || String(new Date(user.created_at).getFullYear()),
+      status: listed?.status || 'active'
+    };
+  };
+
+  useEffect(() => {
+    let alive = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!alive) return;
+      saveUser(data.session?.user ? accountFromAuth(data.session.user) : null);
+    });
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      saveUser(session?.user ? accountFromAuth(session.user) : null);
+    });
+    return () => {
+      alive = false;
+      subscription.subscription.unsubscribe();
+    };
+  }, []);
+
   // Bildschirmgröße überwachen
   useEffect(() => {
     const handleResize = () => {
@@ -1337,48 +1360,72 @@ export default function App() {
   };
 
   // Echter Login / Registrierungs-Handler mit Admin-Nutzerlisten-Synchronisation
-  const handleAuthSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!authEmail) {
-      showToast('Bitte eine E-Mail-Adresse eingeben!');
+    const email = authEmail.trim();
+    const password = authPassword;
+    if (!email || !password) {
+      showToast('E-Mail und Passwort eingeben.');
+      return;
+    }
+    if (password.length < 6) {
+      showToast('Passwort mindestens 6 Zeichen.');
       return;
     }
 
     if (authTab === 'login') {
-      const existingInList = allUsers.find(u => u.email.toLowerCase() === authEmail.trim().toLowerCase());
-      const isVip = existingInList ? existingInList.isVip : isVipUnlocked;
-      const user: UserAccount = {
-        name: existingInList?.name || authEmail.split('@')[0],
-        email: authEmail.trim(),
-        isVip,
-        memberSince: existingInList?.memberSince || '2026',
-        status: existingInList?.status || 'active'
-      };
-      saveUser(user);
-      if (!existingInList) {
-        updateUsersList([user, ...allUsers]);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !data.user) {
+        const message = (error?.message || '').toLowerCase();
+        if (message.includes('not confirmed')) {
+          showToast('Erst die E-Mail bestätigen, dann einloggen.');
+        } else {
+          showToast('E-Mail oder Passwort ist falsch.');
+        }
+        return;
       }
-      showToast(`Erfolgreich angemeldet als ${user.name}`);
-      if (playingVideo && (user.isVip || !playingVideo.isVip)) {
-        setFilmPhase('film');
-      }
-    } else {
-      const user: UserAccount = {
-        name: authName.trim() || authEmail.split('@')[0],
-        email: authEmail.trim(),
-        isVip: registerForVip,
-        memberSince: '2026',
-        status: 'active'
-      };
+      const user = accountFromAuth(data.user);
       saveUser(user);
-      const filtered = allUsers.filter(u => u.email.toLowerCase() !== authEmail.trim().toLowerCase());
+      const filtered = allUsers.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase());
       updateUsersList([user, ...filtered]);
-      showToast(registerForVip ? 'Konto erstellt & VIP-Abo aktiviert!' : 'Konto erfolgreich erstellt!');
+      showToast(`Angemeldet als ${user.name}`);
       if (playingVideo && (user.isVip || !playingVideo.isVip)) {
         setFilmPhase('film');
       }
+      setIsAuthModalOpen(false);
+      return;
     }
 
+    const name = authName.trim() || email.split('@')[0];
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } }
+    });
+    if (error) {
+      const message = error.message.toLowerCase();
+      if (message.includes('already')) {
+        showToast('Diese E-Mail gibt es schon. Bitte einloggen.');
+        setAuthTab('login');
+      } else {
+        showToast('Konto konnte nicht angelegt werden.');
+      }
+      return;
+    }
+    if (!data.session || !data.user) {
+      showToast('Konto angelegt. Bestätige die E-Mail, danach einloggen.');
+      setAuthTab('login');
+      return;
+    }
+    const user = accountFromAuth(data.user);
+    user.name = name;
+    saveUser(user);
+    const filtered = allUsers.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase());
+    updateUsersList([user, ...filtered]);
+    showToast('Konto erstellt.');
+    if (playingVideo && (user.isVip || !playingVideo.isVip)) {
+      setFilmPhase('film');
+    }
     setIsAuthModalOpen(false);
   };
 
@@ -1479,10 +1526,11 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     saveUser(null);
     setIsAuthModalOpen(false);
-    showToast('Erfolgreich abgemeldet.');
+    showToast('Abgemeldet.');
   };
 
   // Homepage Teilen Funktion (Web Share API mit Zwischenablage-Fallback)
