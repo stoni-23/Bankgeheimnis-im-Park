@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Play, Lock, User, X, ChevronRight, ChevronDown, Filter, ThumbsUp,
   Check, LogOut, ShieldCheck, Sparkles, Shield, Share2,
-  Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink,
+  Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink, Gift, Copy, Eye,
   Ticket, Award, Heart, Tv, Maximize2, Minimize2, ChevronLeft, SkipForward
 } from 'lucide-react';
 import { AdminPanel } from './components/AdminPanel';
