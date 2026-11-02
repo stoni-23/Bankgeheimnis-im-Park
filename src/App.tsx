@@ -2833,7 +2833,7 @@ export default function App() {
       {/* MODAL: ANMELDUNG & MITGLIEDERKONTO                           */}
       {/* ============================================================ */}
       {isAuthModalOpen && (
-        <div className="fixed inset-0 z-[80] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fadeIn">
+        <div className="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fadeIn">
           <div className="w-full max-w-md my-auto bg-neutral-900 rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-[#c89346] shadow-2xl flex flex-col max-h-[92vh] overflow-y-auto">
             
             {/* Header */}
