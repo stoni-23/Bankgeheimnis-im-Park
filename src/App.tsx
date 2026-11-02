@@ -15,7 +15,7 @@ import { AdminAuthModal } from './components/AdminAuthModal';
 import { ShareModal } from './components/ShareModal';
 import { AdminBackupData } from './types/admin';
 import { supabase } from './lib/supabase';
-import type { User } from '@supabase/supabase-js';
+import type { User as AuthUser } from '@supabase/supabase-js';
 
 export type CastId =
   | 'omma'
@@ -1070,7 +1070,7 @@ export default function App() {
     }
   };
 
-  const accountFromAuth = (user: User): UserAccount => {
+  const accountFromAuth = (user: AuthUser): UserAccount => {
     const email = user.email || '';
     const listed = allUsers.find((entry) => entry.email.toLowerCase() === email.toLowerCase());
     const metaName = typeof user.user_metadata?.name === 'string' ? user.user_metadata.name : '';
