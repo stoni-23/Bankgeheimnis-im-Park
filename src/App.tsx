@@ -2833,7 +2833,7 @@ export default function App() {
       {/* MODAL: ANMELDUNG & MITGLIEDERKONTO                           */}
       {/* ============================================================ */}
       {isAuthModalOpen && (
-        <div className="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fadeIn">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fadeIn" style={{ zIndex: 200 }}>
           <div className="w-full max-w-md my-auto bg-neutral-900 rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-[#c89346] shadow-2xl flex flex-col max-h-[92vh] overflow-y-auto">
             
             {/* Header */}
@@ -3025,7 +3025,7 @@ export default function App() {
       {playingVideo && (
         <div 
           ref={cinemaContainerRef}
-          className="fixed inset-0 z-[90] bg-black text-white flex flex-col overflow-hidden animate-fadeIn"
+          className={`fixed inset-0 bg-black text-white flex flex-col overflow-hidden animate-fadeIn ${isAuthModalOpen ? 'z-10' : 'z-[90]'}`}
         >
           {/* Player-Kopf: Titel, Autoplay-Umschalter, Nächster Clip, Schließen */}
           <div className="h-14 sm:h-16 px-3 sm:px-6 bg-neutral-950/95 border-b border-neutral-800 flex items-center justify-between gap-2 sm:gap-4 shrink-0 z-20">
