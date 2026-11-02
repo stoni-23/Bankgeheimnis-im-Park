@@ -1002,6 +1002,11 @@ export default function App() {
     });
   }, [allVideos, onlyAbo, onlyExclusive, onlyFavorites, favoriteIds, castFilter, durationFilter]);
 
+  const shownVideos = React.useMemo(() => {
+    if (isVipUnlocked) return filteredVideos;
+    return [...filteredVideos].sort((a, b) => Number(Boolean(a.isVip)) - Number(Boolean(b.isVip)));
+  }, [filteredVideos, isVipUnlocked]);
+
   // Aktive Playlist basierend auf exakt den gefilterten Videos (oder allen zugänglichen Sketchen)
   const currentCategoryPlaylist = React.useMemo(() => {
     return filteredVideos.filter((v) => !v.isVip || isVipUnlocked);
@@ -1573,7 +1578,7 @@ export default function App() {
     setVisibleCount(4);
   };
 
-  const visibleVideos = filteredVideos.slice(0, visibleCount);
+  const visibleVideos = shownVideos.slice(0, visibleCount);
 
   // Render-Funktion für das Namensschild direkt AUF der jeweils angeklickten Figur
   const renderCharBadge = (charKey: string, posClasses: string = "bottom-1 left-1/2 -translate-x-1/2") => {
