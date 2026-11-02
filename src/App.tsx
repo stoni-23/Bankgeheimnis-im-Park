@@ -820,6 +820,50 @@ const INITIAL_USERS: UserAccount[] = [
   { name: 'Kevin', email: 'kevin.park@gmx.de', isVip: false, memberSince: '2026', status: 'active' }
 ];
 
+const MOBILE_COPY = new Set([
+  'parkbank_classics11.mp4',
+  'parkbank_classics10.mp4',
+  'Bankgeheimnis_stricknadel_mod_2.mp4',
+  'Bankgeheimnis_no_go_area_fuer_alman_opa.mp4',
+  'flixtrain_Angels__4K_HIGH_FR24_(1).mp4',
+  'bankgeheimnis_waschenverbotszone.mp4',
+  'Ubahndidos.mp4',
+  'Fremdsprachen_akrobatinnen.mp4',
+  'Bankgeheimnis_omma_barfuß_durchs_waschbecken.mp4',
+  'Tramdidos.mp4',
+  'oma_rocker_im_eco_modus.mp4',
+  'bimmelbahndidos.mp4',
+  'Oma-Schelle-Bahndidos-orginal.mp4',
+  'Bahndidos-Spardidos-mit-oma-schelle.mp4',
+  'Kappenfraktion_oder_hutbürger.mp4',
+  'parkbank_classics2.mp4',
+  'Bankgeheimnis_hippie_hohlkopf.mp4',
+  'blocksberg_brigade_strohbesen_battalion.mp4',
+  'Weichspüler_auf_lunge.mp4',
+  'Bankgeheimnis-Pinguin-im-park.mp4',
+  'kevin_ist_ki_generiert_4K_HIGH_FR24_(1).mp4',
+  'bankgeheimnis_kevin_zeugnis.mp4',
+  'hauptschulabschluss_aus_der_wunderlampe.mp4',
+  'Bahnhofsklo_als_meldeadresse_4K_HIGH_FR24.mp4',
+  'oma_schelle_dunkelkammer.mp4',
+  'parkbank_classics9.mp4',
+  'parkbank_classics3.mp4',
+  'parkbank_classics8.mp4',
+  'Park-Alltag-Teil-1.mp4',
+  'Park-Alltag-Teil-2.mp4',
+  'Park-Alltag-Teil-3.mp4',
+  'Park-Alltag-Teil-4.mp4',
+  '24_stunden_vollgas.mp4',
+]);
+
+function playbackSrc(src?: string) {
+  if (!src || typeof window === 'undefined') return src;
+  if (!window.matchMedia('(max-width: 900px)').matches) return src;
+  const file = decodeURIComponent(src.split('/').pop() || '');
+  if (!MOBILE_COPY.has(file)) return src;
+  return src.replace('/Sketches%2016zu9/', '/Sketches%2016zu9/mobil/');
+}
+
 export default function App() {
   const [animKey, setAnimKey] = useState(1);
   const [activeChar, setActiveChar] = useState<string | null>(null);
@@ -3342,7 +3386,7 @@ export default function App() {
                 <video
                   key={playingVideo.id}
                   ref={videoRef}
-                  src={playingVideo.src}
+                  src={playbackSrc(playingVideo.src)}
                   poster={playingVideo.poster}
                   controls
                   controlsList="nodownload"
