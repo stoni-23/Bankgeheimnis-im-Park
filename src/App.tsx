@@ -405,7 +405,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Alman Opa: Fremdsprachen-Akrobatinnen',
     duration: '00:21 min',
     episodeNumber: '',
-    cast: ['opa'],
+    cast: ['opa', 'gender'],
     isVip: true
   },
   {
