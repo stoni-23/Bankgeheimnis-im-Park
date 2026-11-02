@@ -12,7 +12,7 @@ export default async function handler(req: any, res: any) {
       res.status(400).json({ error: 'Kein laufendes Abo gefunden.' });
       return;
     }
-    const origin = req.headers.origin || 'https://bankgeheimnis-im-park.vercel.app';
+    const origin = req.headers.origin || 'https://bankgeheimnisimpark.de';
     const portal = await stripeClient().billingPortal.sessions.create({
       customer,
       return_url: origin

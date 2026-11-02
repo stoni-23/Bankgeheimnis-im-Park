@@ -11,7 +11,7 @@ export default async function handler(req: any, res: any) {
       res.status(401).json({ error: 'Erst anmelden.' });
       return;
     }
-    const origin = req.headers.origin || 'https://bankgeheimnis-im-park.vercel.app';
+    const origin = req.headers.origin || 'https://bankgeheimnisimpark.de';
     const customerId = user.app_metadata?.stripe_customer;
     const session = await stripeClient().checkout.sessions.create({
       mode: 'subscription',

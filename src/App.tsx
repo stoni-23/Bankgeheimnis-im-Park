@@ -1351,7 +1351,7 @@ export default function App() {
       alt: 'Parkbank Duell',
       title: 'Parkbank Duell',
       action: 'spiel' as const,
-      label: 'Zum Spiel',
+      label: 'Jetzt spielen',
     },
   ];
   const [heroIndex, setHeroIndex] = useState(0);
@@ -1548,7 +1548,7 @@ export default function App() {
       return;
     }
     if (slide.action === 'spiel') {
-      window.open('https://parkbank-duell.vercel.app/', '_blank', 'noopener,noreferrer');
+      document.getElementById('spiel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     scrollToVideos();
@@ -2596,7 +2596,7 @@ export default function App() {
         </div>
 
         <div className={`mb-12 text-left ${isWidescreen ? 'grid grid-cols-2 gap-6 items-stretch' : 'flex flex-col gap-6'}`}>
-          <div className="h-full p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
+          <div id="spiel" className="h-full scroll-mt-20 p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl bg-[#6d3c17] text-[#e8b568] flex items-center justify-center border border-[#c89346]/40 group-hover:scale-110 transition-transform">
@@ -2706,7 +2706,7 @@ export default function App() {
 
             {/* Jetzt spielen Button - öffnet direkt im neuen Tab ohne Kasten */}
             <a 
-              href="https://parkbank-duell.vercel.app/"
+              href="https://duell.bankgeheimnisimpark.de"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-5 w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white text-sm sm:text-base font-black border-2 border-[#c89346] shadow-lg transition-transform active:scale-95 cursor-pointer text-center"
