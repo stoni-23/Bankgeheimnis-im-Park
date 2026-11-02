@@ -30,7 +30,9 @@ export type CastId =
   | 'pimpelhuber'
   | 'blocksberg'
   | 'omaschelle'
-  | 'parkbank';
+  | 'parkbank'
+  | 'rentnerin'
+  | 'classic';
 
 interface RealVideo {
   id: string;
@@ -75,6 +77,136 @@ const getVideoDescription = (vid: RealVideo): string => {
 };
 
 const REAL_VIDEOS: RealVideo[] = [
+  {
+    id: 'r2-vollgas',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/24_stunden_vollgas.mp4',
+    poster: '/assets/posters/vollgas.jpg?v=frame',
+    title: '24 Stunden Vollgas',
+    duration: '03:00 min',
+    episodeNumber: '',
+    cast: ['omaschelle', 'punk', 'rentnerin'],
+    isVip: true
+  },
+  {
+    id: 'r2-protein',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_protein_fuers_gehirn.mp4',
+    poster: '/assets/posters/protein-gehirn.jpg?v=frame',
+    title: 'Alman Opa: Protein fürs Gehirn',
+    duration: '00:21 min',
+    episodeNumber: '',
+    cast: ['opa'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-1',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics1.mp4',
+    poster: '/assets/posters/classic-1.jpg?v=frame',
+    title: 'Parkbank Classics 1',
+    duration: '00:15 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-2',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics2.mp4',
+    poster: '/assets/posters/classic-2.jpg?v=frame',
+    title: 'Parkbank Classics 2',
+    duration: '00:18 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-3',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics3.mp4',
+    poster: '/assets/posters/classic-3.jpg?v=frame',
+    title: 'Parkbank Classics 3',
+    duration: '00:21 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-4',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics4.mp4',
+    poster: '/assets/posters/classic-4.jpg?v=frame',
+    title: 'Parkbank Classics 4',
+    duration: '00:13 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-5',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics5.mp4',
+    poster: '/assets/posters/classic-5.jpg?v=frame',
+    title: 'Parkbank Classics 5',
+    duration: '00:19 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-6',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics6.mp4',
+    poster: '/assets/posters/classic-6.jpg?v=frame',
+    title: 'Parkbank Classics 6',
+    duration: '00:16 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-7',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics7.mp4',
+    poster: '/assets/posters/classic-7.jpg?v=frame',
+    title: 'Parkbank Classics 7',
+    duration: '00:14 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-8',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics8.mp4',
+    poster: '/assets/posters/classic-8.jpg?v=frame',
+    title: 'Parkbank Classics 8',
+    duration: '00:15 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-9',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics9.mp4',
+    poster: '/assets/posters/classic-9.jpg?v=frame',
+    title: 'Parkbank Classics 9',
+    duration: '00:21 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-10',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics10.mp4',
+    poster: '/assets/posters/classic-10.jpg?v=frame',
+    title: 'Parkbank Classics 10',
+    duration: '00:18 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
+  {
+    id: 'r2-classic-11',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/parkbank_classics11.mp4',
+    poster: '/assets/posters/classic-11.jpg?v=frame',
+    title: 'Parkbank Classics 11',
+    duration: '00:27 min',
+    episodeNumber: '',
+    cast: ['classic'],
+    isVip: true
+  },
   {
     id: 'r2-plan',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_Ihr_plan_ist_aufgeflogen.mp4',
@@ -272,7 +404,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Oma ist weg',
     duration: '02:40 min',
     episodeNumber: '',
-    cast: ['chantal', 'bahndidos', 'hippie'],
+    cast: ['chantal', 'bahndidos', 'hippie', 'rentnerin'],
     isVip: true
   },
   {
@@ -605,7 +737,9 @@ const CAST_LABEL: Record<CastId, string> = {
   pimpelhuber: 'Pimpelhuber',
   blocksberg: 'Blocksberg Brigade',
   omaschelle: 'Oma Schelle',
-  parkbank: 'Parkbank'
+  parkbank: 'Parkbank',
+  rentnerin: 'Rasende Rentnerin',
+  classic: 'Classics'
 };
 
 const CAST_FILTERS: CastId[] = [
@@ -621,7 +755,9 @@ const CAST_FILTERS: CastId[] = [
   'pimpelhuber',
   'blocksberg',
   'omaschelle',
-  'parkbank'
+  'parkbank',
+  'rentnerin',
+  'classic'
 ];
 
 interface LeafParticle {

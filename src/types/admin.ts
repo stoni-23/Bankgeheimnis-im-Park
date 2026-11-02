@@ -16,7 +16,9 @@ export type CastId =
   | 'pimpelhuber'
   | 'blocksberg'
   | 'omaschelle'
-  | 'parkbank';
+  | 'parkbank'
+  | 'rentnerin'
+  | 'classic';
 
 export interface RealVideo {
   id: string;
