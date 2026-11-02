@@ -5,6 +5,12 @@
   "redirects": [
     {
       "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.bankgeheimnisimpark.de" }],
+      "destination": "https://bankgeheimnisimpark.de/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "bankgeheimnis-im-park.vercel.app" }],
       "destination": "https://bankgeheimnisimpark.de/$1",
       "permanent": true

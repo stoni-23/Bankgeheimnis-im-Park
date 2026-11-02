@@ -1897,13 +1897,14 @@ export default function App() {
       {/* ============================================================ */}
       {/* HEADER: FESTSTEHEND IN EINER REIHE (KEIN YT ZEICHEN)         */}
       {/* ============================================================ */}
-      <header className="w-full max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between z-40 border-b border-neutral-900 bg-black/95 backdrop-blur-md sticky top-0 shrink-0">
+      <header role="banner" className="w-full max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between z-40 border-b border-neutral-900 bg-black/95 backdrop-blur-md sticky top-0 shrink-0">
         
         {/* Logo und Kanalname nebeneinander in einer Reihe */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
           <img 
             src="/assets/logo_gross.webp" 
             alt="Bankgeheimnis im Park Logo" 
+            title="Bankgeheimnis im Park"
             className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0"
           />
           <span className="font-extrabold text-sm sm:text-lg text-white tracking-tight whitespace-nowrap">
@@ -1943,6 +1944,8 @@ export default function App() {
         </div>
       </header>
 
+      <main id="inhalt">
+
       {/* ============================================================ */}
       {/* SEKTION 1: DAS HERO-BANNER                                   */}
       {/* - OHNE INFO-ICONS (i)                                       */}
@@ -1975,6 +1978,7 @@ export default function App() {
                 key={slide.src}
                 src={slide.src}
                 alt={slide.alt}
+                title={slide.title}
                 className={`absolute inset-0 h-full w-full object-contain ${index === heroIndex ? 'opacity-100' : 'opacity-0'}`}
               />
             ))}
@@ -2379,6 +2383,7 @@ export default function App() {
                     <img 
                       src={vid.poster ?? `https://img.youtube.com/vi/${vid.youtubeId}/hqdefault.jpg`} 
                       alt={vid.title}
+                      title={vid.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none"
                       loading="lazy"
                     />
@@ -2560,6 +2565,7 @@ export default function App() {
             <img 
               src="/assets/group_frei.webp" 
               alt="Bankgeheimnis im Park Crew am Steineingang und Mauer" 
+              title="Die Parkbank-Crew"
               className="w-full h-auto object-contain max-h-[540px] drop-shadow-[0_16px_40px_rgba(0,0,0,0.95)]"
               loading="lazy"
               decoding="async"
@@ -2613,6 +2619,7 @@ export default function App() {
                   <img 
                     src="/assets/parkbank-duell.webp" 
                     alt="Parkbank Duell" 
+                    title="Parkbank Duell"
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -2707,6 +2714,7 @@ export default function App() {
             {/* Jetzt spielen Button - öffnet direkt im neuen Tab ohne Kasten */}
             <a 
               href="https://duell.bankgeheimnisimpark.de"
+              title="Parkbank Duell spielen"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-5 w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white text-sm sm:text-base font-black border-2 border-[#c89346] shadow-lg transition-transform active:scale-95 cursor-pointer text-center"
@@ -2918,12 +2926,18 @@ export default function App() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* FOOTER */}
-      <footer className="w-full py-12 px-4 sm:px-6 text-center border-t border-neutral-900 bg-black">
+      <footer role="contentinfo" className="w-full py-12 px-4 sm:px-6 text-center border-t border-neutral-900 bg-black">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           
-          {/* Social Media Kanäle: TT, Insta, FB, YouTube in einer Reihe mit nur Icons und Plattformnamen */}
+        <nav aria-label="Inhalt" className="mb-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm font-bold text-[#e8b568]">
+          <a href="/" title="Startseite">Start</a>
+          <a href="#video-section" title="Zu den Sketchen">Sketche</a>
+          <a href="#spiel" title="Zum Spiel und Geschenkcode">Spiel</a>
+          <a href="https://duell.bankgeheimnisimpark.de" title="Parkbank Duell spielen">Parkbank Duell</a>
+        </nav>
           <div className="mb-6 flex flex-row items-center justify-center gap-1 sm:gap-2.5 flex-nowrap w-full max-w-full px-1">
             {/* TikTok */}
             <a 
