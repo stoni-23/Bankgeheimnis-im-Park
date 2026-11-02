@@ -3173,7 +3173,6 @@ export default function App() {
                     poster={filmPhase === 'film' ? playingVideo.poster : undefined}
                     controls={filmPhase === 'film'}
                     controlsList="nodownload"
-                    crossOrigin="anonymous"
                     {...({ 'x-webkit-airplay': 'allow' } as Record<string, string>)}
                     autoPlay
                     playsInline
