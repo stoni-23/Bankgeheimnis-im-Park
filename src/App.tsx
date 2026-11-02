@@ -747,6 +747,7 @@ export default function App() {
   const [authName, setAuthName] = useState('');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
+  const [authHint, setAuthHint] = useState('');
   const [registerForVip, setRegisterForVip] = useState(true);
 
   // Automatische Bildschirmanpassung (Quer- vs. Hochformat)
@@ -1430,39 +1431,55 @@ export default function App() {
     window.location.href = body.url;
   };
 
+  const signInAccount = async (email: string, password: string) => {
+    let result = await supabase.auth.signInWithPassword({ email, password });
+    const firstMessage = (result.error?.message || '').toLowerCase();
+    if (result.error && firstMessage.includes('not confirmed')) {
+      await fetch('/api/konto-freigeben', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      result = await supabase.auth.signInWithPassword({ email, password });
+    }
+    if (result.error || !result.data.user) {
+      const message = (result.error?.message || '').toLowerCase();
+      if (message.includes('not confirmed')) {
+        setAuthHint('Die Bestätigungsmail geht auf localhost und gilt nicht. Das Konto ließ sich nicht freischalten.');
+      } else {
+        setAuthHint('E-Mail oder Passwort ist falsch.');
+      }
+      return null;
+    }
+    const user = accountFromAuth(result.data.user);
+    saveUser(user);
+    const filtered = allUsers.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase());
+    updateUsersList([user, ...filtered]);
+    setAuthHint('');
+    setIsAuthModalOpen(false);
+    if (playingVideo && (user.isVip || !playingVideo.isVip)) {
+      setFilmPhase('film');
+    }
+    return user;
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const email = authEmail.trim();
     const password = authPassword;
+    setAuthHint('');
     if (!email || !password) {
-      showToast('E-Mail und Passwort eingeben.');
+      setAuthHint('E-Mail und Passwort eingeben.');
       return;
     }
     if (password.length < 6) {
-      showToast('Passwort mindestens 6 Zeichen.');
+      setAuthHint('Passwort mindestens 6 Zeichen.');
       return;
     }
 
     if (authTab === 'login') {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error || !data.user) {
-        const message = (error?.message || '').toLowerCase();
-        if (message.includes('not confirmed')) {
-          showToast('Erst die E-Mail bestätigen, dann einloggen.');
-        } else {
-          showToast('E-Mail oder Passwort ist falsch.');
-        }
-        return;
-      }
-      const user = accountFromAuth(data.user);
-      saveUser(user);
-      const filtered = allUsers.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase());
-      updateUsersList([user, ...filtered]);
-      showToast(`Angemeldet als ${user.name}`);
-      if (playingVideo && (user.isVip || !playingVideo.isVip)) {
-        setFilmPhase('film');
-      }
-      setIsAuthModalOpen(false);
+      const user = await signInAccount(email, password);
+      if (user) showToast(`Angemeldet als ${user.name}`);
       return;
     }
 
@@ -1470,38 +1487,41 @@ export default function App() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } }
+      options: {
+        data: { name },
+        emailRedirectTo: window.location.origin
+      }
     });
     if (error) {
       const message = error.message.toLowerCase();
-      if (message.includes('already')) {
-        showToast('Diese E-Mail gibt es schon. Bitte einloggen.');
-        setAuthTab('login');
-      } else {
-        showToast('Konto konnte nicht angelegt werden.');
+      if (!message.includes('already')) {
+        setAuthHint('Konto konnte nicht angelegt werden.');
+        return;
       }
-      return;
     }
-    if (!data.session || !data.user) {
-      showToast('Konto angelegt. Bestätige die E-Mail, danach einloggen.');
+    if (!data?.session) {
+      await fetch('/api/konto-freigeben', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+    }
+    const user = data?.session?.user
+      ? accountFromAuth(data.session.user)
+      : await signInAccount(email, password);
+    if (!user) {
       setAuthTab('login');
       return;
     }
-    const user = accountFromAuth(data.user);
-    user.name = name;
-    saveUser(user);
-    const filtered = allUsers.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase());
-    updateUsersList([user, ...filtered]);
-    showToast('Konto erstellt.');
-    if (registerForVip) {
+    if (data?.session?.user) {
+      user.name = name || user.name;
+      saveUser(user);
+      const filtered = allUsers.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase());
+      updateUsersList([user, ...filtered]);
       setIsAuthModalOpen(false);
-      await startAbo();
-      return;
     }
-    if (playingVideo && !playingVideo.isVip) {
-      setFilmPhase('film');
-    }
-    setIsAuthModalOpen(false);
+    showToast('Konto erstellt. Du bist angemeldet.');
+    if (registerForVip) await startAbo();
   };
 
   // Admin Aktionen: Videos, Backups & PIN
@@ -3008,6 +3028,10 @@ export default function App() {
                         <span>Ehren-Parkausweis aktivieren (3,99 €/Monat)</span>
                       </label>
                     </div>
+                  )}
+
+                  {authHint && (
+                    <p className="text-sm text-[#e8b568] leading-snug">{authHint}</p>
                   )}
 
                   <button
