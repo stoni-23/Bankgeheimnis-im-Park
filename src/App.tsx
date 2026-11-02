@@ -1078,11 +1078,38 @@ export default function App() {
     return {
       name: metaName || listed?.name || email.split('@')[0] || 'Gast',
       email,
-      isVip: Boolean(listed?.isVip),
+      isVip: user.app_metadata?.vip === true,
       memberSince: listed?.memberSince || String(new Date(user.created_at).getFullYear()),
       status: listed?.status || 'active'
     };
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const abo = params.get('abo');
+    if (!abo) return;
+    const sessionId = params.get('session_id');
+    window.history.replaceState({}, '', window.location.pathname);
+    if (abo === 'abgebrochen') {
+      setToastMsg('Zahlung abgebrochen.');
+      setTimeout(() => setToastMsg(null), 3500);
+      return;
+    }
+    if (abo !== 'ok' || !sessionId) return;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) return;
+      await fetch('/api/abo-bestaetigen', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      });
+      await supabase.auth.refreshSession();
+      setToastMsg('Zahlung wird geprüft. Der Ausweis geht auf, sobald Stripe durch ist.');
+      setTimeout(() => setToastMsg(null), 3500);
+    })();
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -1365,6 +1392,44 @@ export default function App() {
   };
 
   // Echter Login / Registrierungs-Handler mit Admin-Nutzerlisten-Synchronisation
+  const startAbo = async () => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) {
+      setAuthTab('register');
+      setRegisterForVip(true);
+      setIsAuthModalOpen(true);
+      showToast('Erst kostenlos anmelden, dann den Ausweis holen.');
+      return;
+    }
+    const response = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok || !body.url) {
+      showToast(body.error || 'Zahlung gerade nicht möglich.');
+      return;
+    }
+    window.location.href = body.url;
+  };
+
+  const openAboPortal = async () => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return;
+    const response = await fetch('/api/portal', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok || !body.url) {
+      showToast(body.error || 'Abo kann gerade nicht geöffnet werden.');
+      return;
+    }
+    window.location.href = body.url;
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const email = authEmail.trim();
@@ -1428,7 +1493,12 @@ export default function App() {
     const filtered = allUsers.filter((entry) => entry.email.toLowerCase() !== user.email.toLowerCase());
     updateUsersList([user, ...filtered]);
     showToast('Konto erstellt.');
-    if (playingVideo && (user.isVip || !playingVideo.isVip)) {
+    if (registerForVip) {
+      setIsAuthModalOpen(false);
+      await startAbo();
+      return;
+    }
+    if (playingVideo && !playingVideo.isVip) {
       setFilmPhase('film');
     }
     setIsAuthModalOpen(false);
@@ -2644,12 +2714,9 @@ export default function App() {
             <button 
               onClick={() => {
                 if (isVipUnlocked) {
-                  showToast('Dein Ehren-Parkausweis ist aktiv!');
-                  setIsAuthModalOpen(true);
+                  openAboPortal();
                 } else {
-                  setAuthTab('register');
-                  setRegisterForVip(true);
-                  setIsAuthModalOpen(true);
+                  startAbo();
                 }
               }}
               className="mt-8 w-full py-3.5 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-base sm:text-lg transition-transform active:scale-95 shadow-xl border-2 border-[#c89346] cursor-pointer flex items-center justify-center gap-2"
@@ -2657,7 +2724,7 @@ export default function App() {
               {isVipUnlocked ? (
                 <>
                   <Check className="w-5 h-5 text-[#e8b568]" />
-                  <span>Ehren-Parkausweis aktiv</span>
+                  <span>Abo verwalten</span>
                 </>
               ) : (
                 <>
@@ -2837,20 +2904,19 @@ export default function App() {
                   </div>
                 </div>
 
-                {!currentUser.isVip && (
+                {!currentUser.isVip ? (
                   <button
-                    onClick={() => {
-                      const updated = { ...currentUser, isVip: true };
-                      saveUser(updated);
-                      const updatedAll = allUsers.map((u) => 
-                        u.email.toLowerCase() === currentUser.email.toLowerCase() ? { ...u, isVip: true } : u
-                      );
-                      updateUsersList(updatedAll);
-                      showToast('🎉 Ehren-Parkausweis erfolgreich aktiviert!');
-                    }}
+                    onClick={startAbo}
                     className="w-full py-3 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-bold text-base border border-[#c89346] shadow cursor-pointer transition-all"
                   >
                     Jetzt Ehren-Parkausweis sichern (3,99 €/Monat)
+                  </button>
+                ) : (
+                  <button
+                    onClick={openAboPortal}
+                    className="w-full py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-[#e8b568] font-bold text-base border border-[#c89346] shadow cursor-pointer transition-all"
+                  >
+                    Abo verwalten oder kündigen
                   </button>
                 )}
 
