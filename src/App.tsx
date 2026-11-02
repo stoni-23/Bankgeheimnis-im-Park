@@ -3165,41 +3165,21 @@ export default function App() {
                     <span>Nochmal ansehen</span>
                   </button>
                 </div>
-              ) : (
+              ) : filmPhase === 'intro' ? (
                 <>
                   <video
-                    ref={videoRef}
-                    src={filmPhase === 'intro' ? INTRO_SRC : playingVideo.src}
-                    poster={filmPhase === 'film' ? playingVideo.poster : undefined}
-                    controls={filmPhase === 'film'}
-                    controlsList="nodownload"
-                    {...({ 'x-webkit-airplay': 'allow' } as Record<string, string>)}
+                    src={INTRO_SRC}
                     autoPlay
                     playsInline
-                    preload="metadata"
-                    onPlaying={() => {
-                      if (filmPhase === 'intro') setIntroReady(true);
-                    }}
+                    preload="auto"
+                    onPlaying={() => setIntroReady(true)}
                     onEnded={() => {
-                      if (filmPhase === 'intro') {
-                        if (!currentUser) {
-                          setFilmPhase('guestLock');
-                        } else {
-                          setFilmPhase('film');
-                        }
-                      } else if (filmPhase === 'film') {
-                        if (isAutoplay && isVipUnlocked && currentCategoryPlaylist.length > 0) {
-                          handleNextClip(false);
-                        } else {
-                          setFilmPhase('ende');
-                        }
-                      }
+                      if (!currentUser) setFilmPhase('guestLock');
+                      else setFilmPhase('film');
                     }}
-                    onContextMenu={(e) => e.preventDefault()}
                     className="w-full h-full max-h-full object-contain bg-black"
                   />
-
-                  {filmPhase === 'intro' && !introReady && (
+                  {!introReady && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
                       <img
                         src="/assets/logo_gross.webp"
@@ -3209,6 +3189,29 @@ export default function App() {
                     </div>
                   )}
                 </>
+              ) : (
+                <video
+                  key={playingVideo.id}
+                  ref={videoRef}
+                  src={playingVideo.src}
+                  poster={playingVideo.poster}
+                  controls
+                  controlsList="nodownload"
+                  crossOrigin="anonymous"
+                  {...({ 'x-webkit-airplay': 'allow' } as Record<string, string>)}
+                  autoPlay
+                  playsInline
+                  preload="metadata"
+                  onEnded={() => {
+                    if (isAutoplay && isVipUnlocked && currentCategoryPlaylist.length > 0) {
+                      handleNextClip(false);
+                    } else {
+                      setFilmPhase('ende');
+                    }
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
+                  className="w-full h-full max-h-full object-contain bg-black"
+                />
               )
             ) : (
               <iframe
