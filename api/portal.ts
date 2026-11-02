@@ -1,4 +1,4 @@
-import { stripeClient, userFromAuthHeader } from './lib/abo';
+import { stripeClient, userFromAuthHeader } from './lib/abo.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
