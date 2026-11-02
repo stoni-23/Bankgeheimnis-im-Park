@@ -48,7 +48,8 @@ const CAST_OPTIONS: { id: CastId; label: string }[] = [
   { id: 'omaschelle', label: 'Oma Schelle' },
   { id: 'parkbank', label: 'Parkbank' },
   { id: 'rentnerin', label: 'Rasende Rentnerin' },
-  { id: 'classic', label: 'Classics' }
+  { id: 'classic', label: 'Classics' },
+  { id: 'gender', label: 'Gender Girls' }
 ];
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({

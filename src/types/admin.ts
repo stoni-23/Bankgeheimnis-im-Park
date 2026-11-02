@@ -18,7 +18,8 @@ export type CastId =
   | 'omaschelle'
   | 'parkbank'
   | 'rentnerin'
-  | 'classic';
+  | 'classic'
+  | 'gender';
 
 export interface RealVideo {
   id: string;

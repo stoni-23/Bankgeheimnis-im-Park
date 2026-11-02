@@ -32,7 +32,8 @@ export type CastId =
   | 'omaschelle'
   | 'parkbank'
   | 'rentnerin'
-  | 'classic';
+  | 'classic'
+  | 'gender';
 
 interface RealVideo {
   id: string;
@@ -77,6 +78,16 @@ const getVideoDescription = (vid: RealVideo): string => {
 };
 
 const REAL_VIDEOS: RealVideo[] = [
+  {
+    id: 'r2-berg-runter',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_rollt_den_berg_runter.mp4',
+    poster: '/assets/posters/berg-runter.jpg?v=frame',
+    title: 'Alman Opa: rollt den Berg runter',
+    duration: '00:15 min',
+    episodeNumber: '',
+    cast: ['opa', 'gender'],
+    isVip: true
+  },
   {
     id: 'r2-vollgas',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/24_stunden_vollgas.mp4',
@@ -739,7 +750,8 @@ const CAST_LABEL: Record<CastId, string> = {
   omaschelle: 'Oma Schelle',
   parkbank: 'Parkbank',
   rentnerin: 'Rasende Rentnerin',
-  classic: 'Classics'
+  classic: 'Classics',
+  gender: 'Gender Girls'
 };
 
 const CAST_FILTERS: CastId[] = [
@@ -757,7 +769,8 @@ const CAST_FILTERS: CastId[] = [
   'omaschelle',
   'parkbank',
   'rentnerin',
-  'classic'
+  'classic',
+  'gender'
 ];
 
 interface LeafParticle {
