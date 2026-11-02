@@ -1828,6 +1828,7 @@ export default function App() {
           <p className="mt-3 text-lg sm:text-xl text-neutral-300 font-medium leading-relaxed">
             Echte Comedy von der Parkbank – Wählen Sie eine Folge und schauen Sie direkt im Player los!
           </p>
+          <p className="mt-2 text-[11px] text-neutral-500">Sketche mit KI erzeugt.</p>
         </div>
 
 
@@ -2822,6 +2823,7 @@ export default function App() {
           <p className="text-sm sm:text-base text-[#c89346] font-extrabold mt-2 tracking-wide">
             Comedy, Sketche & Geheimnisse von der wohl berühmtesten Parkbank Deutschlands.
           </p>
+          <p className="mt-3 text-[11px] text-neutral-500">Sketche mit KI erzeugt.</p>
         </div>
       </footer>
 
@@ -3032,6 +3034,7 @@ export default function App() {
               <h2 className="text-white font-black text-sm sm:text-base md:text-lg truncate max-w-xs sm:max-w-md md:max-w-xl">
                 {playingVideo.title}
               </h2>
+              <span className="hidden sm:inline text-[10px] font-medium text-neutral-500 shrink-0">KI</span>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
