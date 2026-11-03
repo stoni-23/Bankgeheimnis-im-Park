@@ -79,6 +79,26 @@ const getVideoDescription = (vid: RealVideo): string => {
 
 const REAL_VIDEOS: RealVideo[] = [
   {
+    id: 'r2-alltag-neu',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/ES%20REICHT%21%20Opa%20rechnet%20mit%20der%20%E2%80%9EGeneration%20Spachtelmasse%E2%80%9C%20ab%21.mp4',
+    poster: '/assets/posters/park-alltag-neu3.jpg?v=frame',
+    title: 'Park Alltag Teil 3',
+    duration: '02:31 min',
+    episodeNumber: '',
+    cast: ['parkbank', 'opa'],
+    isVip: true
+  },
+  {
+    id: 'r2-schelle-bohne',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Unterwegs%20mit%20Oma%20Schelle_%20Eskalation%20im%20Caf%C3%A9%20Rote%20Bohne%21%20%F0%9F%AB%98.mp4',
+    poster: '/assets/posters/oma-schelle-rote-bohne.jpg?v=frame',
+    title: 'Oma Schelle: Eskalation im Café Rote Bohne',
+    duration: '02:56 min',
+    episodeNumber: '',
+    cast: ['omaschelle', 'bahndidos', 'hippie'],
+    isVip: true
+  },
+  {
     id: 'r2-berg-runter',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_rollt_den_berg_runter.mp4',
     poster: '/assets/posters/berg-runter.jpg?v=frame',
@@ -416,7 +436,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '02:40 min',
     episodeNumber: '',
     cast: ['chantal', 'bahndidos', 'hippie', 'rentnerin'],
-    isVip: true
+    isVip: false
   },
   {
     id: 'r2-kappen',
@@ -476,7 +496,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '02:47 min',
     episodeNumber: '',
     cast: ['omma', 'opa', 'bahndidos'],
-    isVip: true
+    isVip: false
   },
   {
     id: 'r2-weich',
@@ -558,7 +578,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '01:33 min',
     episodeNumber: '',
     cast: ['pimpelhuber'],
-    isVip: true
+    isVip: false
   },
   {
     id: 'r2-hauptschule',
@@ -688,7 +708,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '03:36 min',
     episodeNumber: '',
     cast: ['parkbank'],
-    isVip: true
+    isVip: false
   },
   {
     id: 'r2-alltag-2',
@@ -704,7 +724,7 @@ const REAL_VIDEOS: RealVideo[] = [
     id: 'r2-alltag-3',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Park-Alltag-Teil-3.mp4',
     poster: '/assets/posters/park-alltag-3.jpg?v=frame',
-    title: 'Park Alltag Teil 3',
+    title: 'Park Alltag Teil 4',
     duration: '02:38 min',
     episodeNumber: '',
     cast: ['parkbank'],
@@ -714,7 +734,7 @@ const REAL_VIDEOS: RealVideo[] = [
     id: 'r2-alltag-4',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Park-Alltag-Teil-4.mp4',
     poster: '/assets/posters/park-alltag-4.jpg?v=frame',
-    title: 'Park Alltag Teil 4',
+    title: 'Park Alltag Teil 5',
     duration: '02:55 min',
     episodeNumber: '',
     cast: ['parkbank'],
