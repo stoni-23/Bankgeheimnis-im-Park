@@ -346,7 +346,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '01:01 min',
     episodeNumber: '',
     cast: ['bahndidos', 'omma'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-genz',
@@ -466,7 +466,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '01:15 min',
     episodeNumber: '',
     cast: ['omma', 'talahons'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-tram',
@@ -588,7 +588,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '01:01 min',
     episodeNumber: '',
     cast: ['opa', 'talahinnen'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-kevin-ki',
@@ -688,7 +688,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '01:04 min',
     episodeNumber: '',
     cast: ['omma', 'talahons'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-sbahn',
