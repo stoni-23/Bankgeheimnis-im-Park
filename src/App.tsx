@@ -2651,6 +2651,22 @@ export default function App() {
           </div>
         </div>
 
+        <div className="mb-8 mx-auto w-full max-w-[280px]">
+          <p className="mb-2 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Parkbank Duell Trailer</p>
+          <video
+            className="w-full rounded-2xl border-2 border-[#c89346]/40 bg-black"
+            style={{ aspectRatio: '1080 / 1350' }}
+            controls
+            playsInline
+            preload="none"
+            poster="/assets/posters/duell-trailer.jpg?v=frame"
+            controlsList="nodownload"
+            title="Parkbank Duell Trailer"
+          >
+            <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
+          </video>
+        </div>
+
         <div className={`mb-12 text-left ${isWidescreen ? 'grid grid-cols-2 gap-6 items-stretch' : 'flex flex-col gap-6'}`}>
           <div id="spiel" className="h-full scroll-mt-20 p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
             <div>
@@ -2805,22 +2821,6 @@ export default function App() {
           </button>
         </div>
 
-        </div>
-
-        <div className="mt-6 mx-auto w-full max-w-[280px]">
-          <p className="mb-2 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Duell-Trailer</p>
-          <video
-            className="w-full rounded-2xl border-2 border-[#c89346]/40 bg-black"
-            style={{ aspectRatio: '1080 / 1350' }}
-            controls
-            playsInline
-            preload="none"
-            poster="/assets/posters/duell-trailer.jpg?v=frame"
-            controlsList="nodownload"
-            title="Parkbank-Duell Trailer"
-          >
-            <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
-          </video>
         </div>
 
       </section>
