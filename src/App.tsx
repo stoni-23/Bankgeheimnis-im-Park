@@ -95,7 +95,7 @@ const REAL_VIDEOS: RealVideo[] = [
     title: 'Park Alltag Teil 3',
     duration: '02:31 min',
     episodeNumber: '',
-    cast: ['parkbank', 'opa'],
+    cast: ['parkbank'],
     isVip: true
   },
   {
@@ -389,7 +389,7 @@ const REAL_VIDEOS: RealVideo[] = [
     isVip: true
   },
   {
-    id: 'r2-ramadan',
+    id: 'r2-ramadan-gehirn',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_talahons_ramadan_f%C3%BCrs_gehirn.mp4',
     poster: '/assets/posters/opa-talahons-ramadan.jpg?v=frame',
     title: 'Alman Opa: Talahons, Ramadan fürs Gehirn',
@@ -2402,13 +2402,13 @@ export default function App() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {visibleVideos.map((vid) => {
+            {visibleVideos.map((vid, index) => {
 
               const isLiked = likedVideos[vid.id];
 
               return (
                 <div 
-                  key={vid.id}
+                  key={`${vid.id}-${index}`}
                   onClick={() => handleWatchVideo(vid)}
                   className="group bg-neutral-900/90 rounded-2xl overflow-hidden border-2 border-neutral-800 hover:border-[#c89346] transition-all duration-300 flex flex-col justify-between cursor-pointer shadow-xl hover:-translate-y-1"
                 >
