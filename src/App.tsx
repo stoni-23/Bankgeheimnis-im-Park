@@ -79,6 +79,16 @@ const getVideoDescription = (vid: RealVideo): string => {
 
 const REAL_VIDEOS: RealVideo[] = [
   {
+    id: 'r2-gelber-sack',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_punk_verbrennungsanlage_HD_720p.mp4',
+    poster: '/assets/posters/gelber-sack.jpg?v=frame',
+    title: 'Alman Opa: Container oder Gelber Sack',
+    duration: '00:24 min',
+    episodeNumber: '',
+    cast: ['opa', 'punk'],
+    isVip: true
+  },
+  {
     id: 'r2-alltag-neu',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/ES%20REICHT%21%20Opa%20rechnet%20mit%20der%20%E2%80%9EGeneration%20Spachtelmasse%E2%80%9C%20ab%21.mp4',
     poster: '/assets/posters/park-alltag-neu3.jpg?v=frame',
