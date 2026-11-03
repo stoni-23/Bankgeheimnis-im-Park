@@ -516,7 +516,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '01:02 min',
     episodeNumber: '',
     cast: ['opa', 'talahinnen'],
-    isVip: false
+    isVip: true
   },
   {
     id: 'r2-kevin-zeugnis',
@@ -588,7 +588,7 @@ const REAL_VIDEOS: RealVideo[] = [
     duration: '01:01 min',
     episodeNumber: '',
     cast: ['opa', 'talahinnen'],
-    isVip: true
+    isVip: false
   },
   {
     id: 'r2-kevin-ki',
