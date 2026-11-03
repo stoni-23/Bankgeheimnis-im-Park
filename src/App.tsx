@@ -79,6 +79,16 @@ const getVideoDescription = (vid: RealVideo): string => {
 
 const REAL_VIDEOS: RealVideo[] = [
   {
+    id: 'r2-altglas',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Omma_reif_fuers_altglas_Full%20HD%201080p_MEDIUM_FR24.mp4',
+    poster: '/assets/posters/altglas.jpg?v=frame',
+    title: 'Omma: reif fürs Altglas',
+    duration: '01:02 min',
+    episodeNumber: '',
+    cast: ['omma'],
+    isVip: true
+  },
+  {
     id: 'r2-gelber-sack',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/opa_punk_verbrennungsanlage_HD_720p.mp4',
     poster: '/assets/posters/gelber-sack.jpg?v=frame',
@@ -2795,6 +2805,22 @@ export default function App() {
           </button>
         </div>
 
+        </div>
+
+        <div className="mt-6 mx-auto w-full max-w-[280px]">
+          <p className="mb-2 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Duell-Trailer</p>
+          <video
+            className="w-full rounded-2xl border-2 border-[#c89346]/40 bg-black"
+            style={{ aspectRatio: '1080 / 1350' }}
+            controls
+            playsInline
+            preload="none"
+            poster="/assets/posters/duell-trailer.jpg?v=frame"
+            controlsList="nodownload"
+            title="Parkbank-Duell Trailer"
+          >
+            <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
+          </video>
         </div>
 
       </section>
