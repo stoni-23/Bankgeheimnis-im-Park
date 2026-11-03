@@ -2531,7 +2531,36 @@ export default function App() {
         </p>
 
         {/* On-Site Parkbank Info-Box (Keine externen YouTube-Verlinkungen) */}
-        <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-left">
+        <div className="mt-12 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#3a2211]/90 text-[#e8b568] font-bold text-xs sm:text-sm uppercase tracking-wider border border-[#7a461e]/70 mb-4">
+            <Sparkles className="w-3.5 h-3.5 text-[#e8b568]" />
+            <span>Offizielles Portal</span>
+          </div>
+
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase leading-tight">
+            Bankgeheimnis im Park
+          </h2>
+          <p className="text-xl sm:text-2xl font-black text-[#c89346] mt-2">
+            Dein Portal für Comedy Deutsch & Parkbank-Satire
+          </p>
+
+          <p className="mt-5 text-neutral-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
+            Vergiss trockene Finanzthemen: Unser Bankgeheimnis findet draußen im Grünen statt! Auf der offiziellen Website von Bankgeheimnis im Park erwartet dich unzensierte Comedy deutsch, bissige Alltagssatire und schwarzer Humor direkt von Deutschlands bekanntester Parkbank.
+          </p>
+        </div>
+
+      </section>
+
+      {/* ============================================================ */}
+      {/* SEKTION 3: DAS PORTAL - COMEDY DEUTSCH & PARKBANK-SATIRE     */}
+      {/* SEO-OPTIMIERTER INHALT: ELEGANT & INTERAKTIV STRUKTURIERT   */}
+      {/* ============================================================ */}
+      <section 
+        id="portal-info"
+        className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-14 sm:py-20 bg-gradient-to-b from-[#050505] via-neutral-950 to-[#000000] border-t border-neutral-900"
+      >
+        {/* Header mit klarer SEO-Hierarchie */}
+        <div className="mb-12 p-6 sm:p-8 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-left">
           <div className="flex flex-col items-start text-left">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#6d3c17]/40 text-[#e8b568] flex items-center justify-center shrink-0 border border-[#c89346]/40 mb-4">
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -2553,35 +2582,6 @@ export default function App() {
             <span>Jetzt Sketche ansehen</span>
             <ChevronRight className="w-5 h-5 text-[#e8b568]" />
           </button>
-        </div>
-
-      </section>
-
-      {/* ============================================================ */}
-      {/* SEKTION 3: DAS PORTAL - COMEDY DEUTSCH & PARKBANK-SATIRE     */}
-      {/* SEO-OPTIMIERTER INHALT: ELEGANT & INTERAKTIV STRUKTURIERT   */}
-      {/* ============================================================ */}
-      <section 
-        id="portal-info"
-        className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-14 sm:py-20 bg-gradient-to-b from-[#050505] via-neutral-950 to-[#000000] border-t border-neutral-900"
-      >
-        {/* Header mit klarer SEO-Hierarchie */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#3a2211]/90 text-[#e8b568] font-bold text-xs sm:text-sm uppercase tracking-wider border border-[#7a461e]/70 mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-[#e8b568]" />
-            <span>Offizielles Portal</span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase leading-tight">
-            Bankgeheimnis im Park
-          </h2>
-          <p className="text-xl sm:text-2xl font-black text-[#c89346] mt-2">
-            Dein Portal für Comedy Deutsch & Parkbank-Satire
-          </p>
-
-          <p className="mt-5 text-neutral-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-            Vergiss trockene Finanzthemen: Unser Bankgeheimnis findet draußen im Grünen statt! Auf der offiziellen Website von Bankgeheimnis im Park erwartet dich unzensierte Comedy deutsch, bissige Alltagssatire und schwarzer Humor direkt von Deutschlands bekanntester Parkbank.
-          </p>
         </div>
 
         {/* Die Bahndidos & Story Showcase Box */}
@@ -2651,20 +2651,24 @@ export default function App() {
           </div>
         </div>
 
-        <div className="mb-8 mx-auto w-full max-w-[280px]">
-          <p className="mb-2 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Parkbank Duell Trailer</p>
-          <video
-            className="w-full rounded-2xl border-2 border-[#c89346]/40 bg-black"
-            style={{ aspectRatio: '1080 / 1350' }}
-            controls
-            playsInline
-            preload="none"
-            poster="/assets/posters/duell-trailer.jpg?v=frame"
-            controlsList="nodownload"
-            title="Parkbank Duell Trailer"
-          >
-            <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
-          </video>
+        <div className={`mb-8 ${isWidescreen ? 'grid grid-cols-2 gap-6' : ''}`}>
+          <div className="rounded-2xl border-2 border-neutral-800 bg-neutral-900/90 p-4 sm:p-5">
+            <p className="mb-3 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Parkbank Duell Trailer</p>
+            <div className="mx-auto w-full max-w-[280px] overflow-hidden rounded-xl border border-[#c89346]/40 bg-black">
+              <video
+                className="block w-full h-auto bg-black"
+                style={{ aspectRatio: '1080 / 1350' }}
+                controls
+                playsInline
+                preload="metadata"
+                poster="/assets/posters/duell-trailer.jpg?v=frame"
+                controlsList="nodownload"
+                title="Parkbank Duell Trailer"
+              >
+                <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
         </div>
 
         <div className={`mb-12 text-left ${isWidescreen ? 'grid grid-cols-2 gap-6 items-stretch' : 'flex flex-col gap-6'}`}>
