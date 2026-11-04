@@ -2651,26 +2651,6 @@ export default function App() {
           </div>
         </div>
 
-        <div className={`mb-8 ${isWidescreen ? 'grid grid-cols-2 gap-6' : ''}`}>
-          <div className="rounded-2xl border-2 border-neutral-800 bg-neutral-900/90 p-4 sm:p-5">
-            <p className="mb-3 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Parkbank Duell Trailer</p>
-            <div className="mx-auto w-full max-w-[280px] overflow-hidden rounded-xl border border-[#c89346]/40 bg-black">
-              <video
-                className="block w-full h-auto bg-black"
-                style={{ aspectRatio: '1080 / 1350' }}
-                controls
-                playsInline
-                preload="metadata"
-                poster="/assets/posters/duell-trailer.jpg?v=frame"
-                controlsList="nodownload"
-                title="Parkbank Duell Trailer"
-              >
-                <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
-              </video>
-            </div>
-          </div>
-        </div>
-
         <div className={`mb-12 text-left ${isWidescreen ? 'grid grid-cols-2 gap-6 items-stretch' : 'flex flex-col gap-6'}`}>
           <div id="spiel" className="h-full scroll-mt-20 p-6 sm:p-7 rounded-2xl bg-neutral-900/90 border-2 border-neutral-800 hover:border-[#c89346] transition-all flex flex-col justify-between group">
             <div>
@@ -2827,11 +2807,25 @@ export default function App() {
 
         </div>
 
-      </section>
+        <div className="mt-8 rounded-2xl border-2 border-neutral-800 bg-neutral-900/90 p-4 sm:p-5">
+          <p className="mb-3 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Parkbank Duell Trailer</p>
+          <div className="mx-auto w-full max-w-[280px] overflow-hidden rounded-xl border border-[#c89346]/40 bg-black">
+            <video
+              className="block w-full h-auto bg-black"
+              style={{ aspectRatio: '1080 / 1350' }}
+              controls
+              playsInline
+              preload="metadata"
+              poster="/assets/posters/duell-trailer.jpg?v=frame"
+              controlsList="nodownload"
+              title="Parkbank Duell Trailer"
+            >
+              <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
 
-      {/* ============================================================ */}
-      {/* SEKTION 4: VIP ABO & MITGLIEDSCHAFT                          */}
-      {/* ============================================================ */}
+      </section>
       <section 
         id="vip-section" 
         className="w-full max-w-5xl mx-auto px-4 sm:px-8 py-12 bg-black border-t border-neutral-900"

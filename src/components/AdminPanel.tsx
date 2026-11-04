@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useId } from 'react';
+import React, { useEffect, useState, useId } from 'react';
 import {
   X, BarChart3, Users, Film, Download, Upload, Key, 
   Trash2, Plus, Check, Shield, Search, Lock, Unlock,
@@ -72,6 +72,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 }) => {
   const jsonUploadId = useId();
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'videos' | 'backup'>('overview');
+  const [accountsNote, setAccountsNote] = useState('Konten werden geladen.');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancel = false;
+    (async () => {
+      try {
+        const response = await fetch('/api/admin-nutzer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: adminPin })
+        });
+        if (!response.ok || cancel) {
+          if (!cancel) setAccountsNote('Konten konnten nicht geladen werden.');
+          return;
+        }
+        const data = await response.json();
+        if (cancel || !Array.isArray(data.users)) return;
+        onUpdateUsers(data.users);
+        setAccountsNote('Echte Konten von der Anmeldung.');
+      } catch {
+        if (!cancel) setAccountsNote('Konten konnten nicht geladen werden.');
+      }
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, [isOpen, adminPin]);
 
   // Video-Formular State
   const [isAddVideoOpen, setIsAddVideoOpen] = useState(false);
@@ -213,16 +241,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   // Handler: VIP Status eines Nutzers umschalten
-  const handleToggleVip = (email: string) => {
-    const updated = users.map((u) => {
-      if (u.email === email) {
-        const nextVip = !u.isVip;
-        showToast(nextVip ? `⭐ VIP für ${u.name} aktiviert` : `Standard-Status für ${u.name}`);
-        return { ...u, isVip: nextVip };
+  const handleToggleVip = async (email: string) => {
+    const user = users.find((entry) => entry.email === email);
+    if (!user) return;
+    const nextVip = !user.isVip;
+    if (user.id) {
+      const response = await fetch('/api/admin-nutzer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: adminPin, action: 'vip', userId: user.id, vip: nextVip })
+      });
+      if (!response.ok) {
+        showToast('Abo konnte nicht gespeichert werden.');
+        return;
       }
-      return u;
-    });
+    }
+    const updated = users.map((entry) => (entry.email === email ? { ...entry, isVip: nextVip } : entry));
     onUpdateUsers(updated);
+    showToast(nextVip ? `Abo für ${user.name} aktiv` : `${user.name} ist wieder Standard`);
   };
 
   // Handler: Nutzer-Status umschalten (Aktiv <-> Gesperrt)
@@ -448,7 +484,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <Users className="w-4 h-4 text-[#e8b568]" />
                   </div>
                   <div className="text-2xl sm:text-3xl font-black text-white">{totalUsers}</div>
-                  <div className="text-[11px] text-neutral-400 mt-1">Im lokalen Speicher</div>
+                  <div className="text-[11px] text-neutral-400 mt-1">{accountsNote}</div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-neutral-900 border border-[#c89346]/40 shadow-sm">
@@ -466,7 +502,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <Eye className="w-4 h-4 text-[#e8b568]" />
                   </div>
                   <div className="text-2xl sm:text-3xl font-black text-white">{totalViews}</div>
-                  <div className="text-[11px] text-neutral-400 mt-1">Alle Clips kumuliert</div>
+                  <div className="text-[11px] text-neutral-400 mt-1">Nur auf diesem Gerät gezählt</div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-neutral-900 border border-neutral-800">
@@ -542,9 +578,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="p-4 rounded-2xl bg-[#6d3c17]/20 border border-[#c89346]/40 flex items-start gap-3 text-xs sm:text-sm text-neutral-300">
                 <Sparkles className="w-5 h-5 text-[#e8b568] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-white block mb-0.5">Automatisches Backup empfohlen</span>
+                  <span className="font-bold text-white block mb-0.5">Konten liegen auf dem Server</span>
                   <span>
-                    Deine Nutzer und neu eingepflegten Videos liegen im lokalen Browser-Speicher. Exportiere unter dem Reiter <strong>Backup & PIN</strong> regelmäßig eine Sicherungsdatei als JSON, damit bei Browser-Updates oder Gerätewechsel nichts verloren geht.
+                    Standard und Abo kommen aus der Anmeldung, nicht aus einer JSON-Datei. Aufrufe und selbst eingefügte Clips gelten noch nur auf diesem Gerät. Sortierung und neue Clips für alle bleiben im Code, bis dafür eine eigene Liste steht.
                   </span>
                 </div>
               </div>
@@ -734,6 +770,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             </td>
 
                             <td className="py-3 px-4 text-right">
+                              {!user.id && (
                               <button
                                 type="button"
                                 onClick={() => handleDeleteUser(user.email, user.name)}
@@ -742,6 +779,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
+                              )}
                             </td>
                           </tr>
                         ))
