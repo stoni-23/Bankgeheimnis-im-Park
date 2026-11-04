@@ -1002,6 +1002,7 @@ export default function App() {
   const bannerCanvasRef = useRef<HTMLCanvasElement>(null);
   const cinemaContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const trailerRef = useRef<HTMLVideoElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showTitleBanner, setShowTitleBanner] = useState(true);
 
@@ -2816,8 +2817,9 @@ export default function App() {
 
         <div className="mt-8 rounded-2xl border-2 border-neutral-800 bg-neutral-900/90 p-4 sm:p-5">
           <p className="mb-3 text-center text-sm font-black uppercase tracking-wide text-[#e8b568]">Parkbank Duell Trailer</p>
-          <div className="mx-auto w-full max-w-[280px] overflow-hidden rounded-xl border border-[#c89346]/40 bg-black">
+          <div className="relative mx-auto w-full max-w-[280px] overflow-hidden rounded-xl border border-[#c89346]/40 bg-black">
             <video
+              ref={trailerRef}
               className="block w-full h-auto bg-black"
               style={{ aspectRatio: '1080 / 1350' }}
               controls
@@ -2826,9 +2828,22 @@ export default function App() {
               poster="/assets/posters/duell-trailer.jpg?v=frame"
               controlsList="nodownload"
               title="Parkbank Duell Trailer"
-            >
-              <source src="https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4" type="video/mp4" />
-            </video>
+            />
+            <button
+              type="button"
+              className="absolute inset-0 cursor-pointer"
+              aria-label="Parkbank Duell Trailer abspielen"
+              onClick={(event) => {
+                const video = trailerRef.current;
+                const button = event.currentTarget;
+                if (!video) return;
+                if (!video.src) {
+                  video.src = 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/duell_trailer_Full%20HD%201080p_MEDIUM_FR24.mp4';
+                }
+                button.remove();
+                video.play().catch(() => {});
+              }}
+            />
           </div>
         </div>
 
