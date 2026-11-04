@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { 
   Play, Lock, User, X, ChevronRight, ChevronDown, Filter, ThumbsUp,
   Check, LogOut, ShieldCheck, Sparkles, Shield, Share2,
   Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink, Gift, Copy, Eye,
   Ticket, Award, Heart, Tv, Maximize2, Minimize2, ChevronLeft, SkipForward
 } from 'lucide-react';
-import { AdminPanel } from './components/AdminPanel';
-import { AdminAuthModal } from './components/AdminAuthModal';
+const AdminPanel = lazy(() => import('./components/AdminPanel').then((mod) => ({ default: mod.AdminPanel })));
+const AdminAuthModal = lazy(() => import('./components/AdminAuthModal').then((mod) => ({ default: mod.AdminAuthModal })));
 import { ShareModal } from './components/ShareModal';
 import { AdminBackupData } from './types/admin';
 import { supabase } from './lib/supabase';
@@ -2020,6 +2020,9 @@ export default function App() {
                 alt={slide.alt}
                 title={slide.title}
                 className={`absolute inset-0 h-full w-full object-contain ${index === heroIndex ? 'opacity-100' : 'opacity-0'}`}
+                width={896}
+                height={1200}
+                fetchPriority={index === 0 ? 'high' : 'low'}
               />
             ))}
           </div>
@@ -2428,6 +2431,8 @@ export default function App() {
                       src={vid.poster ?? `https://img.youtube.com/vi/${vid.youtubeId}/hqdefault.jpg`} 
                       alt={`Comedy-Sketch: ${vid.title}`}
                       title={vid.title}
+                      width={1280}
+                      height={720}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none"
                       loading="lazy"
                     />
@@ -2619,6 +2624,8 @@ export default function App() {
               className="w-full h-auto object-contain max-h-[540px] drop-shadow-[0_16px_40px_rgba(0,0,0,0.95)]"
               loading="lazy"
               decoding="async"
+              width={1600}
+              height={893}
             />
             <div className={`flex flex-col gap-4 ${isWidescreen ? '' : 'mt-6'}`}>
               <div className="p-5 rounded-2xl bg-neutral-950/80 border-2 border-neutral-800">
@@ -2815,7 +2822,7 @@ export default function App() {
               style={{ aspectRatio: '1080 / 1350' }}
               controls
               playsInline
-              preload="metadata"
+              preload="none"
               poster="/assets/posters/duell-trailer.jpg?v=frame"
               controlsList="nodownload"
               title="Parkbank Duell Trailer"
@@ -3507,43 +3514,43 @@ export default function App() {
       {/* ============================================================ */}
       {/* ADMIN AUTHENTIFIZIERUNG (PIN-ABFRAGE)                        */}
       {/* ============================================================ */}
-      <AdminAuthModal
-        isOpen={isAdminAuthModalOpen}
-        onClose={() => setIsAdminAuthModalOpen(false)}
-        onSuccess={() => {
-          setIsAdminAuthModalOpen(false);
-          setIsAdminAuthenticated(true);
-          setIsAdminPanelOpen(true);
-          showToast('🔓 Admin-Bereich freigeschaltet!');
-        }}
-        adminPin={adminPin}
-      />
-
-      {/* ============================================================ */}
-      {/* ADMIN PANEL (DASHBOARD)                                      */}
-      {/* ============================================================ */}
-      <AdminPanel
-        isOpen={isAdminPanelOpen}
-        onClose={() => setIsAdminPanelOpen(false)}
-        users={allUsers}
-        onUpdateUsers={updateUsersList}
-        customVideos={customVideos}
-        officialVideos={REAL_VIDEOS}
-        onAddCustomVideo={handleAddCustomVideo}
-        onDeleteCustomVideo={handleDeleteCustomVideo}
-        onToggleVideoVip={handleToggleVideoVip}
-        videoViews={videoViews}
-        favorites={favoriteIds}
-        adminPin={adminPin}
-        onUpdateAdminPin={handleUpdateAdminPin}
-        onLogoutAdmin={() => {
-          setIsAdminAuthenticated(false);
-          setIsAdminPanelOpen(false);
-          showToast('Admin-Bereich gesperrt.');
-        }}
-        onImportBackup={handleImportBackup}
-        showToast={showToast}
-      />
+      {(isAdminAuthModalOpen || isAdminPanelOpen) && (
+        <Suspense fallback={null}>
+          <AdminAuthModal
+            isOpen={isAdminAuthModalOpen}
+            onClose={() => setIsAdminAuthModalOpen(false)}
+            onSuccess={() => {
+              setIsAdminAuthModalOpen(false);
+              setIsAdminAuthenticated(true);
+              setIsAdminPanelOpen(true);
+              showToast('🔓 Admin-Bereich freigeschaltet!');
+            }}
+            adminPin={adminPin}
+          />
+          <AdminPanel
+            isOpen={isAdminPanelOpen}
+            onClose={() => setIsAdminPanelOpen(false)}
+            users={allUsers}
+            onUpdateUsers={updateUsersList}
+            customVideos={customVideos}
+            officialVideos={REAL_VIDEOS}
+            onAddCustomVideo={handleAddCustomVideo}
+            onDeleteCustomVideo={handleDeleteCustomVideo}
+            onToggleVideoVip={handleToggleVideoVip}
+            videoViews={videoViews}
+            favorites={favoriteIds}
+            adminPin={adminPin}
+            onUpdateAdminPin={handleUpdateAdminPin}
+            onLogoutAdmin={() => {
+              setIsAdminAuthenticated(false);
+              setIsAdminPanelOpen(false);
+              showToast('Admin-Bereich gesperrt.');
+            }}
+            onImportBackup={handleImportBackup}
+            showToast={showToast}
+          />
+        </Suspense>
+      )}
 
       {/* ============================================================ */}
       {/* HOMEPAGE & LOGO TEILEN MODAL                                 */}
