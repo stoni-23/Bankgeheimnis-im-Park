@@ -79,6 +79,16 @@ const getVideoDescription = (vid: RealVideo): string => {
 
 const REAL_VIDEOS: RealVideo[] = [
   {
+    id: 'r2-bummel',
+    src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_bummelbahndidos_Full%20HD%201080p_MEDIUM_FR24.mp4',
+    poster: '/assets/posters/bummelbahndidos.jpg?v=frame',
+    title: 'Alman Opa: Bummel-Bahndidos',
+    duration: '00:35 min',
+    episodeNumber: '',
+    cast: ['opa', 'bahndidos'],
+    isVip: true
+  },
+  {
     id: 'r2-altglas',
     src: 'https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/Omma_reif_fuers_altglas_Full%20HD%201080p_MEDIUM_FR24.mp4',
     poster: '/assets/posters/altglas.jpg?v=frame',

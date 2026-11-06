@@ -2,6 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
+    <loc>https://bankgeheimnisimpark.de/?v=r2-bummel</loc>
+    <video:video>
+      <video:thumbnail_loc>https://bankgeheimnisimpark.de/assets/posters/bummelbahndidos.jpg</video:thumbnail_loc>
+      <video:title>Alman Opa: Bummel-Bahndidos</video:title>
+      <video:description>Alman Opa: Bummel-Bahndidos. Comedy-Sketch von Bankgeheimnis im Park.</video:description>
+      <video:content_loc>https://pub-b2dbd42a03674a94b543b5fd499d6a9e.r2.dev/Sketches%2016zu9/alman_opa_bummelbahndidos_Full%20HD%201080p_MEDIUM_FR24.mp4</video:content_loc>
+      <video:duration>35</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:requires_subscription>yes</video:requires_subscription>
+    </video:video>
+  </url>
+  <url>
     <loc>https://bankgeheimnisimpark.de/?v=r2-altglas</loc>
     <video:video>
       <video:thumbnail_loc>https://bankgeheimnisimpark.de/assets/posters/altglas.jpg</video:thumbnail_loc>
