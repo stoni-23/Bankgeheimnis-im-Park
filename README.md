@@ -61,3 +61,16 @@ npm run build
 ## 📜 Lizenz & Copyright
 
 © 2026 Bankgeheimnis im Park. Alle Rechte vorbehalten.
+
+
+---
+
+## Admin: Parkbank-Duell-Statistiken
+
+Im bestehenden Admin-Panel gibt es den Tab **Parkbank-Duell**. Dafür auf Vercel (nur Server-Env, keine `VITE_`-Keys):
+
+- `ADMIN_PIN` – Pflicht; ohne gesetzten PIN antwortet die Admin-API mit 503 (kein Default-PIN).
+- `SUPABASE_DUELL_URL` – Projekt-URL der Parkbank-Duell-Supabase.
+- `SUPABASE_DUELL_SECRET_KEY` – Service-Role-/Secret-Key derselben DB (nie im Client).
+
+Zusätzlich muss in der Duell-Datenbank die SQL-Migration `027_admin_duell_stats.sql` (Repo wortduell, Ordner `online/sql`) eingespielt sein.

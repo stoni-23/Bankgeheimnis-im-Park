@@ -1,17 +1,15 @@
 import { setVip, supabaseUrl } from './lib/abo.js';
-
-function allowed(pin: unknown) {
-  const expected = process.env.ADMIN_PIN || '1870';
-  return String(pin || '') === expected;
-}
+import { requireAdminPin, setNoStore } from './lib/admin-auth.js';
 
 export default async function handler(req: any, res: any) {
+  setNoStore(res);
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Nur POST.' });
     return;
   }
-  if (!allowed(req.body?.pin)) {
-    res.status(401).json({ error: 'PIN falsch.' });
+  const auth = requireAdminPin(req.body?.pin);
+  if (!auth.ok) {
+    res.status(auth.status).json({ error: auth.error });
     return;
   }
   const secret = process.env.SUPABASE_SECRET_KEY;
