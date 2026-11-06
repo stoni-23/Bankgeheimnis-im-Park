@@ -8,7 +8,7 @@ import {
   Play, Lock, User, X, ChevronRight, ChevronDown, Filter, ThumbsUp,
   Check, LogOut, ShieldCheck, Sparkles, Shield, Share2,
   Film, Users, Gamepad2, Trophy, RotateCcw, RotateCw, ExternalLink, Gift, Copy, Eye,
-  Ticket, Award, Heart, Tv, Maximize2, Minimize2, ChevronLeft, SkipForward
+  Ticket, Award, Heart, Tv, Maximize2, Minimize2, ChevronLeft, SkipForward, Shuffle
 } from 'lucide-react';
 const AdminPanel = lazy(() => import('./components/AdminPanel').then((mod) => ({ default: mod.AdminPanel })));
 const AdminAuthModal = lazy(() => import('./components/AdminAuthModal').then((mod) => ({ default: mod.AdminAuthModal })));
@@ -1013,6 +1013,9 @@ export default function App() {
   const cinemaContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const trailerRef = useRef<HTMLVideoElement>(null);
+  const castingRef = useRef(false);
+  const keepFullscreenRef = useRef(false);
+  const skipIntroRef = useRef(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showTitleBanner, setShowTitleBanner] = useState(true);
 
@@ -1079,12 +1082,63 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [tvLogo]);
 
-  // Bei jedem Clip-Wechsel und Start: IMMER zuerst das Intro abspielen
+  // Intro nur beim ersten Start. Läuft schon ein Fernseher oder Vollbild, bleibt dasselbe Videoelement.
   useEffect(() => {
     if (!playingVideo?.src) return;
+    if (skipIntroRef.current) {
+      skipIntroRef.current = false;
+      setFilmPhase('film');
+      setIntroReady(true);
+      return;
+    }
     setFilmPhase('intro');
     setIntroReady(false);
   }, [playingVideo]);
+
+  // Dieselbe Videodatei weiterspielen, damit Cast und Vollbild nicht abreißen
+  useEffect(() => {
+    if (filmPhase !== 'film' || !playingVideo?.src) return;
+    const video = videoRef.current as (HTMLVideoElement & {
+      webkitDisplayingFullscreen?: boolean;
+      webkitEnterFullscreen?: () => void;
+    }) | null;
+    if (!video) return;
+    let gone = false;
+    const start = () => {
+      if (gone) return;
+      video.play().catch(() => {});
+      if (!keepFullscreenRef.current) return;
+      keepFullscreenRef.current = false;
+      const inFullscreen = Boolean(
+        document.fullscreenElement ||
+        (document as Document & { webkitFullscreenElement?: Element | null }).webkitFullscreenElement ||
+        video.webkitDisplayingFullscreen
+      );
+      if (inFullscreen) return;
+      const box = cinemaContainerRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
+      if (box?.requestFullscreen) box.requestFullscreen().catch(() => {});
+      else if (box?.webkitRequestFullscreen) box.webkitRequestFullscreen();
+      else video.webkitEnterFullscreen?.();
+    };
+    if (castingRef.current) {
+      const nextSrc = playbackSrc(playingVideo.src);
+      video.addEventListener('loadeddata', start, { once: true });
+      if (nextSrc && video.getAttribute('src') !== nextSrc) video.src = nextSrc;
+      video.load();
+      return () => {
+        gone = true;
+        video.removeEventListener('loadeddata', start);
+      };
+    }
+    if (video.readyState >= 2) start();
+    else {
+      video.addEventListener('loadeddata', start, { once: true });
+      return () => {
+        gone = true;
+        video.removeEventListener('loadeddata', start);
+      };
+    }
+  }, [playingVideo?.id, filmPhase]);
 
   // Scroll-Sperre für den Hintergrund, wenn der Player geöffnet ist
   useEffect(() => {
@@ -1253,6 +1307,38 @@ export default function App() {
     ? currentCategoryPlaylist.findIndex((v) => v.id === playingVideo.id) 
     : -1;
 
+  const noteScreen = () => {
+    const video = videoRef.current as (HTMLVideoElement & {
+      remote?: { state?: string };
+      webkitCurrentPlaybackTargetIsWireless?: boolean;
+      webkitDisplayingFullscreen?: boolean;
+    }) | null;
+    const remoteState = video?.remote?.state;
+    const casting = remoteState === 'connected' || remoteState === 'connecting' || Boolean(video?.webkitCurrentPlaybackTargetIsWireless);
+    const fullscreen = Boolean(
+      document.fullscreenElement ||
+      (document as Document & { webkitFullscreenElement?: Element | null }).webkitFullscreenElement ||
+      video?.webkitDisplayingFullscreen
+    );
+    castingRef.current = casting;
+    keepFullscreenRef.current = fullscreen;
+    return casting || fullscreen;
+  };
+
+  const openFollowUp = (video: RealVideo, label: string) => {
+    const keep = noteScreen();
+    skipIntroRef.current = keep;
+    setPlayingVideo(video);
+    if (keep) {
+      setFilmPhase('film');
+      setIntroReady(true);
+    } else {
+      setFilmPhase('intro');
+      setIntroReady(false);
+    }
+    showToast(label);
+  };
+
   const handleNextClip = (manual = true) => {
     if (currentCategoryPlaylist.length <= 1) {
       if (manual) showToast('Kein weiterer Clip in dieser Auswahl.');
@@ -1270,11 +1356,8 @@ export default function App() {
       return;
     }
 
-    // IMMER Intro vor jedem Clip abspielen (auch bei Autoplay)
-    setPlayingVideo(nextVid);
-    setFilmPhase('intro');
-    setIntroReady(false);
-    showToast(`${manual ? 'Nächster Clip' : 'Autoplay'}: ${nextVid.title}`);
+    // Fernseher und Vollbild behalten dasselbe Video, sonst reißt die Verbindung ab
+    openFollowUp(nextVid, `${manual ? 'Nächster Clip' : 'Autoplay'}: ${nextVid.title}`);
   };
 
   const handlePrevClip = () => {
@@ -1291,11 +1374,17 @@ export default function App() {
       return;
     }
 
-    // IMMER Intro vor jedem Clip abspielen
-    setPlayingVideo(prevVid);
-    setFilmPhase('intro');
-    setIntroReady(false);
-    showToast(`Vorheriger Clip: ${prevVid.title}`);
+    openFollowUp(prevVid, `Vorheriger Clip: ${prevVid.title}`);
+  };
+
+  const playRandomClip = () => {
+    const pool = allVideos.filter((video) => video.src && video.id !== playingVideo?.id && (!video.isVip || isVipUnlocked));
+    if (pool.length === 0) {
+      showToast('Keine weitere Folge frei.');
+      return;
+    }
+    const next = pool[Math.floor(Math.random() * pool.length)];
+    openFollowUp(next, `Zufällig: ${next.title}`);
   };
 
   // Speichern in localStorage
@@ -3400,6 +3489,17 @@ export default function App() {
                 </span>
               </button>
 
+              {/* Zufällige Folge: Abo alles, ohne Abo nur die freien Clips */}
+              <button
+                type="button"
+                onClick={playRandomClip}
+                className="px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-neutral-700 hover:border-[#c89346] transition-colors cursor-pointer shadow-sm active:scale-95"
+                title="Zufällige Folge abspielen"
+              >
+                <Shuffle className="w-4 h-4 text-[#e8b568]" />
+                <span className="hidden sm:inline">Zufall</span>
+              </button>
+
               {/* Nächster Clip Button im Header */}
               {currentCategoryPlaylist.length > 1 && (
                 <button
@@ -3536,7 +3636,6 @@ export default function App() {
                 </>
               ) : (
                 <video
-                  key={playingVideo.id}
                   ref={videoRef}
                   src={playbackSrc(playingVideo.src)}
                   poster={playingVideo.poster}
