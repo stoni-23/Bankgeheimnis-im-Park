@@ -1385,7 +1385,7 @@ export default function App() {
       name: playingVideo.title,
       description: getVideoDescription(playingVideo),
       thumbnailUrl: [`https://bankgeheimnisimpark.de${(playingVideo.poster || '').split('?')[0]}`],
-      contentUrl: playingVideo.src,
+      embedUrl: `https://bankgeheimnisimpark.de/?v=${playingVideo.id}`,
       duration: `PT${minutes}M${rest}S`,
       isAccessibleForFree: !playingVideo.isVip
     };
