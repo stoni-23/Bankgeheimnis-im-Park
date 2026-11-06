@@ -1028,13 +1028,7 @@ export default function App() {
   const videoSectionRef = useRef<HTMLElement>(null);
 
   const isVipUnlocked = Boolean(currentUser?.isVip);
-
-  // Sicherheits-Wächter: Nicht angemeldete Gäste dürfen NIEMALS in der Filmphase sein
-  useEffect(() => {
-    if (!currentUser && filmPhase === 'film') {
-      setFilmPhase('guestLock');
-    }
-  }, [currentUser, filmPhase]);
+  const previewSeconds = 5;
 
   // Zeigt den Clip-Namen prominent beim Start eines Clips / Intro für 5 Sekunden an
   useEffect(() => {
@@ -1354,7 +1348,7 @@ export default function App() {
       if (!clipId) return;
       const vid = REAL_VIDEOS.find((video) => video.id === clipId);
       if (!vid) return;
-      if (vid.isVip && !account?.isVip) {
+      if (vid.isVip && account && !account.isVip) {
         setToastMsg('🔒 Für diesen Sketch wird der Ehren-Parkausweis benötigt!');
         setTimeout(() => setToastMsg(null), 3500);
         setRegisterForVip(true);
@@ -1646,7 +1640,7 @@ export default function App() {
     });
 
     // Bei Premium-Videos (mit Schloss im Thumbnail): Registrierung/VIP Hinweis
-    if (vid.isVip && !isVipUnlocked) {
+    if (vid.isVip && !isVipUnlocked && currentUser) {
       showToast('🔒 Für diesen Sketch wird der Ehren-Parkausweis benötigt!');
       setRegisterForVip(true);
       setAuthTab('register');
@@ -3445,30 +3439,32 @@ export default function App() {
                       <Lock className="w-4 h-4 text-[#e8b568]" />
                     </div>
                     <span className="text-xs font-black uppercase tracking-wider text-[#e8b568]">
-                      Kostenloser Sketch
+                      {playingVideo.isVip ? 'Ehren-Parkausweis' : 'Kostenloser Sketch'}
                     </span>
                   </div>
 
                   <h3 className="text-lg sm:text-2xl font-black text-white leading-snug mb-2">
-                    Kostenlos schauen nach Anmeldung
+                    {playingVideo.isVip ? 'Weiter nur mit dem Ehren-Parkausweis' : 'Kostenlos schauen nach Anmeldung'}
                   </h3>
 
                   <p className="text-xs sm:text-sm text-neutral-300 mb-5 leading-relaxed max-w-xs">
-                    Melde dich einmalig kostenlos an, um alle Parkbank-Sketche sofort und in voller Länge zu schauen.
+                    {playingVideo.isVip
+                      ? 'Fünf Sekunden sind frei. Den Rest gibt es mit dem Ehren-Parkausweis.'
+                      : 'Melde dich einmalig kostenlos an, um alle freien Parkbank-Sketche in voller Länge zu schauen.'}
                   </p>
 
                   <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full">
                     <button
                       type="button"
                       onClick={() => {
-                        setRegisterForVip(false);
+                        setRegisterForVip(Boolean(playingVideo.isVip));
                         setAuthTab('register');
                         setIsAuthModalOpen(true);
                       }}
                       className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#6d3c17] hover:bg-[#7d441a] text-white font-black text-sm uppercase tracking-wider border-2 border-[#c89346] shadow-lg transition-transform active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                     >
                       <User className="w-4 h-4" />
-                      <span>Kostenlos anmelden</span>
+                      <span>{playingVideo.isVip ? 'Ehren-Parkausweis' : 'Kostenlos anmelden'}</span>
                     </button>
 
                     <button
@@ -3514,8 +3510,7 @@ export default function App() {
                     preload="auto"
                     onPlaying={() => setIntroReady(true)}
                     onEnded={() => {
-                      if (!currentUser) setFilmPhase('guestLock');
-                      else setFilmPhase('film');
+                      setFilmPhase('film');
                     }}
                     className="w-full h-full max-h-full object-contain bg-black"
                   />
@@ -3542,7 +3537,24 @@ export default function App() {
                   autoPlay
                   playsInline
                   preload="metadata"
+                  onTimeUpdate={(event) => {
+                    if (currentUser) return;
+                    if (event.currentTarget.currentTime < previewSeconds) return;
+                    event.currentTarget.pause();
+                    setFilmPhase('guestLock');
+                  }}
+                  onSeeking={(event) => {
+                    if (currentUser) return;
+                    if (event.currentTarget.currentTime <= previewSeconds) return;
+                    event.currentTarget.currentTime = 0;
+                    event.currentTarget.pause();
+                    setFilmPhase('guestLock');
+                  }}
                   onEnded={() => {
+                    if (!currentUser) {
+                      setFilmPhase('guestLock');
+                      return;
+                    }
                     if (isAutoplay && isVipUnlocked && currentCategoryPlaylist.length > 0) {
                       handleNextClip(false);
                     } else {
