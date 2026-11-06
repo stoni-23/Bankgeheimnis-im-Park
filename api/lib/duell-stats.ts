@@ -29,23 +29,120 @@ export type SecretPrefixKind = 'sb_secret' | 'legacy_jwt' | 'anomaly';
 
 const FETCH_TIMEOUT_MS = 12_000;
 
+export type NetworkCauseSafe = {
+  name?: string;
+  code?: string;
+  syscall?: string;
+  errno?: number;
+  port?: number;
+  summary?: string;
+};
+
 /** Typisierter Upstream-Fehler ohne Secrets im Message-Text. */
 export class UpstreamError extends Error {
   readonly stage: DuellErrorStage;
   readonly httpStatus: number | null;
   readonly baseUrlHost: string | null;
+  readonly networkCause: NetworkCauseSafe | null;
 
   constructor(
     stage: DuellErrorStage,
     message: string,
-    options?: { httpStatus?: number | null; baseUrlHost?: string | null; cause?: unknown }
+    options?: {
+      httpStatus?: number | null;
+      baseUrlHost?: string | null;
+      cause?: unknown;
+      networkCause?: NetworkCauseSafe | null;
+    }
   ) {
     super(message, options?.cause !== undefined ? { cause: options.cause } : undefined);
     this.name = 'UpstreamError';
     this.stage = stage;
     this.httpStatus = options?.httpStatus ?? null;
     this.baseUrlHost = options?.baseUrlHost ?? null;
+    this.networkCause = options?.networkCause ?? null;
   }
+}
+
+const ALLOWED_ERROR_NAMES = new Set([
+  'Error',
+  'TypeError',
+  'RangeError',
+  'AbortError',
+  'DOMException',
+  'SystemError',
+  'AggregateError'
+]);
+
+/** Entfernt Hosts, IPs und credential-artige Tokens aus kurzen Cause-Texten. */
+export function sanitizeCauseSummary(raw: string): string | null {
+  if (!raw || typeof raw !== 'string') return null;
+  let s = raw.slice(0, 200);
+  // Credentials / Bearer / Keys
+  s = s.replace(/sb_secret_[A-Za-z0-9_]+/gi, '[REDACTED_SECRET]');
+  s = s.replace(/sb_publishable_[A-Za-z0-9_]+/gi, '[REDACTED_PUB]');
+  s = s.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[REDACTED_JWT]');
+  s = s.replace(/Bearer\s+\S+/gi, 'Bearer [REDACTED]');
+  s = s.replace(/(api[_-]?key|password|secret|token)\s*[:=]\s*\S+/gi, '$1=[REDACTED]');
+  // IPv4 / IPv6
+  s = s.replace(/\b\d{1,3}(?:\.\d{1,3}){3}\b/g, '[IP]');
+  s = s.replace(/\b(?:[A-Fa-f0-9]{0,4}:){2,7}[A-Fa-f0-9]{0,4}\b/g, '[IP]');
+  // Hostnamen / Domains (nach getaddrinfo etc. oft enthalten)
+  s = s.replace(/\b[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+\b/gi, '[HOST]');
+  s = s.replace(/\s+/g, ' ').trim();
+  // Nur behalten, wenn noch ein erkennbarer Netz-Code/Syscall-Hinweis übrig ist
+  if (!/[A-Z]{2,}[_A-Z0-9]*|getaddrinfo|connect|ENOTFOUND|EAI_|ECONN|ENET|ETIMEDOUT|EPROTO|ERR_/i.test(s)) {
+    return null;
+  }
+  return s.slice(0, 120) || null;
+}
+
+function readCauseNode(node: unknown): NetworkCauseSafe | null {
+  if (!isRecord(node) && !(node instanceof Error)) return null;
+  const rec = node as Record<string, unknown>;
+  const out: NetworkCauseSafe = {};
+  const nameRaw = typeof rec.name === 'string' ? rec.name : node instanceof Error ? node.name : undefined;
+  if (nameRaw && ALLOWED_ERROR_NAMES.has(nameRaw)) out.name = nameRaw;
+  if (typeof rec.code === 'string' && /^[A-Z0-9_]{2,64}$/.test(rec.code)) out.code = rec.code;
+  if (typeof rec.syscall === 'string' && /^[a-z0-9_]{1,40}$/i.test(rec.syscall)) out.syscall = rec.syscall;
+  if (typeof rec.errno === 'number' && Number.isFinite(rec.errno)) out.errno = rec.errno;
+  if (typeof rec.port === 'number' && Number.isFinite(rec.port) && rec.port > 0 && rec.port < 65536) {
+    out.port = rec.port;
+  }
+  const msg = typeof rec.message === 'string' ? rec.message : node instanceof Error ? node.message : '';
+  const summary = sanitizeCauseSummary(msg);
+  if (summary) out.summary = summary;
+  if (!out.name && !out.code && !out.syscall && out.errno === undefined && out.port === undefined && !out.summary) {
+    return null;
+  }
+  return out;
+}
+
+function mergeNetworkCause(base: NetworkCauseSafe | null, next: NetworkCauseSafe): NetworkCauseSafe {
+  if (!base) return { ...next };
+  // Deeper nodes oft mit code/syscall: fehlende Felder auffüllen, vorhandene code/syscall bevorzugen
+  return {
+    name: next.name ?? base.name,
+    code: next.code ?? base.code,
+    syscall: next.syscall ?? base.syscall,
+    errno: next.errno ?? base.errno,
+    port: next.port ?? base.port,
+    summary: next.summary ?? base.summary
+  };
+}
+
+/** Läuft Error.cause-Kette ab und nimmt den informativsten whitelisted Node. */
+export function extractNetworkCause(err: unknown): NetworkCauseSafe | null {
+  let best: NetworkCauseSafe | null = null;
+  let cur: unknown = err;
+  for (let i = 0; i < 6 && cur; i += 1) {
+    const parsed = readCauseNode(cur);
+    if (parsed) best = mergeNetworkCause(best, parsed);
+    if (cur instanceof Error && 'cause' in cur) cur = (cur as Error & { cause?: unknown }).cause;
+    else if (isRecord(cur) && 'cause' in cur) cur = cur.cause;
+    else break;
+  }
+  return best;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -189,15 +286,18 @@ export async function fetchDuellStatsRpc(
       });
     } catch (err) {
       const name = err instanceof Error ? err.name : 'Error';
+      const networkCause = extractNetworkCause(err);
       if (name === 'AbortError') {
         throw new UpstreamError('timeout', 'Supabase-RPC Timeout', {
           baseUrlHost: host,
-          cause: err
+          cause: err,
+          networkCause
         });
       }
       throw new UpstreamError('network', 'Supabase-RPC Netzfehler', {
         baseUrlHost: host,
-        cause: err
+        cause: err,
+        networkCause
       });
     }
 
@@ -239,6 +339,7 @@ export function buildDuellFailureLog(
   }
 
   if (err instanceof UpstreamError) {
+    const network_cause = err.networkCause ?? extractNetworkCause(err);
     return {
       scope: 'admin-parkbank',
       stage: err.stage,
@@ -247,7 +348,8 @@ export function buildDuellFailureLog(
       message: err.message,
       env: { has_url: hasUrl, has_secret: hasSecret },
       baseUrlHost: err.baseUrlHost ?? host,
-      secret_prefix: hasSecret && env.secret ? classifySecretPrefix(env.secret) : null
+      secret_prefix: hasSecret && env.secret ? classifySecretPrefix(env.secret) : null,
+      network_cause
     };
   }
 
@@ -255,11 +357,12 @@ export function buildDuellFailureLog(
     scope: 'admin-parkbank',
     stage: 'network',
     http_status: null,
-    error_name: err instanceof Error ? err.name : 'Error',
-    message: err instanceof Error ? err.message : 'unknown',
+    error_name: err instanceof Error && ALLOWED_ERROR_NAMES.has(err.name) ? err.name : 'Error',
+    message: 'unexpected',
     env: { has_url: hasUrl, has_secret: hasSecret },
     baseUrlHost: host,
-    secret_prefix: hasSecret && env.secret ? classifySecretPrefix(env.secret) : null
+    secret_prefix: hasSecret && env.secret ? classifySecretPrefix(env.secret) : null,
+    network_cause: extractNetworkCause(err)
   };
 }
 
