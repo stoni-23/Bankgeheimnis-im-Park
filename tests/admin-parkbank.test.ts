@@ -6,9 +6,11 @@ import {
   buildDuellFailureLog,
   classifySecretPrefix,
   duellServiceHeaders,
+  extractNetworkCause,
   fetchDuellStatsRpc,
   normalizeDuellStats,
   resolveDuellRpcUrl,
+  sanitizeCauseSummary,
   userFacingDuellError
 } from '../api/lib/duell-stats.ts';
 import handler from '../api/admin-parkbank.ts';
@@ -223,6 +225,72 @@ describe('fetchDuellStatsRpc', () => {
       () => fetchDuellStatsRpc('https://example.supabase.co', 'sb_secret_x', fetchImpl),
       (err: unknown) => err instanceof UpstreamError && err.stage === 'network'
     );
+  });
+});
+
+describe('network cause extraction', () => {
+  it('extrahiert EAI_AGAIN aus nested cause', async () => {
+    const nested = Object.assign(new Error('getaddrinfo EAI_AGAIN dgpafaefazeyrbhfjsur.supabase.co'), {
+      code: 'EAI_AGAIN',
+      syscall: 'getaddrinfo',
+      errno: -3001
+    });
+    const top = new TypeError('fetch failed', { cause: nested });
+    const fetchImpl: typeof fetch = async () => {
+      throw top;
+    };
+    let caught: unknown;
+    try {
+      await fetchDuellStatsRpc('https://example.supabase.co', 'sb_secret_x', fetchImpl);
+    } catch (e) {
+      caught = e;
+    }
+    assert.ok(caught instanceof UpstreamError);
+    assert.equal(caught.stage, 'network');
+    assert.equal(caught.networkCause?.code, 'EAI_AGAIN');
+    assert.equal(caught.networkCause?.syscall, 'getaddrinfo');
+    const log = buildDuellFailureLog(caught, {
+      baseUrl: 'https://example.supabase.co',
+      secret: 'sb_secret_x'
+    });
+    const nc = log.network_cause as Record<string, unknown>;
+    assert.equal(nc.code, 'EAI_AGAIN');
+    assert.equal(nc.syscall, 'getaddrinfo');
+    const serialized = JSON.stringify(log);
+    assert.equal(serialized.includes('dgpafaefazeyrbhfjsur'), false);
+    assert.ok(typeof nc.summary === 'string' && (nc.summary as string).includes('EAI_AGAIN'));
+  });
+
+  it('redaktiert Credentials in Cause-Messages', () => {
+    const summary = sanitizeCauseSummary(
+      'connect failed password=supergeheim token=abc Bearer sb_secret_LEAK123 host=evil.example'
+    );
+    assert.ok(summary === null || !summary.includes('supergeheim'));
+    assert.ok(summary === null || !summary.includes('sb_secret_LEAK123'));
+    assert.ok(summary === null || !summary.includes('evil.example'));
+    const cause = extractNetworkCause(
+      Object.assign(new Error('ENETUNREACH password=sb_secret_SHOULDNOT'), {
+        code: 'ENETUNREACH',
+        syscall: 'connect'
+      })
+    );
+    assert.equal(cause?.code, 'ENETUNREACH');
+    assert.ok(!JSON.stringify(cause).includes('SHOULDNOT'));
+    assert.ok(!JSON.stringify(cause).includes('sb_secret_SHOULDNOT'));
+  });
+
+  it('extractNetworkCause aus TypeError fetch failed', () => {
+    const nested = Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:443'), {
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      errno: -111,
+      port: 443
+    });
+    const cause = extractNetworkCause(new TypeError('fetch failed', { cause: nested }));
+    assert.equal(cause?.code, 'ECONNREFUSED');
+    assert.equal(cause?.syscall, 'connect');
+    assert.equal(cause?.port, 443);
+    assert.ok(!JSON.stringify(cause).includes('127.0.0.1'));
   });
 });
 
