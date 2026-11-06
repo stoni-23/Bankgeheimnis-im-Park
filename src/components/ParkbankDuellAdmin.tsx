@@ -229,14 +229,15 @@ export const ParkbankDuellAdmin: React.FC<ParkbankDuellAdminProps> = ({
               icon={<Users className="w-4 h-4 text-[#e8b568]" />}
             />
             <MetricCard
-              label="Aktuell online"
+              label="Gerade online"
               value={stats.aktuell_online}
-              hint={stats.online_definition || 'Queue ≤ 6 s oder aktives Match'}
+              hint={stats.online_definition || 'Nur Matchmaking-Queue (last_seen ≤ 6 s) – kein Match-Heartbeat'}
               icon={<Users className="w-4 h-4 text-[#e8b568]" />}
             />
             <MetricCard
               label="Aktive Duelle"
               value={stats.aktive_duelle}
+              hint="Runde läuft/endete ≤30 s oder Vorlauf ≤2 min (verwaiste status=active zählen nicht)"
               icon={<Swords className="w-4 h-4 text-[#e8b568]" />}
             />
             <MetricCard
