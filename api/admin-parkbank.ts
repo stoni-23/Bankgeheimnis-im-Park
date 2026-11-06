@@ -1,5 +1,9 @@
 import { requireAdminPin, setNoStore } from './lib/admin-auth.js';
-import { fetchDuellStatsRpc } from './lib/duell-stats.js';
+import {
+  buildDuellFailureLog,
+  fetchDuellStatsRpc,
+  userFacingDuellError
+} from './lib/duell-stats.js';
 
 type VercelReq = {
   method?: string;
@@ -36,7 +40,9 @@ export default async function handler(req: VercelReq, res: VercelRes) {
   try {
     const stats = await fetchDuellStatsRpc(baseUrl, secret);
     res.status(200).json(stats);
-  } catch {
-    res.status(502).json({ error: 'Parkbank-Duell-Stats konnten nicht geladen werden.' });
+  } catch (err) {
+    // Nur sichere Felder – niemals Secret, PIN oder Request-Body
+    console.error('[admin-parkbank]', buildDuellFailureLog(err, { baseUrl, secret }));
+    res.status(502).json({ error: userFacingDuellError(err) });
   }
 }
