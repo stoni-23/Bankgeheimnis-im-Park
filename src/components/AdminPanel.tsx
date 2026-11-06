@@ -9,9 +9,10 @@ import {
   Trash2, Plus, Check, Shield, Search, Lock, Unlock,
   Eye, TrendingUp, Sparkles, RefreshCw, AlertTriangle,
   Play, ExternalLink, Calendar, Heart, ShieldAlert,
-  Save, ArrowUpDown, Award
+  Save, ArrowUpDown, Award, Swords
 } from 'lucide-react';
 import { CastId, RealVideo, UserAccount, AdminBackupData } from '../types/admin';
+import { ParkbankDuellAdmin } from './ParkbankDuellAdmin';
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -71,7 +72,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   showToast
 }) => {
   const jsonUploadId = useId();
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'videos' | 'backup'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'videos' | 'parkbank' | 'backup'>('overview');
   const [accountsNote, setAccountsNote] = useState('Konten werden geladen.');
 
   useEffect(() => {
@@ -449,6 +450,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           >
             <Film className="w-4 h-4 text-[#e8b568]" />
             <span>Videoverwaltung ({allVideos.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('parkbank')}
+            className={`px-3 sm:px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              activeTab === 'parkbank'
+                ? 'bg-[#6d3c17] text-white border border-[#c89346] shadow-sm'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            <Swords className="w-4 h-4 text-[#e8b568]" />
+            <span>Parkbank-Duell</span>
           </button>
 
           <button
@@ -1057,6 +1071,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
 
             </div>
+          )}
+
+          {/* ---------------------------------------------------------- */}
+          {/* TAB: PARKBANK-DUELL STATS                                  */}
+          {/* ---------------------------------------------------------- */}
+          {activeTab === 'parkbank' && (
+            <ParkbankDuellAdmin
+              adminPin={adminPin}
+              isActive={activeTab === 'parkbank'}
+              showToast={showToast}
+            />
           )}
 
           {/* ---------------------------------------------------------- */}
