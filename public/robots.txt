@@ -3,3 +3,4 @@ Content-Signal: search=yes, ai-train=no
 Allow: /
 
 Sitemap: https://bankgeheimnisimpark.de/sitemap.xml
+Sitemap: https://bankgeheimnisimpark.de/video-sitemap.xml

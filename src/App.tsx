@@ -1348,7 +1348,21 @@ export default function App() {
     let alive = true;
     supabase.auth.getSession().then(({ data }) => {
       if (!alive) return;
-      saveUser(data.session?.user ? accountFromAuth(data.session.user) : null);
+      const account = data.session?.user ? accountFromAuth(data.session.user) : null;
+      saveUser(account);
+      const clipId = new URLSearchParams(window.location.search).get('v');
+      if (!clipId) return;
+      const vid = REAL_VIDEOS.find((video) => video.id === clipId);
+      if (!vid) return;
+      if (vid.isVip && !account?.isVip) {
+        setToastMsg('🔒 Für diesen Sketch wird der Ehren-Parkausweis benötigt!');
+        setTimeout(() => setToastMsg(null), 3500);
+        setRegisterForVip(true);
+        setAuthTab('register');
+        setIsAuthModalOpen(true);
+        return;
+      }
+      setPlayingVideo(vid);
     });
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
       saveUser(session?.user ? accountFromAuth(session.user) : null);
@@ -1358,6 +1372,32 @@ export default function App() {
       subscription.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!playingVideo?.src) return;
+    const match = playingVideo.duration.match(/(\d+):(\d+)/);
+    const seconds = match ? Number(match[1]) * 60 + Number(match[2]) : 0;
+    const minutes = Math.floor(seconds / 60);
+    const rest = seconds % 60;
+    const data = {
+      '@context': 'https://schema.org',
+      '@type': 'VideoObject',
+      name: playingVideo.title,
+      description: getVideoDescription(playingVideo),
+      thumbnailUrl: [`https://bankgeheimnisimpark.de${(playingVideo.poster || '').split('?')[0]}`],
+      contentUrl: playingVideo.src,
+      duration: `PT${minutes}M${rest}S`,
+      isAccessibleForFree: !playingVideo.isVip
+    };
+    let script = document.getElementById('video-jsonld');
+    if (!script) {
+      script = document.createElement('script');
+      script.id = 'video-jsonld';
+      script.type = 'application/ld+json';
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(data);
+  }, [playingVideo]);
 
   // Bildschirmgröße überwachen
   useEffect(() => {
