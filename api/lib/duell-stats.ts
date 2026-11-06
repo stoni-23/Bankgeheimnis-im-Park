@@ -118,22 +118,26 @@ function readCauseNode(node: unknown): NetworkCauseSafe | null {
   return out;
 }
 
+function mergeNetworkCause(base: NetworkCauseSafe | null, next: NetworkCauseSafe): NetworkCauseSafe {
+  if (!base) return { ...next };
+  // Deeper nodes oft mit code/syscall: fehlende Felder auffüllen, vorhandene code/syscall bevorzugen
+  return {
+    name: next.name ?? base.name,
+    code: next.code ?? base.code,
+    syscall: next.syscall ?? base.syscall,
+    errno: next.errno ?? base.errno,
+    port: next.port ?? base.port,
+    summary: next.summary ?? base.summary
+  };
+}
+
 /** Läuft Error.cause-Kette ab und nimmt den informativsten whitelisted Node. */
 export function extractNetworkCause(err: unknown): NetworkCauseSafe | null {
   let best: NetworkCauseSafe | null = null;
   let cur: unknown = err;
   for (let i = 0; i < 6 && cur; i += 1) {
     const parsed = readCauseNode(cur);
-    if (parsed) {
-      // Bevorzuge Nodes mit code/syscall
-      if (!best || (parsed.code && !best.code) || (parsed.syscall && !best.syscall)) {
-        best = { ...best, ...parsed };
-      } else if (best) {
-        best = { ...parsed, ...best };
-      } else {
-        best = parsed;
-      }
-    }
+    if (parsed) best = mergeNetworkCause(best, parsed);
     if (cur instanceof Error && 'cause' in cur) cur = (cur as Error & { cause?: unknown }).cause;
     else if (isRecord(cur) && 'cause' in cur) cur = cur.cause;
     else break;
